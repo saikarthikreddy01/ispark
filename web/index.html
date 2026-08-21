@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>🎓 Academic Pathway Advisor — Decentralized Graph-RAG AI</title>
+  <title>🎓 Academic Pathway Advisor</title>
   
   <link rel="stylesheet" href="style.css">
   <script type="text/javascript" src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
@@ -16,41 +16,22 @@
   <div id="landing-screen">
     <div class="landing-badge">
       <span>⚡</span>
-      <span>Decentralized Graph-RAG Platform · v2.5 Enterprise</span>
+      <span>Graph-RAG Academic Platform</span>
     </div>
 
     <h1 class="landing-title">
-      Academic Pathway <span class="gradient-text">Advisor AI</span>
+      Academic Pathway <span class="gradient-text">Advisor</span>
     </h1>
 
     <p class="landing-subtitle">
-      Autonomous multi-semester degree sequencing, topological prerequisite conflict detection, and policy-grounded academic advising for college students.
+      Automated degree sequencing, prerequisite conflict detection, and policy-grounded academic advising.
     </p>
 
     <button id="enter-portal-btn" class="landing-enter-btn">
       <span>ENTER ADVISOR PORTAL</span>
       <span class="enter-kbd">ENTER ↵</span>
     </button>
-    <div class="landing-key-hint">Press <kbd class="enter-kbd">Enter</kbd> on your keyboard or click the button above to launch.</div>
-
-    <!-- Feature Highlights -->
-    <div class="landing-features">
-      <div class="landing-feature-card">
-        <div class="landing-feature-icon">🕸️</div>
-        <div class="landing-feature-title">Knowledge Graph DAGs</div>
-        <div class="landing-feature-desc">44+ indexed courses with topological sorting, prerequisite chains, and bottleneck analytics.</div>
-      </div>
-      <div class="landing-feature-card">
-        <div class="landing-feature-icon">💬</div>
-        <div class="landing-feature-title">Citation-Traceable RAG</div>
-        <div class="landing-feature-desc">Conversational advising with expandable citations grounded in institutional regulations (§1.1, §5.2).</div>
-      </div>
-      <div class="landing-feature-card">
-        <div class="landing-feature-icon">⚖️</div>
-        <div class="landing-feature-title">Constraint Verification</div>
-        <div class="landing-feature-desc">Instant schedule simulation, credit cap verification, and formal faculty waiver petitions.</div>
-      </div>
-    </div>
+    <div class="landing-key-hint">Press <kbd class="enter-kbd">Enter</kbd> or click above to launch.</div>
   </div>
 
   <!-- ==========================================================================
@@ -63,14 +44,14 @@
       <div class="brand-header">
         <div class="brand-logo">
           <span>🎓</span>
-          <span class="gradient-text">Pathway Advisor</span>
+          <span class="gradient-text">Advisor</span>
         </div>
-        <div class="brand-caption">Graph-RAG Academic Platform</div>
+        <div class="brand-caption">Academic Intelligence Platform</div>
       </div>
 
       <!-- Student Profile Card in Sidebar -->
       <div class="student-card">
-        <div style="font-size: 0.72rem; color: var(--text-muted); text-transform: uppercase; font-weight: 700; margin-bottom: 8px;">Active Student Profile</div>
+        <div style="font-size: 0.72rem; color: var(--text-muted); text-transform: uppercase; font-weight: 700; margin-bottom: 8px;">Active Student</div>
         <select id="student-select" style="margin-bottom: 12px;"></select>
         
         <div style="display: flex; align-items: center; margin-bottom: 10px;">
@@ -88,7 +69,7 @@
             <div style="font-size: 1rem; font-weight: 700; color: #34d399;" id="profile-gpa">3.65</div>
           </div>
           <div style="background: rgba(15, 23, 42, 0.6); padding: 6px; border-radius: 6px; text-align: center;">
-            <div style="font-size: 0.68rem; color: var(--text-muted); text-transform: uppercase;">Grad Horizon</div>
+            <div style="font-size: 0.68rem; color: var(--text-muted); text-transform: uppercase;">Graduation</div>
             <div style="font-size: 0.85rem; font-weight: 700; color: #93c5fd;">Spring 2026</div>
           </div>
         </div>
@@ -115,7 +96,7 @@
       <!-- Return to Intro Screen -->
       <div style="margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--border-subtle);">
         <button id="exit-to-landing-btn" class="btn btn-secondary" style="width: 100%; font-size: 0.82rem;">
-          <span>🏠 Return to Welcome Screen</span>
+          <span>🏠 Welcome Screen</span>
         </button>
       </div>
     </aside>
