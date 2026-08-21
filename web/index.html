@@ -37,19 +37,18 @@
         Automated degree sequencing, prerequisite conflict detection, and policy-grounded advising.
       </p>
 
-      <!-- Student Login Card -->
-      <div class="login-card">
-        <div class="login-card-header">
-          <span style="font-size: 1.3rem;">🔐</span>
-          <div>
-            <div style="font-size: 1rem; font-weight: 700; color: #f8fafc;">Student Portal Login</div>
-            <div style="font-size: 0.76rem; color: var(--text-muted);">Enter your university credentials to continue</div>
-          </div>
+      <!-- Student Auth Card (Login & Sign Up) -->
+      <div class="auth-card">
+        <!-- Auth Mode Tabs -->
+        <div class="auth-tabs">
+          <button type="button" class="auth-tab-btn active" id="auth-tab-login" onclick="setAuthMode('login')">Sign In</button>
+          <button type="button" class="auth-tab-btn" id="auth-tab-signup" onclick="setAuthMode('signup')">Sign Up</button>
         </div>
 
-        <div id="login-error-alert" class="login-alert">⚠️ Please enter a valid Register Number.</div>
+        <div id="auth-alert-box" class="auth-alert error"></div>
 
-        <form id="student-login-form" onsubmit="handleStudentLogin(event)">
+        <!-- FORM 1: LOGIN -->
+        <form id="form-login" onsubmit="handleStudentLogin(event)">
           <div class="login-field-group">
             <label class="login-label" for="login-regno">Register Number / Student ID</label>
             <input type="text" id="login-regno" class="login-input" placeholder="e.g. S1001" required autocomplete="username">
@@ -64,17 +63,48 @@
             <span>Sign In to Advisor Portal</span>
             <span style="font-size: 1rem;">➔</span>
           </button>
+
+          <div class="auth-switch-link">
+            Don't have an account? <a onclick="setAuthMode('signup')">Create one here</a>
+          </div>
         </form>
 
-        <!-- Quick 1-Click Demo Logins for Judges -->
-        <div class="quick-login-row">
-          <div class="quick-login-title">Quick Demo Logins:</div>
-          <div class="quick-chips">
-            <button type="button" class="quick-chip-btn" onclick="quickFillLogin('S1001')">👤 Alice (Senior CS)</button>
-            <button type="button" class="quick-chip-btn" onclick="quickFillLogin('S1002')">👤 Bob (At-Risk)</button>
-            <button type="button" class="quick-chip-btn" onclick="quickFillLogin('S1003')">👤 Charlie (Honor Roll)</button>
+        <!-- FORM 2: SIGN UP -->
+        <form id="form-signup" style="display: none;" onsubmit="handleStudentSignUp(event)">
+          <div class="login-field-group">
+            <label class="login-label" for="signup-name">Full Student Name</label>
+            <input type="text" id="signup-name" class="login-input" placeholder="e.g. Dana Lee" required>
           </div>
-        </div>
+
+          <div class="login-field-group">
+            <label class="login-label" for="signup-regno">Register Number</label>
+            <input type="text" id="signup-regno" class="login-input" placeholder="e.g. S1004" required>
+          </div>
+
+          <div class="login-field-group">
+            <label class="login-label" for="signup-major">Major</label>
+            <input type="text" id="signup-major" class="login-input" placeholder="e.g. Computer Science" value="Computer Science" required>
+          </div>
+
+          <div class="login-field-group">
+            <label class="login-label" for="signup-grad">Expected Graduation</label>
+            <input type="text" id="signup-grad" class="login-input" placeholder="e.g. Spring 2027" value="Spring 2027" required>
+          </div>
+
+          <div class="login-field-group">
+            <label class="login-label" for="signup-password">Password</label>
+            <input type="password" id="signup-password" class="login-input" placeholder="••••••••" required autocomplete="new-password">
+          </div>
+
+          <button type="submit" class="btn-signin">
+            <span>Create Student Account</span>
+            <span style="font-size: 1rem;">➔</span>
+          </button>
+
+          <div class="auth-switch-link">
+            Already registered? <a onclick="setAuthMode('login')">Sign In</a>
+          </div>
+        </form>
       </div>
 
     </div>
@@ -270,37 +300,92 @@
     </div>
   </div>
 
-  <script src="app.js?v=3.1"></script>
+  <script src="app.js?v=3.2"></script>
   <script>
+    function setAuthMode(mode) {
+      const tabLogin = document.getElementById("auth-tab-login");
+      const tabSignup = document.getElementById("auth-tab-signup");
+      const formLogin = document.getElementById("form-login");
+      const formSignup = document.getElementById("form-signup");
+      const alertBox = document.getElementById("auth-alert-box");
+
+      if (alertBox) alertBox.style.display = "none";
+
+      if (mode === "login") {
+        tabLogin.classList.add("active");
+        tabSignup.classList.remove("active");
+        formLogin.style.display = "block";
+        formSignup.style.display = "none";
+      } else {
+        tabSignup.classList.add("active");
+        tabLogin.classList.remove("active");
+        formSignup.style.display = "block";
+        formLogin.style.display = "none";
+      }
+    }
+
     function handleStudentLogin(e) {
       if (e) e.preventDefault();
       const regnoInput = document.getElementById("login-regno");
-      const errAlert = document.getElementById("login-error-alert");
+      const alertBox = document.getElementById("auth-alert-box");
       const regno = regnoInput ? regnoInput.value.trim().toUpperCase() : "";
 
-      const found = APP_DATA.students.find(s => s.id === regno);
+      const found = APP_DATA.students.find(s => s.id.toUpperCase() === regno);
       if (found) {
-        if (errAlert) errAlert.style.display = "none";
+        if (alertBox) alertBox.style.display = "none";
         state.currentStudent = found;
+        initStudentPicker();
         const picker = document.getElementById("user-select");
         if (picker) picker.value = found.id;
         renderDashboard();
         openDashboard('pathway');
       } else {
-        // Fallback demo matching
-        if (errAlert) {
-          errAlert.textContent = `⚠️ Register Number '${regno}' not recognized. Try S1001, S1002, or S1003.`;
-          errAlert.style.display = "block";
+        if (alertBox) {
+          alertBox.className = "auth-alert error";
+          alertBox.textContent = `⚠️ Register Number '${regno}' not found. Please sign up first.`;
+          alertBox.style.display = "block";
         }
       }
     }
 
-    function quickFillLogin(regno) {
-      const regnoInput = document.getElementById("login-regno");
-      const pwdInput = document.getElementById("login-password");
-      if (regnoInput) regnoInput.value = regno;
-      if (pwdInput) pwdInput.value = "password123";
-      handleStudentLogin();
+    function handleStudentSignUp(e) {
+      if (e) e.preventDefault();
+      const name = document.getElementById("signup-name").value.trim();
+      const regno = document.getElementById("signup-regno").value.trim().toUpperCase();
+      const major = document.getElementById("signup-major").value.trim();
+      const grad = document.getElementById("signup-grad").value.trim();
+      const alertBox = document.getElementById("auth-alert-box");
+
+      if (!name || !regno) return;
+
+      const existing = APP_DATA.students.find(s => s.id.toUpperCase() === regno);
+      if (existing) {
+        if (alertBox) {
+          alertBox.className = "auth-alert error";
+          alertBox.textContent = `⚠️ Student with Reg No '${regno}' is already registered. Please Sign In.`;
+          alertBox.style.display = "block";
+        }
+        return;
+      }
+
+      // Create new student
+      const newStudent = {
+        id: regno,
+        name: name,
+        major: major || "Computer Science",
+        gpa: 3.75,
+        completed: ["CS101", "MATH101", "CS102", "MATH201", "PHYS101", "CS201", "CS250", "ENG101"],
+        planned: ["CS301", "CS302", "CS303", "CS350", "CS401", "CS402", "CS499"],
+        conflicts: [],
+        expected_grad: grad || "Spring 2027",
+        standing: "Good Standing"
+      };
+
+      APP_DATA.students.push(newStudent);
+      state.currentStudent = newStudent;
+      initStudentPicker();
+      renderDashboard();
+      openDashboard('pathway');
     }
 
     function openDashboard(tabName = 'pathway') {
@@ -312,8 +397,8 @@
     function signOut() {
       document.getElementById("dashboard-screen").style.display = "none";
       document.getElementById("landing-screen").style.display = "flex";
-      const errAlert = document.getElementById("login-error-alert");
-      if (errAlert) errAlert.style.display = "none";
+      const alertBox = document.getElementById("auth-alert-box");
+      if (alertBox) alertBox.style.display = "none";
     }
   </script>
 </body>

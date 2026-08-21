@@ -150,8 +150,8 @@ code, pre {
   line-height: 1.55;
 }
 
-/* Student Login Card */
-.login-card {
+/* Student Auth Card (Login & Sign Up) */
+.auth-card {
   background: rgba(16, 24, 40, 0.85);
   backdrop-filter: blur(20px);
   border: 1px solid rgba(255, 255, 255, 0.12);
@@ -165,17 +165,39 @@ code, pre {
   z-index: 3;
 }
 
-.login-card-header {
+.auth-tabs {
   display: flex;
-  align-items: center;
-  gap: 10px;
+  background: rgba(11, 17, 32, 0.8);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 4px;
   margin-bottom: 20px;
-  padding-bottom: 14px;
-  border-bottom: 1px solid var(--border);
+  gap: 4px;
+}
+
+.auth-tab-btn {
+  flex: 1;
+  padding: 9px;
+  border-radius: 6px;
+  font-size: 0.86rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: center;
+}
+
+.auth-tab-btn.active {
+  background: #38bdf8;
+  color: #060913;
+  font-weight: 700;
+  box-shadow: 0 2px 10px rgba(56, 189, 248, 0.35);
 }
 
 .login-field-group {
-  margin-bottom: 16px;
+  margin-bottom: 14px;
 }
 
 .login-label {
@@ -185,7 +207,7 @@ code, pre {
   color: var(--text-muted);
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  margin-bottom: 6px;
+  margin-bottom: 5px;
 }
 
 .login-input {
@@ -193,9 +215,9 @@ code, pre {
   background: rgba(11, 17, 32, 0.9);
   border: 1px solid var(--border);
   border-radius: var(--radius-sm);
-  padding: 11px 14px;
+  padding: 10px 14px;
   color: var(--text-main);
-  font-size: 0.92rem;
+  font-size: 0.9rem;
   font-family: inherit;
   outline: none;
   transition: all 0.2s ease;
@@ -222,7 +244,7 @@ code, pre {
   align-items: center;
   justify-content: center;
   gap: 8px;
-  margin-top: 8px;
+  margin-top: 10px;
 }
 
 .btn-signin:hover {
@@ -230,53 +252,42 @@ code, pre {
   box-shadow: 0 6px 25px rgba(56, 189, 248, 0.6);
 }
 
-.login-alert {
+.auth-alert {
   padding: 8px 12px;
   border-radius: var(--radius-sm);
   font-size: 0.8rem;
-  background: rgba(248, 113, 113, 0.15);
-  border: 1px solid rgba(248, 113, 113, 0.3);
-  color: var(--accent-rose);
   margin-bottom: 14px;
   display: none;
 }
 
-.quick-login-row {
-  margin-top: 18px;
-  padding-top: 14px;
-  border-top: 1px solid var(--border);
+.auth-alert.error {
+  background: rgba(248, 113, 113, 0.15);
+  border: 1px solid rgba(248, 113, 113, 0.3);
+  color: var(--accent-rose);
 }
 
-.quick-login-title {
-  font-size: 0.72rem;
-  color: var(--text-dim);
-  text-transform: uppercase;
-  font-weight: 700;
-  margin-bottom: 8px;
+.auth-alert.success {
+  background: rgba(52, 211, 153, 0.15);
+  border: 1px solid rgba(52, 211, 153, 0.3);
+  color: var(--accent-green);
 }
 
-.quick-chips {
-  display: flex;
-  gap: 6px;
-  flex-wrap: wrap;
+.auth-switch-link {
+  text-align: center;
+  margin-top: 16px;
+  font-size: 0.82rem;
+  color: var(--text-muted);
 }
 
-.quick-chip-btn {
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-full);
-  padding: 4px 10px;
-  font-size: 0.74rem;
+.auth-switch-link a {
+  color: var(--accent-blue);
+  text-decoration: none;
   font-weight: 600;
-  color: #93c5fd;
   cursor: pointer;
-  transition: all 0.15s ease;
 }
 
-.quick-chip-btn:hover {
-  background: rgba(56, 189, 248, 0.2);
-  border-color: var(--accent-blue);
-  color: white;
+.auth-switch-link a:hover {
+  text-decoration: underline;
 }
 
 /* ==========================================================================
