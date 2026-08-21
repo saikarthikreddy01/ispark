@@ -32,10 +32,10 @@ class MongoDBManager:
             self.client.admin.command('ping')
             self.db = self.client[DATABASE_NAME]
             self.is_connected = True
-            print(f"✅ Connected to MongoDB at {MONGODB_URI} [DB: {DATABASE_NAME}]")
+            print(f"[OK] Connected to MongoDB at {MONGODB_URI} [DB: {DATABASE_NAME}]")
             self._seed_initial_data()
         except Exception as e:
-            print(f"ℹ️ MongoDB server not reachable at {MONGODB_URI} ({e}). Using local file-backed persistence layer.")
+            print(f"[INFO] MongoDB at {MONGODB_URI} ({e}). Using local persistent database.")
             self.is_connected = False
             self._init_file_db()
 
@@ -69,14 +69,14 @@ class MongoDBManager:
             students = self._load_json(DATA_DIR / "sample_students.json")
             if students:
                 self.db.students.insert_many(students)
-                print(f"🌱 Seeded {len(students)} students to MongoDB.")
+                print(f"[SEED] Seeded {len(students)} students to MongoDB.")
 
         # 2. Courses
         if self.db.courses.count_documents({}) == 0:
             courses = self._load_json(DATA_DIR / "courses.json")
             if courses:
                 self.db.courses.insert_many(courses)
-                print(f"🌱 Seeded {len(courses)} courses to MongoDB.")
+                print(f"[SEED] Seeded {len(courses)} courses to MongoDB.")
 
         # 3. Equivalencies
         if self.db.equivalencies.count_documents({}) == 0:
