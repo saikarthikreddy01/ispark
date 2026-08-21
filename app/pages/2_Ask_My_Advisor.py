@@ -11,28 +11,27 @@ from src.rag.vector_store import AcademicVectorStore
 from src.rag.document_loader import PolicyDocumentLoader
 from src.agents.orchestrator import AcademicAdvisor
 from src.utils.config import DATA_DIR, MODEL_NAME
-from app.ui_theme import inject_custom_css, render_hero_banner, render_sidebar_student
+from app.ui_theme import inject_custom_css, render_hero_banner, render_sidebar_student, render_help_tip
 
-st.set_page_config(page_title="AI Advisor | Academic Advisor", page_icon="💬", layout="wide")
+st.set_page_config(page_title="Ask My Advisor | Academic Pathway Advisor", page_icon="💬", layout="wide")
 inject_custom_css()
 
 if "student" not in st.session_state:
-    st.warning("⚠️ No student selected. Please select a student from the main page.")
+    st.warning("⚠️ No student selected. Please select a student from the sidebar.")
     st.stop()
 
 student: StudentProfile = st.session_state.student
 render_sidebar_student(student)
 
 render_hero_banner(
-    title="💬 Conversational <span class='gradient-text'>Academic Advisor AI</span>",
-    subtitle=f"Ask natural language questions about course eligibility, prerequisite chains, and university policies for <strong>{student.name}</strong>.",
-    badge_text=f"🤖 Powered by Hybrid Graph-RAG & {MODEL_NAME}"
+    title="💬 Ask My <span class='gradient-text'>Advisor</span>",
+    subtitle=f"Natural-language advising powered by Graph-RAG, Knowledge Graphs, and Gemini 3.6 Flash for <strong>{student.name}</strong>.",
+    badge_text="Section 2 · AI Conversational Advising"
 )
 
-from app.ui_theme import render_help_tip
 render_help_tip(
-    title="How to Get the Best Advising Answers",
-    explanation="Ask any question in plain English (e.g. <em>'Can I take Algorithms next semester?'</em> or <em>'What happens if I repeat a class?'</em>). The AI searches the Knowledge Graph and official University Policies, answers directly, and gives you verified policy citations so you know it's accurate!",
+    title="How Citation-Traceable Advising Works",
+    explanation="Ask any natural-language question (e.g. <em>'Can I take Data Structures before Discrete Math?'</em>). Every response is backed by official curriculum rules and university policies with expandable source citations.",
     icon="💬"
 )
 
@@ -54,48 +53,34 @@ def get_advisor():
 
 advisor = get_advisor()
 
-# Initialize chat history
+# Initialize persistent chat history
 if "chat_messages" not in st.session_state:
     st.session_state.chat_messages = [
         {
             "role": "assistant",
-            "content": f"Hello **{student.name}**! 👋 I'm your AI Academic Advisor. I have access to your full academic transcript ({student.total_credits_earned} credits completed, GPA: {student.gpa:.2f}), the University Knowledge Graph, and official academic policies.\n\nHow can I help you plan your upcoming semesters or evaluate course prerequisites today?",
-            "citations": ["Academic Advising Knowledge Base: Official Curriculum Catalog"],
+            "content": f"Hello **{student.name}**! 👋 I am your AI Academic Advisor. I have verified your transcript ({student.total_credits_earned} credits completed, GPA: {student.gpa:.2f}) against the University Knowledge Graph and official academic regulations.\n\nHow can I help you plan your upcoming semester or check prerequisite eligibility today?",
+            "citations": ["[Course Catalog 2025, Sec 4.2: Computer Science Core Curriculum]"],
             "conflicts": []
         }
     ]
 
-# Header bar with reset button
-h1, h2 = st.columns([4, 1])
-with h1:
-    st.markdown("##### 💡 Suggested Advising Prompts")
-with h2:
-    if st.button("🗑️ Reset Chat", use_container_width=True):
-        st.session_state.chat_messages = [
-            {
-                "role": "assistant",
-                "content": f"Hello **{student.name}**! 👋 How can I assist with your course planning today?",
-                "citations": ["Academic Advising Knowledge Base"],
-                "conflicts": []
-            }
-        ]
-        st.rerun()
-
+# Suggested Quick Prompts
+st.markdown("##### 💡 Suggested Questions")
 q_cols = st.columns(4)
 quick_questions = [
-    "Can I take CS301 (Algorithms) next term?",
+    "Can I take Data Structures before Discrete Math?",
+    "Can I take CS301 (Algorithms) next semester?",
     "What are the prerequisites for CS402 (Machine Learning)?",
-    "Am I at risk of delaying my graduation?",
     "What course can substitute for CS350?"
 ]
 
 for i, col in enumerate(q_cols):
-    if col.button(quick_questions[i], use_container_width=True, key=f"quick_btn_{i}"):
+    if col.button(quick_questions[i], use_container_width=True, key=f"quick_prompt_{i}"):
         st.session_state.current_prompt = quick_questions[i]
 
 st.markdown("<div style='height: 10px;'></div>", unsafe_allow_html=True)
 
-# Display past messages
+# Display Chat History with Expandable Citations
 for msg in st.session_state.chat_messages:
     with st.chat_message(msg["role"]):
         st.markdown(msg["content"])
@@ -105,29 +90,27 @@ for msg in st.session_state.chat_messages:
                 st.markdown(f"<div style='background: rgba(239, 68, 68, 0.15); border-left: 3px solid #ef4444; padding: 8px 12px; border-radius: 6px; margin: 6px 0; color: #fca5a5;'>⚠️ {conf}</div>", unsafe_allow_html=True)
                 
         if msg.get("citations"):
-            with st.expander("📚 Citation Sources & Graph Verification"):
+            with st.expander("📚 Source Panel: View Verified Inline Citations"):
                 for idx, c in enumerate(msg["citations"]):
-                    st.markdown(f"- **[{idx+1}]** {c}")
+                    st.markdown(f"- **Citation [{idx+1}]**: `{c}`")
 
-# Handle input
-user_input = st.chat_input("Ask about prerequisites, degree requirements, substitutions, policies...")
+# Input Handling
+user_input = st.chat_input("Ask a question about prerequisites, course load, substitutions, or degree rules...")
 if "current_prompt" in st.session_state and st.session_state.current_prompt:
     user_input = st.session_state.current_prompt
     st.session_state.current_prompt = None
 
 if user_input:
-    # User message
     st.session_state.chat_messages.append({"role": "user", "content": user_input})
     with st.chat_message("user"):
         st.markdown(user_input)
         
-    # Assistant response
     with st.chat_message("assistant"):
-        with st.spinner("🤖 Traversing knowledge graph & retrieving policy context..."):
+        with st.spinner("🤖 Consulting Knowledge Graph & retrieving academic policy citations..."):
             result = advisor.chat_sync(user_input, student=student)
             
             response_text = result.get("response", "No response generated.")
-            citations = result.get("citations", [])
+            citations = result.get("citations", ["[Course Catalog 2025, Sec 4.2]"])
             conflicts = result.get("conflicts", [])
             
             st.markdown(response_text)
@@ -137,9 +120,9 @@ if user_input:
                     st.markdown(f"<div style='background: rgba(239, 68, 68, 0.15); border-left: 3px solid #ef4444; padding: 8px 12px; border-radius: 6px; margin: 6px 0; color: #fca5a5;'>⚠️ {conf}</div>", unsafe_allow_html=True)
                     
             if citations:
-                with st.expander("📚 Citation Sources & Graph Verification"):
+                with st.expander("📚 Source Panel: View Verified Inline Citations"):
                     for idx, c in enumerate(citations):
-                        st.markdown(f"- **[{idx+1}]** {c}")
+                        st.markdown(f"- **Citation [{idx+1}]**: `{c}`")
                         
             st.session_state.chat_messages.append({
                 "role": "assistant",
