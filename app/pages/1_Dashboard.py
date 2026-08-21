@@ -88,6 +88,13 @@ with c5:
         icon="✅"
     )
 
+from app.ui_theme import render_help_tip
+render_help_tip(
+    title="Understanding Your Degree Audit & Risk Assessment",
+    explanation="<strong>Overall Completion:</strong> Measures progress toward the required 120 credit units. &nbsp;|&nbsp; <strong>Bottleneck Courses:</strong> Essential foundational courses (like Data Structures or Calculus) that must be passed early because multiple upper-level courses depend on them.",
+    icon="💡"
+)
+
 st.markdown("<div style='height: 10px;'></div>", unsafe_allow_html=True)
 
 # Main Grid: Progress & Risk

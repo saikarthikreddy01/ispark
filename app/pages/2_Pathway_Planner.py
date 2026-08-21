@@ -47,6 +47,13 @@ render_hero_banner(
     badge_text="Graph-RAG Multi-Semester Engine"
 )
 
+from app.ui_theme import render_help_tip
+render_help_tip(
+    title="How the Automatic Pathway Planner Works",
+    explanation="The planner automatically sorts all remaining courses so that earlier prerequisite courses are scheduled before advanced courses. It balances your workload to around 12–16 credits per term and ensures courses are only scheduled when offered (Fall/Spring).",
+    icon="🗺️"
+)
+
 # Controls
 col1, col2 = st.columns([1, 3])
 with col1:

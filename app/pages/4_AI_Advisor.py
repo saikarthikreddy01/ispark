@@ -29,6 +29,13 @@ render_hero_banner(
     badge_text=f"🤖 Powered by Hybrid Graph-RAG & {MODEL_NAME}"
 )
 
+from app.ui_theme import render_help_tip
+render_help_tip(
+    title="How to Get the Best Advising Answers",
+    explanation="Ask any question in plain English (e.g. <em>'Can I take Algorithms next semester?'</em> or <em>'What happens if I repeat a class?'</em>). The AI searches the Knowledge Graph and official University Policies, answers directly, and gives you verified policy citations so you know it's accurate!",
+    icon="💬"
+)
+
 # Load cached advisor instance
 @st.cache_resource
 def get_advisor():

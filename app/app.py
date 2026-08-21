@@ -174,6 +174,17 @@ if student:
             icon="✅"
         )
 
+    # Friendly Beginner Quick Start Guide
+    from app.ui_theme import render_guide_box
+    render_guide_box(
+        steps=[
+            ("1", "Select a Student Profile (Sidebar)", "Choose a student on the left sidebar to load their specific major, transcript, GPA, and completed courses."),
+            ("2", "Audit Progress & Bottlenecks (Dashboard & Planner)", "Open the Dashboard to see what's completed and check the Pathway Planner for your semester-by-semester road to graduation."),
+            ("3", "Verify Schedule & Chat with AI (Advisor & Checker)", "Simulate upcoming classes in Conflict Checker or ask the AI Advisor any question to get answers backed by official university policies.")
+        ],
+        title="🌟 Quick Start: How to Use this Portal (3 Simple Steps)"
+    )
+
     st.markdown("### 🧭 Interactive Intelligence Modules")
     st.caption("Select a specialized workflow to explore your degree pathway, curriculum topology, or converse with AI.")
 

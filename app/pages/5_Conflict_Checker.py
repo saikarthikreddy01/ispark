@@ -44,6 +44,13 @@ render_hero_banner(
     badge_text="Constraint Verification Engine"
 )
 
+from app.ui_theme import render_help_tip
+render_help_tip(
+    title="How Schedule Validation Works",
+    explanation="<strong>Step 1:</strong> Select the courses you want to take next term. &nbsp;|&nbsp; <strong>Step 2:</strong> Pick the semester (Fall/Spring). &nbsp;|&nbsp; <strong>Step 3:</strong> The engine automatically checks if you completed all prerequisites, ensures the course is offered in that semester, and verifies you stay within 12–18 credits.",
+    icon="🔍"
+)
+
 all_courses = kg.get_all_courses()
 course_options = [f"{c.id} - {c.name} ({c.credits} cr)" for c in all_courses]
 

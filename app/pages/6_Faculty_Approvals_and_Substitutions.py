@@ -54,6 +54,13 @@ render_hero_banner(
     badge_text="Decentralized Academic Governance & Exceptions"
 )
 
+from app.ui_theme import render_help_tip
+render_help_tip(
+    title="How Course Substitutions & Exception Waivers Work",
+    explanation="<strong>Substitutions:</strong> If a required course is full or conflicting, find approved alternative courses with matching learning outcomes. &nbsp;|&nbsp; <strong>Faculty Petitions:</strong> If you need a special waiver (like taking 19+ credits or overriding a prerequisite), submit a petition to automatically check eligibility and get faculty sign-off.",
+    icon="📝"
+)
+
 # Main Navigation Tabs
 tab_subs, tab_approval, tab_history = st.tabs([
     "🔁 Alternative Courses & Substitutions",

@@ -31,6 +31,13 @@ render_hero_banner(
     badge_text="2D Physics Knowledge Graph Visualizer"
 )
 
+from app.ui_theme import render_help_tip
+render_help_tip(
+    title="How to Read the Curriculum Knowledge Graph",
+    explanation="Select any course on the left to see its direct requirements and all downstream classes that depend on it. In the interactive graph, drag nodes around, scroll to zoom in/out, and click nodes to explore prerequisite relationships.",
+    icon="🕸️"
+)
+
 @st.cache_resource
 def get_kg():
     kg = AcademicKnowledgeGraph()

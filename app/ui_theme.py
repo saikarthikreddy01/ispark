@@ -344,3 +344,43 @@ def render_sidebar_student(student):
         unsafe_allow_html=True
     )
     st.sidebar.progress(pct)
+
+def render_guide_box(steps: list[tuple[str, str, str]], title: str = "💡 Quick Start Guide for Students"):
+    """Renders a clean, friendly 3-step beginner guide."""
+    step_items = ""
+    for num, heading, desc in steps:
+        step_items += f"""
+        <div style="display: flex; gap: 14px; align-items: flex-start; background: rgba(15, 23, 42, 0.5); border: 1px solid rgba(255, 255, 255, 0.06); border-radius: 12px; padding: 14px; margin-bottom: 8px;">
+            <div style="min-width: 32px; height: 32px; border-radius: 50%; background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%); display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 0.95rem; color: white;">
+                {num}
+            </div>
+            <div>
+                <div style="font-weight: 700; color: #f8fafc; font-size: 0.95rem; margin-bottom: 2px;">{heading}</div>
+                <div style="font-size: 0.84rem; color: #94a3b8; line-height: 1.4;">{desc}</div>
+            </div>
+        </div>
+        """
+        
+    st.markdown(
+        f"""
+        <div style="background: rgba(30, 41, 59, 0.5); border: 1px solid rgba(99, 102, 241, 0.25); border-radius: 16px; padding: 20px; margin-bottom: 20px;">
+            <div style="font-weight: 700; color: #c7d2fe; font-size: 1.05rem; margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
+                <span>{title}</span>
+            </div>
+            {step_items}
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
+
+def render_help_tip(title: str, explanation: str, icon: str = "💡"):
+    """Renders a friendly plain-English concept explanation."""
+    st.markdown(
+        f"""
+        <div style="background: rgba(99, 102, 241, 0.08); border-left: 4px solid #6366f1; border-radius: 0 10px 10px 0; padding: 12px 16px; margin: 12px 0;">
+            <div style="font-weight: 700; color: #c7d2fe; font-size: 0.9rem; margin-bottom: 2px;">{icon} {title}</div>
+            <div style="font-size: 0.84rem; color: #cbd5e1; line-height: 1.4;">{explanation}</div>
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
