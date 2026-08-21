@@ -19,92 +19,107 @@
   <!-- ==========================================================================
        1. MINIMAL 3D HERO LANDING & STUDENT LOGIN
        ========================================================================== -->
+  <!-- ==========================================================================
+       1. MINIMAL 3D HERO LANDING (DIAGRAM ON LEFT, AUTH BOX ON RIGHT)
+       ========================================================================== -->
   <div id="landing-screen" class="landing-container">
     <!-- 3D Interactive Geometric Constellation Canvas -->
     <canvas id="three-landing-canvas"></canvas>
 
-    <div class="landing-content">
-      <div class="landing-badge">
-        <span>✨</span>
-        <span>Graph-RAG Academic Platform</span>
-      </div>
-
-      <h1 class="landing-title">
-        Academic AI <span class="gradient-text">Advisor</span>
-      </h1>
-
-      <p class="landing-subtitle">
-        Automated degree sequencing, prerequisite conflict detection, and policy-grounded advising.
-      </p>
-
-      <!-- Student Auth Card (Login & Sign Up) -->
-      <div class="auth-card">
-        <!-- Auth Mode Tabs -->
-        <div class="auth-tabs">
-          <button type="button" class="auth-tab-btn active" id="auth-tab-login" onclick="setAuthMode('login')">Sign In</button>
-          <button type="button" class="auth-tab-btn" id="auth-tab-signup" onclick="setAuthMode('signup')">Sign Up</button>
+    <div class="landing-split-row">
+      
+      <!-- LEFT SIDE: Diagram & Hero Typography -->
+      <div class="landing-left-hero">
+        <div class="landing-badge">
+          <span>✨</span>
+          <span>Graph-RAG Academic Platform</span>
         </div>
 
-        <div id="auth-alert-box" class="auth-alert error"></div>
+        <h1 class="landing-title">
+          Academic AI <br><span class="gradient-text">Advisor</span>
+        </h1>
 
-        <!-- FORM 1: LOGIN -->
-        <form id="form-login" onsubmit="handleStudentLogin(event)">
-          <div class="login-field-group">
-            <label class="login-label" for="login-regno">Register Number / Student ID</label>
-            <input type="text" id="login-regno" class="login-input" placeholder="e.g. S1001" required autocomplete="username">
+        <p class="landing-subtitle">
+          Autonomous multi-semester degree sequencing, prerequisite conflict detection, and policy-grounded academic advising.
+        </p>
+
+        <div class="hero-feature-tags">
+          <span class="hero-tag">🕸️ Knowledge Graph DAGs</span>
+          <span class="hero-tag">🗺️ Topological Sequencing</span>
+          <span class="hero-tag">💬 Policy Graph-RAG</span>
+        </div>
+      </div>
+
+      <!-- RIGHT SIDE: Student Auth Card (Login & Sign Up) -->
+      <div class="landing-right-auth">
+        <div class="auth-card">
+          <!-- Auth Mode Tabs -->
+          <div class="auth-tabs">
+            <button type="button" class="auth-tab-btn active" id="auth-tab-login" onclick="setAuthMode('login')">Sign In</button>
+            <button type="button" class="auth-tab-btn" id="auth-tab-signup" onclick="setAuthMode('signup')">Sign Up</button>
           </div>
 
-          <div class="login-field-group">
-            <label class="login-label" for="login-password">Password</label>
-            <input type="password" id="login-password" class="login-input" placeholder="••••••••" required autocomplete="current-password">
-          </div>
+          <div id="auth-alert-box" class="auth-alert error"></div>
 
-          <button type="submit" class="btn-signin">
-            <span>Sign In to Advisor Portal</span>
-            <span style="font-size: 1rem;">➔</span>
-          </button>
+          <!-- FORM 1: LOGIN -->
+          <form id="form-login" onsubmit="handleStudentLogin(event)">
+            <div class="login-field-group">
+              <label class="login-label" for="login-regno">Register Number / Student ID</label>
+              <input type="text" id="login-regno" class="login-input" placeholder="e.g. S1001" required autocomplete="username">
+            </div>
 
-          <div class="auth-switch-link">
-            Don't have an account? <a onclick="setAuthMode('signup')">Create one here</a>
-          </div>
-        </form>
+            <div class="login-field-group">
+              <label class="login-label" for="login-password">Password</label>
+              <input type="password" id="login-password" class="login-input" placeholder="••••••••" required autocomplete="current-password">
+            </div>
 
-        <!-- FORM 2: SIGN UP -->
-        <form id="form-signup" style="display: none;" onsubmit="handleStudentSignUp(event)">
-          <div class="login-field-group">
-            <label class="login-label" for="signup-name">Full Student Name</label>
-            <input type="text" id="signup-name" class="login-input" placeholder="e.g. Dana Lee" required>
-          </div>
+            <button type="submit" class="btn-signin">
+              <span>Sign In to Advisor Portal</span>
+              <span style="font-size: 1rem;">➔</span>
+            </button>
 
-          <div class="login-field-group">
-            <label class="login-label" for="signup-regno">Register Number</label>
-            <input type="text" id="signup-regno" class="login-input" placeholder="e.g. S1004" required>
-          </div>
+            <div class="auth-switch-link">
+              Don't have an account? <a onclick="setAuthMode('signup')">Create one here</a>
+            </div>
+          </form>
 
-          <div class="login-field-group">
-            <label class="login-label" for="signup-major">Major</label>
-            <input type="text" id="signup-major" class="login-input" placeholder="e.g. Computer Science" value="Computer Science" required>
-          </div>
+          <!-- FORM 2: SIGN UP -->
+          <form id="form-signup" style="display: none;" onsubmit="handleStudentSignUp(event)">
+            <div class="login-field-group">
+              <label class="login-label" for="signup-name">Full Student Name</label>
+              <input type="text" id="signup-name" class="login-input" placeholder="e.g. Dana Lee" required>
+            </div>
 
-          <div class="login-field-group">
-            <label class="login-label" for="signup-grad">Expected Graduation</label>
-            <input type="text" id="signup-grad" class="login-input" placeholder="e.g. Spring 2027" value="Spring 2027" required>
-          </div>
+            <div class="login-field-group">
+              <label class="login-label" for="signup-regno">Register Number</label>
+              <input type="text" id="signup-regno" class="login-input" placeholder="e.g. S1004" required>
+            </div>
 
-          <div class="login-field-group">
-            <label class="login-label" for="signup-password">Password</label>
-            <input type="password" id="signup-password" class="login-input" placeholder="••••••••" required autocomplete="new-password">
-          </div>
+            <div class="login-field-group">
+              <label class="login-label" for="signup-major">Major</label>
+              <input type="text" id="signup-major" class="login-input" placeholder="e.g. Computer Science" value="Computer Science" required>
+            </div>
 
-          <button type="submit" class="btn-signin">
-            <span>Create Student Account</span>
-            <span style="font-size: 1rem;">➔</span>
-          </button>
+            <div class="login-field-group">
+              <label class="login-label" for="signup-grad">Expected Graduation</label>
+              <input type="text" id="signup-grad" class="login-input" placeholder="e.g. Spring 2027" value="Spring 2027" required>
+            </div>
 
-          <div class="auth-switch-link">
-            Already registered? <a onclick="setAuthMode('login')">Sign In</a>
-          </div>
-        </form>
+            <div class="login-field-group">
+              <label class="login-label" for="signup-password">Password</label>
+              <input type="password" id="signup-password" class="login-input" placeholder="••••••••" required autocomplete="new-password">
+            </div>
+
+            <button type="submit" class="btn-signin">
+              <span>Create Student Account</span>
+              <span style="font-size: 1rem;">➔</span>
+            </button>
+
+            <div class="auth-switch-link">
+              Already registered? <a onclick="setAuthMode('login')">Sign In</a>
+            </div>
+          </form>
+        </div>
       </div>
 
     </div>

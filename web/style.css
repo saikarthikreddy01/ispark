@@ -87,26 +87,33 @@ code, pre {
 }
 
 /* ==========================================================================
-   1. MINIMAL 3D HERO LANDING PAGE
+   1. MINIMAL 3D HERO LANDING (DIAGRAM ON LEFT, AUTH BOX ON RIGHT)
    ========================================================================== */
 .landing-container {
   min-height: 100vh;
   display: flex;
-  flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 40px 20px;
-  text-align: center;
+  padding: 40px 48px;
   position: relative;
   overflow: hidden;
-  background: radial-gradient(circle at 50% 30%, #0d1527 0%, #060913 80%);
+  background: radial-gradient(circle at 30% 40%, #0d1527 0%, #060913 85%);
 }
 
-.landing-content {
+.landing-split-row {
+  display: grid;
+  grid-template-columns: 1.2fr 0.9fr;
+  align-items: center;
+  gap: 60px;
+  max-width: 1240px;
+  width: 100%;
+  margin: 0 auto;
   position: relative;
   z-index: 2;
-  max-width: 760px;
-  margin: 0 auto;
+}
+
+.landing-left-hero {
+  text-align: left;
 }
 
 .landing-badge {
@@ -122,47 +129,76 @@ code, pre {
   font-weight: 700;
   letter-spacing: 0.05em;
   text-transform: uppercase;
-  margin-bottom: 24px;
+  margin-bottom: 20px;
   backdrop-filter: blur(8px);
   box-shadow: 0 0 25px rgba(56, 189, 248, 0.2);
-  animation: float-badge 3s ease-in-out infinite alternate;
-}
-
-@keyframes float-badge {
-  0% { transform: translateY(0px); }
-  100% { transform: translateY(-5px); }
 }
 
 .landing-title {
-  font-size: 3.4rem;
+  font-size: 3.8rem;
   font-weight: 800;
   letter-spacing: -0.04em;
   color: #ffffff;
-  margin-bottom: 12px;
+  margin-bottom: 16px;
   line-height: 1.1;
 }
 
 .landing-subtitle {
-  font-size: 1.05rem;
+  font-size: 1.12rem;
   color: var(--text-muted);
-  max-width: 580px;
-  margin: 0 auto 28px auto;
-  line-height: 1.55;
+  max-width: 540px;
+  margin: 0 0 28px 0;
+  line-height: 1.6;
 }
 
-/* Student Auth Card (Login & Sign Up) */
+.hero-feature-tags {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.hero-tag {
+  background: rgba(16, 24, 40, 0.7);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-full);
+  padding: 6px 14px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #93c5fd;
+  backdrop-filter: blur(8px);
+}
+
+.landing-right-auth {
+  display: flex;
+  justify-content: flex-end;
+}
+
+/* Student Auth Card (Login & Sign Up on Right) */
 .auth-card {
   background: rgba(16, 24, 40, 0.85);
-  backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(24px);
+  border: 1px solid rgba(255, 255, 255, 0.14);
   border-radius: var(--radius-lg);
-  padding: 28px;
+  padding: 32px;
+  width: 100%;
   max-width: 440px;
-  margin: 0 auto;
-  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6), 0 0 30px rgba(56, 189, 248, 0.15);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.7), 0 0 35px rgba(56, 189, 248, 0.15);
   text-align: left;
   position: relative;
   z-index: 3;
+}
+
+@media (max-width: 960px) {
+  .landing-split-row {
+    grid-template-columns: 1fr;
+    gap: 40px;
+    text-align: center;
+  }
+  .landing-left-hero { text-align: center; }
+  .landing-subtitle { margin: 0 auto 24px auto; }
+  .hero-feature-tags { justify-content: center; }
+  .landing-right-auth { justify-content: center; }
+  .landing-container { padding: 40px 20px; }
 }
 
 .auth-tabs {

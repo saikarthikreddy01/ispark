@@ -117,6 +117,7 @@ function initLanding3D() {
     opacity: 0.45
   });
   const wireMesh = new THREE.Mesh(sphereGeo, wireMat);
+  wireMesh.position.x = -6;
   scene.add(wireMesh);
 
   // Glowing Vertex Particles
@@ -127,6 +128,7 @@ function initLanding3D() {
     opacity: 0.95
   });
   const pointMesh = new THREE.Points(sphereGeo, pointMat);
+  pointMesh.position.x = -6;
   scene.add(pointMesh);
 
   // --- 2. Inner Glowing Core Torus Knot ---
@@ -138,6 +140,7 @@ function initLanding3D() {
     opacity: 0.25
   });
   const torusMesh = new THREE.Mesh(torusGeo, torusMat);
+  torusMesh.position.x = -6;
   scene.add(torusMesh);
 
   // --- 3. Ambient Floating Particle Constellation ---
