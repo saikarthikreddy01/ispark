@@ -69,12 +69,88 @@ const APP_DATA = {
   }
 };
 
+// ==========================================================================
+// PERMANENT STORAGE ENGINE (LocalStorage & MongoDB Cloud Sync)
+// ==========================================================================
+const STORAGE_KEYS = {
+  STUDENTS: "academic_advisor_permanent_students_v2",
+  ACTIVE_USER: "academic_advisor_permanent_active_user_v2",
+  CHAT_LOGS: "academic_advisor_permanent_chat_logs_v2",
+  PETITIONS: "academic_advisor_permanent_petitions_v2"
+};
+
+function loadPermanentStudents() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEYS.STUDENTS);
+    if (raw) {
+      const saved = JSON.parse(raw);
+      if (Array.isArray(saved) && saved.length > 0) {
+        // Merge or replace
+        saved.forEach(s => {
+          const idx = APP_DATA.students.findIndex(existing => existing.id.toUpperCase() === s.id.toUpperCase());
+          if (idx >= 0) {
+            APP_DATA.students[idx] = s;
+          } else {
+            APP_DATA.students.push(s);
+          }
+        });
+      }
+    } else {
+      savePermanentStudents();
+    }
+  } catch (err) {
+    console.error("Storage load error:", err);
+  }
+}
+
+function savePermanentStudents() {
+  try {
+    localStorage.setItem(STORAGE_KEYS.STUDENTS, JSON.stringify(APP_DATA.students));
+  } catch (err) {
+    console.error("Storage save error:", err);
+  }
+}
+
+function saveActiveUser(studentId) {
+  try {
+    localStorage.setItem(STORAGE_KEYS.ACTIVE_USER, studentId);
+  } catch (e) {}
+}
+
+function getActiveUser() {
+  try {
+    return localStorage.getItem(STORAGE_KEYS.ACTIVE_USER);
+  } catch (e) {
+    return null;
+  }
+}
+
+function savePermanentChat(studentId, message) {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEYS.CHAT_LOGS) || "{}";
+    const logs = JSON.parse(raw);
+    logs[studentId] = logs[studentId] || [];
+    logs[studentId].push(message);
+    localStorage.setItem(STORAGE_KEYS.CHAT_LOGS, JSON.stringify(logs));
+  } catch (e) {}
+}
+
+// Load Permanent Storage on Start
+loadPermanentStudents();
+
 // Global State
 let state = {
   currentStudent: APP_DATA.students[0],
   currentTab: "pathway",
   network: null
 };
+
+// Auto-restore previous permanent session if available
+const rememberedUserId = getActiveUser();
+if (rememberedUserId) {
+  const remembered = APP_DATA.students.find(s => s.id.toUpperCase() === rememberedUserId.toUpperCase());
+  if (remembered) state.currentStudent = remembered;
+}
 
 // Lifecycle
 window.addEventListener("DOMContentLoaded", () => {

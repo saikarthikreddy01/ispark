@@ -358,6 +358,8 @@
         if (res.ok && data.student) {
           if (alertBox) alertBox.style.display = "none";
           state.currentStudent = data.student;
+          saveActiveUser(data.student.id);
+          savePermanentStudents();
           initStudentPicker();
           const picker = document.getElementById("user-select");
           if (picker) picker.value = data.student.id;
@@ -366,14 +368,16 @@
           return;
         }
       } catch (err) {
-        console.log("Backend API offline, using local client DB fallback.");
+        console.log("Backend API offline, using permanent local storage.");
       }
 
-      // Client-Side Fallback
+      // Client-Side Permanent Fallback
       const found = APP_DATA.students.find(s => s.id.toUpperCase() === regno);
       if (found) {
         if (alertBox) alertBox.style.display = "none";
         state.currentStudent = found;
+        saveActiveUser(found.id);
+        savePermanentStudents();
         initStudentPicker();
         const picker = document.getElementById("user-select");
         if (picker) picker.value = found.id;
@@ -382,7 +386,7 @@
       } else {
         if (alertBox) {
           alertBox.className = "auth-alert error";
-          alertBox.textContent = `⚠️ Register Number '${regno}' not found. Please sign up first.`;
+          alertBox.textContent = `⚠️ Register Number '${regno}' not found. Please Sign Up to create your account.`;
           alertBox.style.display = "block";
         }
       }
@@ -399,39 +403,11 @@
 
       if (!name || !regno) return;
 
-      // Try Backend MongoDB API
-      try {
-        const res = await fetch("/api/auth/signup", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            name: name,
-            regno: regno,
-            major: major || "Computer Science",
-            expected_grad: grad || "Spring 2027",
-            password: pwd
-          })
-        });
-        const data = await res.json();
-        if (res.ok && data.student) {
-          if (alertBox) alertBox.style.display = "none";
-          APP_DATA.students.push(data.student);
-          state.currentStudent = data.student;
-          initStudentPicker();
-          renderDashboard();
-          openDashboard('pathway');
-          return;
-        }
-      } catch (err) {
-        console.log("Backend API offline, using local client DB fallback.");
-      }
-
-      // Client-side fallback
       const existing = APP_DATA.students.find(s => s.id.toUpperCase() === regno);
       if (existing) {
         if (alertBox) {
           alertBox.className = "auth-alert error";
-          alertBox.textContent = `⚠️ Student with Reg No '${regno}' is already registered. Please Sign In.`;
+          alertBox.textContent = `⚠️ Student '${regno}' already exists. Please Sign In.`;
           alertBox.style.display = "block";
         }
         return;
@@ -449,8 +425,31 @@
         standing: "Good Standing"
       };
 
+      // Try Backend MongoDB API
+      try {
+        const res = await fetch("/api/auth/signup", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            name: name,
+            regno: regno,
+            major: major || "Computer Science",
+            expected_grad: grad || "Spring 2027",
+            password: pwd
+          })
+        });
+        const data = await res.json();
+        if (res.ok && data.student) {
+          newStudent = data.student;
+        }
+      } catch (err) {
+        console.log("Backend offline, saving permanently to browser storage.");
+      }
+
       APP_DATA.students.push(newStudent);
       state.currentStudent = newStudent;
+      savePermanentStudents();
+      saveActiveUser(newStudent.id);
       initStudentPicker();
       renderDashboard();
       openDashboard('pathway');
@@ -465,6 +464,7 @@
     function signOut() {
       document.getElementById("dashboard-screen").style.display = "none";
       document.getElementById("landing-screen").style.display = "flex";
+      saveActiveUser("");
       const alertBox = document.getElementById("auth-alert-box");
       if (alertBox) alertBox.style.display = "none";
     }
