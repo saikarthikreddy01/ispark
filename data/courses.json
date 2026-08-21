@@ -1,0 +1,598 @@
+[
+  {
+    "id": "CS101",
+    "name": "Introduction to Computer Science",
+    "department": "CS",
+    "credits": 3,
+    "description": "Foundational concepts of computing, problem-solving strategies, and introduction to programming using Python.",
+    "prerequisite_groups": [],
+    "corequisites": [],
+    "credit_categories": ["CORE"],
+    "offered_semesters": ["FALL", "SPRING"],
+    "difficulty_level": 1
+  },
+  {
+    "id": "CS102",
+    "name": "Programming Fundamentals",
+    "department": "CS",
+    "credits": 3,
+    "description": "In-depth programming concepts including control structures, functions, arrays, file I/O, and debugging techniques.",
+    "prerequisite_groups": [
+      {"prerequisites": [{"course_id": "CS101", "min_grade": "D"}], "logic_type": "AND"}
+    ],
+    "corequisites": [],
+    "credit_categories": ["CORE"],
+    "offered_semesters": ["FALL", "SPRING"],
+    "difficulty_level": 2
+  },
+  {
+    "id": "CS201",
+    "name": "Data Structures",
+    "department": "CS",
+    "credits": 3,
+    "description": "Fundamental data structures: arrays, linked lists, stacks, queues, trees, hash tables, and graphs. Algorithm complexity analysis.",
+    "prerequisite_groups": [
+      {"prerequisites": [{"course_id": "CS102", "min_grade": "C"}], "logic_type": "AND"}
+    ],
+    "corequisites": [],
+    "credit_categories": ["CORE"],
+    "offered_semesters": ["FALL", "SPRING"],
+    "difficulty_level": 3
+  },
+  {
+    "id": "CS202",
+    "name": "Object-Oriented Programming",
+    "department": "CS",
+    "credits": 3,
+    "description": "Object-oriented design principles, inheritance, polymorphism, design patterns, and UML modeling using Java/C++.",
+    "prerequisite_groups": [
+      {"prerequisites": [{"course_id": "CS102", "min_grade": "D"}], "logic_type": "AND"}
+    ],
+    "corequisites": [],
+    "credit_categories": ["CORE"],
+    "offered_semesters": ["FALL", "SPRING"],
+    "difficulty_level": 3
+  },
+  {
+    "id": "CS250",
+    "name": "Computer Organization",
+    "department": "CS",
+    "credits": 3,
+    "description": "Digital logic, CPU architecture, memory hierarchy, assembly language, and instruction set design.",
+    "prerequisite_groups": [
+      {"prerequisites": [{"course_id": "CS102", "min_grade": "D"}], "logic_type": "AND"}
+    ],
+    "corequisites": [],
+    "credit_categories": ["CORE"],
+    "offered_semesters": ["FALL"],
+    "difficulty_level": 3
+  },
+  {
+    "id": "CS301",
+    "name": "Algorithms",
+    "department": "CS",
+    "credits": 3,
+    "description": "Algorithm design paradigms: divide-and-conquer, dynamic programming, greedy algorithms. NP-completeness and computational complexity.",
+    "prerequisite_groups": [
+      {"prerequisites": [{"course_id": "CS201", "min_grade": "C"}, {"course_id": "MATH201", "min_grade": "D"}], "logic_type": "AND"}
+    ],
+    "corequisites": [],
+    "credit_categories": ["CORE"],
+    "offered_semesters": ["FALL", "SPRING"],
+    "difficulty_level": 4
+  },
+  {
+    "id": "CS302",
+    "name": "Database Systems",
+    "department": "CS",
+    "credits": 3,
+    "description": "Relational database design, SQL, normalization, transactions, indexing, and NoSQL databases.",
+    "prerequisite_groups": [
+      {"prerequisites": [{"course_id": "CS201", "min_grade": "D"}], "logic_type": "AND"}
+    ],
+    "corequisites": [],
+    "credit_categories": ["CORE"],
+    "offered_semesters": ["FALL", "SPRING"],
+    "difficulty_level": 3
+  },
+  {
+    "id": "CS303",
+    "name": "Operating Systems",
+    "department": "CS",
+    "credits": 3,
+    "description": "Process management, memory management, file systems, concurrency, synchronization, and virtualization.",
+    "prerequisite_groups": [
+      {"prerequisites": [{"course_id": "CS201", "min_grade": "C"}, {"course_id": "CS250", "min_grade": "D"}], "logic_type": "AND"}
+    ],
+    "corequisites": [],
+    "credit_categories": ["CORE"],
+    "offered_semesters": ["FALL"],
+    "difficulty_level": 4
+  },
+  {
+    "id": "CS304",
+    "name": "Computer Networks",
+    "department": "CS",
+    "credits": 3,
+    "description": "Network protocols, TCP/IP stack, routing, switching, network security fundamentals, and socket programming.",
+    "prerequisite_groups": [
+      {"prerequisites": [{"course_id": "CS201", "min_grade": "D"}], "logic_type": "AND"}
+    ],
+    "corequisites": [],
+    "credit_categories": ["CORE"],
+    "offered_semesters": ["SPRING"],
+    "difficulty_level": 3
+  },
+  {
+    "id": "CS310",
+    "name": "Software Engineering",
+    "department": "CS",
+    "credits": 3,
+    "description": "Software development lifecycle, agile methodologies, requirements engineering, testing, CI/CD, and team collaboration.",
+    "prerequisite_groups": [
+      {"prerequisites": [{"course_id": "CS202", "min_grade": "D"}, {"course_id": "CS201", "min_grade": "D"}], "logic_type": "AND"}
+    ],
+    "corequisites": [],
+    "credit_categories": ["CORE"],
+    "offered_semesters": ["FALL", "SPRING"],
+    "difficulty_level": 3
+  },
+  {
+    "id": "CS350",
+    "name": "Web Development",
+    "department": "CS",
+    "credits": 3,
+    "description": "Full-stack web development: HTML/CSS/JavaScript, React, Node.js, REST APIs, and deployment.",
+    "prerequisite_groups": [
+      {"prerequisites": [{"course_id": "CS202", "min_grade": "D"}], "logic_type": "AND"}
+    ],
+    "corequisites": [],
+    "credit_categories": ["ELECTIVE"],
+    "offered_semesters": ["FALL", "SPRING"],
+    "difficulty_level": 3
+  },
+  {
+    "id": "CS351",
+    "name": "Mobile App Development",
+    "department": "CS",
+    "credits": 3,
+    "description": "Native and cross-platform mobile development using Flutter/React Native. UI/UX design for mobile.",
+    "prerequisite_groups": [
+      {"prerequisites": [{"course_id": "CS202", "min_grade": "D"}], "logic_type": "AND"}
+    ],
+    "corequisites": [],
+    "credit_categories": ["ELECTIVE"],
+    "offered_semesters": ["SPRING"],
+    "difficulty_level": 3
+  },
+  {
+    "id": "CS401",
+    "name": "Artificial Intelligence",
+    "department": "CS",
+    "credits": 3,
+    "description": "Search algorithms, knowledge representation, reasoning, planning, and introduction to machine learning.",
+    "prerequisite_groups": [
+      {"prerequisites": [{"course_id": "CS301", "min_grade": "C"}, {"course_id": "MATH301", "min_grade": "D"}], "logic_type": "AND"}
+    ],
+    "corequisites": [],
+    "credit_categories": ["ELECTIVE"],
+    "offered_semesters": ["FALL"],
+    "difficulty_level": 4
+  },
+  {
+    "id": "CS402",
+    "name": "Machine Learning",
+    "department": "CS",
+    "credits": 3,
+    "description": "Supervised/unsupervised learning, neural networks, deep learning, model evaluation, and practical ML pipelines.",
+    "prerequisite_groups": [
+      {"prerequisites": [{"course_id": "CS401", "min_grade": "C"}, {"course_id": "MATH302", "min_grade": "D"}], "logic_type": "AND"}
+    ],
+    "corequisites": [],
+    "credit_categories": ["ELECTIVE"],
+    "offered_semesters": ["SPRING"],
+    "difficulty_level": 5
+  },
+  {
+    "id": "CS403",
+    "name": "Cybersecurity",
+    "department": "CS",
+    "credits": 3,
+    "description": "Network security, cryptography, ethical hacking, vulnerability assessment, and security policy design.",
+    "prerequisite_groups": [
+      {"prerequisites": [{"course_id": "CS304", "min_grade": "D"}], "logic_type": "AND"}
+    ],
+    "corequisites": [],
+    "credit_categories": ["ELECTIVE"],
+    "offered_semesters": ["FALL"],
+    "difficulty_level": 4
+  },
+  {
+    "id": "CS404",
+    "name": "Distributed Systems",
+    "department": "CS",
+    "credits": 3,
+    "description": "Distributed computing models, consensus algorithms, fault tolerance, microservices, and cloud-native architectures.",
+    "prerequisite_groups": [
+      {"prerequisites": [{"course_id": "CS303", "min_grade": "D"}, {"course_id": "CS304", "min_grade": "D"}], "logic_type": "AND"}
+    ],
+    "corequisites": [],
+    "credit_categories": ["ELECTIVE"],
+    "offered_semesters": ["SPRING"],
+    "difficulty_level": 5
+  },
+  {
+    "id": "CS405",
+    "name": "Cloud Computing",
+    "department": "CS",
+    "credits": 3,
+    "description": "Cloud service models (IaaS, PaaS, SaaS), containerization, Kubernetes, serverless computing, and DevOps.",
+    "prerequisite_groups": [
+      {"prerequisites": [{"course_id": "CS303", "min_grade": "D"}], "logic_type": "AND"}
+    ],
+    "corequisites": [],
+    "credit_categories": ["ELECTIVE"],
+    "offered_semesters": ["FALL"],
+    "difficulty_level": 4
+  },
+  {
+    "id": "CS410",
+    "name": "Compiler Design",
+    "department": "CS",
+    "credits": 3,
+    "description": "Lexical analysis, parsing, semantic analysis, code generation, and optimization techniques.",
+    "prerequisite_groups": [
+      {"prerequisites": [{"course_id": "CS301", "min_grade": "C"}, {"course_id": "CS250", "min_grade": "D"}], "logic_type": "AND"}
+    ],
+    "corequisites": [],
+    "credit_categories": ["ELECTIVE"],
+    "offered_semesters": ["SPRING"],
+    "difficulty_level": 5
+  },
+  {
+    "id": "CS420",
+    "name": "Computer Graphics",
+    "department": "CS",
+    "credits": 3,
+    "description": "2D/3D rendering, transformations, shading, ray tracing, and GPU programming with OpenGL/WebGL.",
+    "prerequisite_groups": [
+      {"prerequisites": [{"course_id": "CS301", "min_grade": "D"}, {"course_id": "MATH202", "min_grade": "D"}], "logic_type": "AND"}
+    ],
+    "corequisites": [],
+    "credit_categories": ["ELECTIVE"],
+    "offered_semesters": ["FALL"],
+    "difficulty_level": 4
+  },
+  {
+    "id": "CS450",
+    "name": "Natural Language Processing",
+    "department": "CS",
+    "credits": 3,
+    "description": "Text processing, language models, transformers, sentiment analysis, and conversational AI.",
+    "prerequisite_groups": [
+      {"prerequisites": [{"course_id": "CS401", "min_grade": "D"}], "logic_type": "AND"}
+    ],
+    "corequisites": [],
+    "credit_categories": ["ELECTIVE"],
+    "offered_semesters": ["SPRING"],
+    "difficulty_level": 4
+  },
+  {
+    "id": "CS360",
+    "name": "Game Development",
+    "department": "CS",
+    "credits": 3,
+    "description": "Game engines, physics simulation, real-time rendering, game AI, and interactive media design.",
+    "prerequisite_groups": [
+      {"prerequisites": [{"course_id": "CS202", "min_grade": "D"}, {"course_id": "CS420", "min_grade": "D"}], "logic_type": "AND"}
+    ],
+    "corequisites": [],
+    "credit_categories": ["ELECTIVE"],
+    "offered_semesters": ["FALL"],
+    "difficulty_level": 4
+  },
+  {
+    "id": "CS370",
+    "name": "Data Science",
+    "department": "CS",
+    "credits": 3,
+    "description": "Data wrangling, exploratory analysis, statistical modeling, visualization, and big data tools (Pandas, Spark).",
+    "prerequisite_groups": [
+      {"prerequisites": [{"course_id": "CS302", "min_grade": "D"}, {"course_id": "MATH301", "min_grade": "D"}], "logic_type": "AND"}
+    ],
+    "corequisites": [],
+    "credit_categories": ["ELECTIVE"],
+    "offered_semesters": ["SPRING"],
+    "difficulty_level": 3
+  },
+  {
+    "id": "CS380",
+    "name": "IoT and Embedded Systems",
+    "department": "CS",
+    "credits": 3,
+    "description": "Microcontrollers, sensor networks, embedded programming, MQTT protocols, and edge computing.",
+    "prerequisite_groups": [
+      {"prerequisites": [{"course_id": "CS250", "min_grade": "D"}], "logic_type": "AND"}
+    ],
+    "corequisites": [],
+    "credit_categories": ["ELECTIVE"],
+    "offered_semesters": ["FALL"],
+    "difficulty_level": 3
+  },
+  {
+    "id": "CS490",
+    "name": "Senior Capstone Project",
+    "department": "CS",
+    "credits": 3,
+    "description": "Team-based capstone project applying software engineering principles to build a complete system. Includes proposal, design, implementation, and presentation.",
+    "prerequisite_groups": [
+      {"prerequisites": [{"course_id": "CS310", "min_grade": "D"}], "logic_type": "AND"}
+    ],
+    "corequisites": [],
+    "credit_categories": ["CAPSTONE"],
+    "offered_semesters": ["FALL", "SPRING"],
+    "difficulty_level": 4
+  },
+  {
+    "id": "MATH101",
+    "name": "Calculus I",
+    "department": "MATH",
+    "credits": 4,
+    "description": "Limits, derivatives, integrals, and the fundamental theorem of calculus. Applications to science and engineering.",
+    "prerequisite_groups": [],
+    "corequisites": [],
+    "credit_categories": ["MATH"],
+    "offered_semesters": ["FALL", "SPRING"],
+    "difficulty_level": 3
+  },
+  {
+    "id": "MATH102",
+    "name": "Calculus II",
+    "department": "MATH",
+    "credits": 4,
+    "description": "Integration techniques, sequences, series, Taylor polynomials, and parametric equations.",
+    "prerequisite_groups": [
+      {"prerequisites": [{"course_id": "MATH101", "min_grade": "C"}], "logic_type": "AND"}
+    ],
+    "corequisites": [],
+    "credit_categories": ["MATH"],
+    "offered_semesters": ["FALL", "SPRING"],
+    "difficulty_level": 4
+  },
+  {
+    "id": "MATH201",
+    "name": "Discrete Mathematics",
+    "department": "MATH",
+    "credits": 3,
+    "description": "Logic, proofs, set theory, combinatorics, graph theory, and number theory. Essential for computer science.",
+    "prerequisite_groups": [
+      {"prerequisites": [{"course_id": "MATH101", "min_grade": "D"}], "logic_type": "AND"}
+    ],
+    "corequisites": [],
+    "credit_categories": ["MATH"],
+    "offered_semesters": ["FALL", "SPRING"],
+    "difficulty_level": 3
+  },
+  {
+    "id": "MATH202",
+    "name": "Linear Algebra",
+    "department": "MATH",
+    "credits": 3,
+    "description": "Vectors, matrices, linear transformations, eigenvalues, eigenvectors, and applications.",
+    "prerequisite_groups": [
+      {"prerequisites": [{"course_id": "MATH102", "min_grade": "D"}], "logic_type": "AND"}
+    ],
+    "corequisites": [],
+    "credit_categories": ["MATH"],
+    "offered_semesters": ["FALL", "SPRING"],
+    "difficulty_level": 3
+  },
+  {
+    "id": "MATH203",
+    "name": "Calculus III",
+    "department": "MATH",
+    "credits": 4,
+    "description": "Multivariable calculus: partial derivatives, multiple integrals, vector calculus, and Stokes' theorem.",
+    "prerequisite_groups": [
+      {"prerequisites": [{"course_id": "MATH102", "min_grade": "C"}], "logic_type": "AND"}
+    ],
+    "corequisites": [],
+    "credit_categories": ["MATH"],
+    "offered_semesters": ["FALL"],
+    "difficulty_level": 4
+  },
+  {
+    "id": "MATH301",
+    "name": "Probability and Statistics",
+    "department": "MATH",
+    "credits": 3,
+    "description": "Probability theory, random variables, distributions, hypothesis testing, confidence intervals, and regression.",
+    "prerequisite_groups": [
+      {"prerequisites": [{"course_id": "MATH102", "min_grade": "D"}], "logic_type": "AND"}
+    ],
+    "corequisites": [],
+    "credit_categories": ["MATH"],
+    "offered_semesters": ["FALL", "SPRING"],
+    "difficulty_level": 3
+  },
+  {
+    "id": "MATH302",
+    "name": "Statistical Learning",
+    "department": "MATH",
+    "credits": 3,
+    "description": "Regression, classification, resampling, regularization, tree-based methods, and unsupervised learning theory.",
+    "prerequisite_groups": [
+      {"prerequisites": [{"course_id": "MATH301", "min_grade": "C"}, {"course_id": "MATH202", "min_grade": "D"}], "logic_type": "AND"}
+    ],
+    "corequisites": [],
+    "credit_categories": ["MATH"],
+    "offered_semesters": ["SPRING"],
+    "difficulty_level": 4
+  },
+  {
+    "id": "PHYS101",
+    "name": "Physics I: Mechanics",
+    "department": "PHYS",
+    "credits": 3,
+    "description": "Newtonian mechanics, energy, momentum, rotational motion, and oscillations.",
+    "prerequisite_groups": [
+      {"prerequisites": [{"course_id": "MATH101", "min_grade": "D", "can_be_concurrent": true}], "logic_type": "AND"}
+    ],
+    "corequisites": ["PHYS101L"],
+    "credit_categories": ["SCIENCE"],
+    "offered_semesters": ["FALL", "SPRING"],
+    "difficulty_level": 3
+  },
+  {
+    "id": "PHYS101L",
+    "name": "Physics I Laboratory",
+    "department": "PHYS",
+    "credits": 1,
+    "description": "Hands-on experiments in mechanics, data analysis, and scientific reporting.",
+    "prerequisite_groups": [],
+    "corequisites": ["PHYS101"],
+    "credit_categories": ["LAB"],
+    "offered_semesters": ["FALL", "SPRING"],
+    "difficulty_level": 2
+  },
+  {
+    "id": "PHYS102",
+    "name": "Physics II: Electromagnetism",
+    "department": "PHYS",
+    "credits": 3,
+    "description": "Electric fields, circuits, magnetism, electromagnetic waves, and optics.",
+    "prerequisite_groups": [
+      {"prerequisites": [{"course_id": "PHYS101", "min_grade": "D"}], "logic_type": "AND"}
+    ],
+    "corequisites": ["PHYS102L"],
+    "credit_categories": ["SCIENCE"],
+    "offered_semesters": ["FALL", "SPRING"],
+    "difficulty_level": 4
+  },
+  {
+    "id": "PHYS102L",
+    "name": "Physics II Laboratory",
+    "department": "PHYS",
+    "credits": 1,
+    "description": "Hands-on experiments in electricity, magnetism, and optics.",
+    "prerequisite_groups": [],
+    "corequisites": ["PHYS102"],
+    "credit_categories": ["LAB"],
+    "offered_semesters": ["FALL", "SPRING"],
+    "difficulty_level": 2
+  },
+  {
+    "id": "ENG101",
+    "name": "English Composition I",
+    "department": "ENG",
+    "credits": 3,
+    "description": "Academic writing, critical reading, argumentation, and research skills.",
+    "prerequisite_groups": [],
+    "corequisites": [],
+    "credit_categories": ["GENERAL_ED"],
+    "offered_semesters": ["FALL", "SPRING"],
+    "difficulty_level": 1
+  },
+  {
+    "id": "ENG102",
+    "name": "English Composition II",
+    "department": "ENG",
+    "credits": 3,
+    "description": "Advanced composition, literary analysis, research papers, and rhetorical strategies.",
+    "prerequisite_groups": [
+      {"prerequisites": [{"course_id": "ENG101", "min_grade": "D"}], "logic_type": "AND"}
+    ],
+    "corequisites": [],
+    "credit_categories": ["GENERAL_ED"],
+    "offered_semesters": ["FALL", "SPRING"],
+    "difficulty_level": 2
+  },
+  {
+    "id": "ENG201",
+    "name": "Technical Writing",
+    "department": "ENG",
+    "credits": 3,
+    "description": "Technical documentation, reports, proposals, and professional communication for engineers.",
+    "prerequisite_groups": [
+      {"prerequisites": [{"course_id": "ENG102", "min_grade": "D"}], "logic_type": "AND"}
+    ],
+    "corequisites": [],
+    "credit_categories": ["GENERAL_ED"],
+    "offered_semesters": ["FALL", "SPRING"],
+    "difficulty_level": 2
+  },
+  {
+    "id": "PHIL101",
+    "name": "Introduction to Philosophy",
+    "department": "PHIL",
+    "credits": 3,
+    "description": "Major philosophical traditions, critical thinking, ethics, epistemology, and metaphysics.",
+    "prerequisite_groups": [],
+    "corequisites": [],
+    "credit_categories": ["GENERAL_ED"],
+    "offered_semesters": ["FALL", "SPRING"],
+    "difficulty_level": 1
+  },
+  {
+    "id": "PHIL301",
+    "name": "Ethics in Technology",
+    "department": "PHIL",
+    "credits": 3,
+    "description": "Ethical frameworks applied to AI, data privacy, surveillance, autonomous systems, and digital rights.",
+    "prerequisite_groups": [
+      {"prerequisites": [{"course_id": "PHIL101", "min_grade": "D"}], "logic_type": "AND"}
+    ],
+    "corequisites": [],
+    "credit_categories": ["GENERAL_ED"],
+    "offered_semesters": ["FALL", "SPRING"],
+    "difficulty_level": 2
+  },
+  {
+    "id": "ECON101",
+    "name": "Principles of Economics",
+    "department": "ECON",
+    "credits": 3,
+    "description": "Microeconomics and macroeconomics fundamentals, supply and demand, market structures, and fiscal policy.",
+    "prerequisite_groups": [],
+    "corequisites": [],
+    "credit_categories": ["GENERAL_ED"],
+    "offered_semesters": ["FALL", "SPRING"],
+    "difficulty_level": 1
+  },
+  {
+    "id": "PSY101",
+    "name": "Introduction to Psychology",
+    "department": "PSY",
+    "credits": 3,
+    "description": "Human behavior, cognition, development, personality, social psychology, and mental health.",
+    "prerequisite_groups": [],
+    "corequisites": [],
+    "credit_categories": ["GENERAL_ED"],
+    "offered_semesters": ["FALL", "SPRING"],
+    "difficulty_level": 1
+  },
+  {
+    "id": "HIST101",
+    "name": "World History",
+    "department": "HIST",
+    "credits": 3,
+    "description": "Survey of world civilizations from ancient times to the modern era.",
+    "prerequisite_groups": [],
+    "corequisites": [],
+    "credit_categories": ["GENERAL_ED"],
+    "offered_semesters": ["FALL", "SPRING"],
+    "difficulty_level": 1
+  },
+  {
+    "id": "COMM101",
+    "name": "Public Speaking",
+    "department": "COMM",
+    "credits": 3,
+    "description": "Oral communication skills, speech preparation, persuasion, and presentation techniques.",
+    "prerequisite_groups": [],
+    "corequisites": [],
+    "credit_categories": ["GENERAL_ED"],
+    "offered_semesters": ["FALL", "SPRING"],
+    "difficulty_level": 1
+  }
+]

@@ -1,0 +1,25 @@
+{
+  "program": "B.S. Computer Science",
+  "total_credits_required": 120,
+  "minimum_gpa": 2.0,
+  "minimum_major_gpa": 2.5,
+  "category_requirements": {
+    "CORE": {"min_credits": 33, "description": "Core CS courses"},
+    "MATH": {"min_credits": 18, "description": "Mathematics courses"},
+    "SCIENCE": {"min_credits": 6, "description": "Natural Science courses"},
+    "LAB": {"min_credits": 2, "description": "Laboratory courses"},
+    "GENERAL_ED": {"min_credits": 21, "description": "General Education courses"},
+    "ELECTIVE": {"min_credits": 12, "description": "CS Elective courses"},
+    "CAPSTONE": {"min_credits": 3, "description": "Senior Capstone"}
+  },
+  "required_courses": [
+    "CS101", "CS102", "CS201", "CS202", "CS250", "CS301", "CS302",
+    "CS303", "CS304", "CS310", "CS490",
+    "MATH101", "MATH102", "MATH201", "MATH301",
+    "PHYS101", "PHYS101L",
+    "ENG101", "ENG102"
+  ],
+  "elective_minimum_count": 4,
+  "max_credits_per_semester": 18,
+  "min_credits_per_semester": 12
+}

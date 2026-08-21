@@ -1,0 +1,7 @@
+[
+  {"course_id": "CS350", "equivalent_course_id": "CS351", "notes": "Both satisfy web/mobile development elective requirement"},
+  {"course_id": "CS401", "equivalent_course_id": "CS450", "notes": "Either satisfies the AI elective requirement"},
+  {"course_id": "MATH203", "equivalent_course_id": "MATH202", "notes": "Calculus III can substitute for Linear Algebra with department approval"},
+  {"course_id": "CS370", "equivalent_course_id": "CS402", "notes": "Data Science can substitute for ML with advisor approval"},
+  {"course_id": "CS405", "equivalent_course_id": "CS404", "notes": "Cloud Computing and Distributed Systems are interchangeable electives"}
+]
