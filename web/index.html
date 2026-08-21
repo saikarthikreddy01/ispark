@@ -324,12 +324,37 @@
       }
     }
 
-    function handleStudentLogin(e) {
+    async function handleStudentLogin(e) {
       if (e) e.preventDefault();
       const regnoInput = document.getElementById("login-regno");
+      const pwdInput = document.getElementById("login-password");
       const alertBox = document.getElementById("auth-alert-box");
       const regno = regnoInput ? regnoInput.value.trim().toUpperCase() : "";
+      const password = pwdInput ? pwdInput.value : "";
 
+      // Try Backend API First
+      try {
+        const res = await fetch("/api/auth/login", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ regno: regno, password: password })
+        });
+        const data = await res.json();
+        if (res.ok && data.student) {
+          if (alertBox) alertBox.style.display = "none";
+          state.currentStudent = data.student;
+          initStudentPicker();
+          const picker = document.getElementById("user-select");
+          if (picker) picker.value = data.student.id;
+          renderDashboard();
+          openDashboard('pathway');
+          return;
+        }
+      } catch (err) {
+        console.log("Backend API offline, using local client DB fallback.");
+      }
+
+      // Client-Side Fallback
       const found = APP_DATA.students.find(s => s.id.toUpperCase() === regno);
       if (found) {
         if (alertBox) alertBox.style.display = "none";
@@ -348,16 +373,45 @@
       }
     }
 
-    function handleStudentSignUp(e) {
+    async function handleStudentSignUp(e) {
       if (e) e.preventDefault();
       const name = document.getElementById("signup-name").value.trim();
       const regno = document.getElementById("signup-regno").value.trim().toUpperCase();
       const major = document.getElementById("signup-major").value.trim();
       const grad = document.getElementById("signup-grad").value.trim();
+      const pwd = document.getElementById("signup-password").value;
       const alertBox = document.getElementById("auth-alert-box");
 
       if (!name || !regno) return;
 
+      // Try Backend MongoDB API
+      try {
+        const res = await fetch("/api/auth/signup", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            name: name,
+            regno: regno,
+            major: major || "Computer Science",
+            expected_grad: grad || "Spring 2027",
+            password: pwd
+          })
+        });
+        const data = await res.json();
+        if (res.ok && data.student) {
+          if (alertBox) alertBox.style.display = "none";
+          APP_DATA.students.push(data.student);
+          state.currentStudent = data.student;
+          initStudentPicker();
+          renderDashboard();
+          openDashboard('pathway');
+          return;
+        }
+      } catch (err) {
+        console.log("Backend API offline, using local client DB fallback.");
+      }
+
+      // Client-side fallback
       const existing = APP_DATA.students.find(s => s.id.toUpperCase() === regno);
       if (existing) {
         if (alertBox) {
@@ -368,7 +422,6 @@
         return;
       }
 
-      // Create new student
       const newStudent = {
         id: regno,
         name: name,
