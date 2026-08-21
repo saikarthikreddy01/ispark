@@ -1,5 +1,5 @@
 /* ==========================================================================
-   Academic AI Advisor — Minimalist 3D Three.js Engine & Client Logic
+   Academic AI Advisor — 3D Neural Lattice & Graph-RAG Engine
    Inspired by alltimehigh.ai
    ========================================================================== */
 
@@ -77,7 +77,7 @@ let state = {
 };
 
 // Lifecycle
-document.addEventListener("DOMContentLoaded", () => {
+window.addEventListener("DOMContentLoaded", () => {
   initStudentPicker();
   renderDashboard();
   initChatInput();
@@ -86,7 +86,7 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 // ==========================================================================
-// 3D THREE.JS ANIMATIONS (Inspired by alltimehigh.ai)
+// 3D THREE.JS ANIMATION ENGINE (Like alltimehigh.ai)
 // ==========================================================================
 function initThreeJSAnimations() {
   initLanding3D();
@@ -99,61 +99,75 @@ function initLanding3D() {
 
   const scene = new THREE.Scene();
   const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
-  camera.position.z = 32;
+  camera.position.z = 28;
 
   const renderer = new THREE.WebGLRenderer({ canvas: canvas, alpha: true, antialias: true });
   renderer.setSize(window.innerWidth, window.innerHeight);
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
-  // 1. Glowing 3D Wireframe Icosahedron / Geodesic Sphere
-  const geometry = new THREE.IcosahedronGeometry(9, 2);
-  const wireframeMaterial = new THREE.MeshBasicMaterial({
+  // --- 1. Morphing 3D Neural Sphere Geometry ---
+  const sphereGeo = new THREE.IcosahedronGeometry(9, 3);
+  const origPositions = sphereGeo.attributes.position.clone();
+
+  // Outer Glowing Wireframe
+  const wireMat = new THREE.MeshBasicMaterial({
     color: 0x38bdf8,
     wireframe: true,
     transparent: true,
-    opacity: 0.22
+    opacity: 0.45
   });
-  const sphereMesh = new THREE.Mesh(geometry, wireframeMaterial);
-  scene.add(sphereMesh);
+  const wireMesh = new THREE.Mesh(sphereGeo, wireMat);
+  scene.add(wireMesh);
 
-  // 2. Vertex Points (Glowing Particles on Sphere)
-  const pointsMaterial = new THREE.PointsMaterial({
+  // Glowing Vertex Particles
+  const pointMat = new THREE.PointsMaterial({
     color: 0x34d399,
-    size: 0.28,
+    size: 0.35,
     transparent: true,
-    opacity: 0.85
+    opacity: 0.95
   });
-  const pointsMesh = new THREE.Points(geometry, pointsMaterial);
-  scene.add(pointsMesh);
+  const pointMesh = new THREE.Points(sphereGeo, pointMat);
+  scene.add(pointMesh);
 
-  // 3. Surrounding Floating Outer Constellation Particles
-  const particleCount = 140;
-  const particleGeo = new THREE.BufferGeometry();
-  const positions = new Float32Array(particleCount * 3);
+  // --- 2. Inner Glowing Core Torus Knot ---
+  const torusGeo = new THREE.TorusKnotGeometry(4.5, 1.2, 80, 16);
+  const torusMat = new THREE.MeshBasicMaterial({
+    color: 0x818cf8,
+    wireframe: true,
+    transparent: true,
+    opacity: 0.25
+  });
+  const torusMesh = new THREE.Mesh(torusGeo, torusMat);
+  scene.add(torusMesh);
 
-  for (let i = 0; i < particleCount * 3; i += 3) {
-    positions[i] = (Math.random() - 0.5) * 45;
-    positions[i + 1] = (Math.random() - 0.5) * 35;
-    positions[i + 2] = (Math.random() - 0.5) * 30;
+  // --- 3. Ambient Floating Particle Constellation ---
+  const partCount = 200;
+  const partGeo = new THREE.BufferGeometry();
+  const partPos = new Float32Array(partCount * 3);
+
+  for (let i = 0; i < partCount * 3; i += 3) {
+    partPos[i] = (Math.random() - 0.5) * 60;
+    partPos[i + 1] = (Math.random() - 0.5) * 45;
+    partPos[i + 2] = (Math.random() - 0.5) * 35;
   }
-
-  particleGeo.setAttribute("position", new THREE.BufferAttribute(positions, 3));
-  const outerParticleMat = new THREE.PointsMaterial({
+  partGeo.setAttribute("position", new THREE.BufferAttribute(partPos, 3));
+  
+  const outerMat = new THREE.PointsMaterial({
     color: 0x60a5fa,
-    size: 0.18,
+    size: 0.25,
     transparent: true,
-    opacity: 0.5
+    opacity: 0.75
   });
-  const outerParticles = new THREE.Points(particleGeo, outerParticleMat);
-  scene.add(outerParticles);
+  const outerCloud = new THREE.Points(partGeo, outerMat);
+  scene.add(outerCloud);
 
-  // Mouse Parallax
+  // Mouse Interaction (Parallax & Tilt)
   let mouseX = 0, mouseY = 0;
   let targetX = 0, targetY = 0;
 
   window.addEventListener("mousemove", (e) => {
-    mouseX = (e.clientX - window.innerWidth / 2) * 0.001;
-    mouseY = (e.clientY - window.innerHeight / 2) * 0.001;
+    mouseX = (e.clientX - window.innerWidth / 2) * 0.0012;
+    mouseY = (e.clientY - window.innerHeight / 2) * 0.0012;
   });
 
   window.addEventListener("resize", () => {
@@ -162,22 +176,40 @@ function initLanding3D() {
     renderer.setSize(window.innerWidth, window.innerHeight);
   });
 
-  // Render Loop
+  // Animation Loop with Real-Time Vertex Morphing
+  let clock = new THREE.Clock();
+
   function animate() {
     requestAnimationFrame(animate);
+    const elapsedTime = clock.getElapsedTime();
 
-    targetX += (mouseX - targetX) * 0.05;
-    targetY += (mouseY - targetY) * 0.05;
+    // Smooth Cursor Physics
+    targetX += (mouseX - targetX) * 0.06;
+    targetY += (mouseY - targetY) * 0.06;
 
-    sphereMesh.rotation.y += 0.002;
-    sphereMesh.rotation.x += 0.001;
-    pointsMesh.rotation.y = sphereMesh.rotation.y;
-    pointsMesh.rotation.x = sphereMesh.rotation.x;
+    wireMesh.rotation.y = elapsedTime * 0.15 + targetX * 1.5;
+    wireMesh.rotation.x = elapsedTime * 0.08 + targetY * 1.5;
+    pointMesh.rotation.y = wireMesh.rotation.y;
+    pointMesh.rotation.x = wireMesh.rotation.x;
 
-    sphereMesh.rotation.y += targetX * 0.5;
-    sphereMesh.rotation.x += targetY * 0.5;
+    torusMesh.rotation.y = -elapsedTime * 0.25 + targetX;
+    torusMesh.rotation.x = -elapsedTime * 0.15 + targetY;
 
-    outerParticles.rotation.y -= 0.0008;
+    outerCloud.rotation.y = -elapsedTime * 0.05;
+
+    // Organic Wave Vertex Pulsing
+    const pos = sphereGeo.attributes.position;
+    for (let i = 0; i < pos.count; i++) {
+      const u = origPositions.getX(i);
+      const v = origPositions.getY(i);
+      const w = origPositions.getZ(i);
+
+      const wave = Math.sin(elapsedTime * 2.5 + u * 0.5 + v * 0.5) * 0.45;
+      const factor = 1 + wave / 9;
+
+      pos.setXYZ(i, u * factor, v * factor, w * factor);
+    }
+    pos.needsUpdate = true;
 
     renderer.render(scene, camera);
   }
@@ -196,7 +228,7 @@ function initBackgroundParticles() {
   renderer.setSize(window.innerWidth, window.innerHeight);
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
-  const count = 180;
+  const count = 160;
   const geo = new THREE.BufferGeometry();
   const pos = new Float32Array(count * 3);
 
@@ -209,9 +241,9 @@ function initBackgroundParticles() {
   geo.setAttribute("position", new THREE.BufferAttribute(pos, 3));
   const mat = new THREE.PointsMaterial({
     color: 0x38bdf8,
-    size: 0.22,
+    size: 0.28,
     transparent: true,
-    opacity: 0.35
+    opacity: 0.45
   });
 
   const particles = new THREE.Points(geo, mat);
@@ -225,8 +257,8 @@ function initBackgroundParticles() {
 
   function animate() {
     requestAnimationFrame(animate);
-    particles.rotation.y += 0.0004;
-    particles.rotation.x += 0.0002;
+    particles.rotation.y += 0.0005;
+    particles.rotation.x += 0.0003;
     renderer.render(scene, camera);
   }
   animate();
