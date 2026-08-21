@@ -106,8 +106,14 @@ function initLanding3D() {
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
   // --- 1. Morphing 3D Neural Sphere Geometry ---
-  const sphereGeo = new THREE.IcosahedronGeometry(9, 3);
+  const sphereGeo = new THREE.IcosahedronGeometry(8.5, 3);
   const origPositions = sphereGeo.attributes.position.clone();
+
+  // Create Diagram Group to offset to left side
+  const diagramGroup = new THREE.Group();
+  diagramGroup.position.x = window.innerWidth > 960 ? -8.5 : 0;
+  diagramGroup.position.y = 0;
+  scene.add(diagramGroup);
 
   // Outer Glowing Wireframe
   const wireMat = new THREE.MeshBasicMaterial({
@@ -117,8 +123,7 @@ function initLanding3D() {
     opacity: 0.45
   });
   const wireMesh = new THREE.Mesh(sphereGeo, wireMat);
-  wireMesh.position.x = -6;
-  scene.add(wireMesh);
+  diagramGroup.add(wireMesh);
 
   // Glowing Vertex Particles
   const pointMat = new THREE.PointsMaterial({
@@ -128,11 +133,10 @@ function initLanding3D() {
     opacity: 0.95
   });
   const pointMesh = new THREE.Points(sphereGeo, pointMat);
-  pointMesh.position.x = -6;
-  scene.add(pointMesh);
+  diagramGroup.add(pointMesh);
 
   // --- 2. Inner Glowing Core Torus Knot ---
-  const torusGeo = new THREE.TorusKnotGeometry(4.5, 1.2, 80, 16);
+  const torusGeo = new THREE.TorusKnotGeometry(4.2, 1.1, 80, 16);
   const torusMat = new THREE.MeshBasicMaterial({
     color: 0x818cf8,
     wireframe: true,
@@ -140,8 +144,7 @@ function initLanding3D() {
     opacity: 0.25
   });
   const torusMesh = new THREE.Mesh(torusGeo, torusMat);
-  torusMesh.position.x = -6;
-  scene.add(torusMesh);
+  diagramGroup.add(torusMesh);
 
   // --- 3. Ambient Floating Particle Constellation ---
   const partCount = 200;
