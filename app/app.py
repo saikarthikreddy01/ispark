@@ -1,6 +1,4 @@
 import streamlit as st
-import pandas as pd
-import json
 import sys
 from pathlib import Path
 
@@ -11,7 +9,8 @@ from src.models.student import StudentProfile
 from src.knowledge_graph.graph_builder import AcademicKnowledgeGraph
 from src.constraint_engine.credit_validator import CreditValidator
 from src.constraint_engine.schedule_feasibility import ScheduleAnalyzer
-from src.utils.config import DATA_DIR
+from src.utils.config import DATABASE_PATH
+from src.utils.database import load_students
 from app.ui_theme import (
     inject_custom_css,
     render_hero_banner,
@@ -32,17 +31,12 @@ st.set_page_config(
 # Inject Academic Blue & Emerald Green Theme
 inject_custom_css()
 
-# Load Sample Students
+# Load students from SQLite, seeded from data/sample_students.json on first run.
 @st.cache_data
-def load_sample_students():
-    students_file = DATA_DIR / "sample_students.json"
-    if students_file.exists():
-        with open(students_file, "r") as f:
-            data = json.load(f)
-            return [StudentProfile(**s) for s in data]
-    return []
+def load_student_profiles():
+    return load_students()
 
-sample_students = load_sample_students()
+sample_students = load_student_profiles()
 
 # Load Knowledge Graph & Analyzers
 @st.cache_resource
@@ -77,14 +71,10 @@ selected_name = st.sidebar.selectbox("👤 Select Student Profile:", student_nam
 
 selected_student = next((s for s in sample_students if f"{s.name} ({s.major})" == selected_name), sample_students[0] if sample_students else None)
 
-# Populate missing fields if needed
 if selected_student:
-    if not hasattr(selected_student, "minor") or not selected_student.minor:
-        selected_student.minor = "Mathematics"
-    if not hasattr(selected_student, "expected_graduation") or not selected_student.expected_graduation:
-        selected_student.expected_graduation = "Spring 2026"
     st.session_state.student = selected_student
     render_sidebar_student(selected_student)
+    st.sidebar.caption(f"Database: {DATABASE_PATH.name}")
 
 # Main Hero Header
 render_hero_banner(
@@ -101,7 +91,7 @@ if student:
     bottlenecks = feasibility.get("bottleneck_courses", [])
     remaining_credits = max(0, 120 - student.total_credits_earned)
     pct_progress = min(student.total_credits_earned / 120.0, 1.0)
-    minor_text = getattr(student, "minor", "Mathematics")
+    minor_text = student.minor or "Mathematics"
     expected_grad = getattr(student, "expected_graduation", "Spring 2026")
 
     # ================= 1. STUDENT PROFILE CARD & QUICK-GLANCE CARDS =================

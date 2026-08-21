@@ -23,3 +23,4 @@ def get_config_var(key: str, default: str = "") -> str:
 GEMINI_API_KEY = get_config_var("GEMINI_API_KEY", "")
 OPENAI_API_KEY = get_config_var("OPENAI_API_KEY", "")
 MODEL_NAME = get_config_var("MODEL_NAME", "gpt-4o-mini" if OPENAI_API_KEY else "gemini-3.6-flash")
+DATABASE_PATH = Path(get_config_var("DATABASE_PATH", str(DATA_DIR / "advisor.db")))

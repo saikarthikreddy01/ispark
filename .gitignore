@@ -26,3 +26,7 @@ chroma_test_db/
 .DS_Store
 Thumbs.db
 *.log
+
+# Local SQLite database
+data/*.db
+data/*.db-*
