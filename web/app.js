@@ -365,6 +365,9 @@ function switchTab(tabName) {
   if (tabName === "graph") {
     setTimeout(renderGraph, 80);
   }
+  if (tabName === "advisor") {
+    setTimeout(loadChatHistory, 80);
+  }
 }
 
 function initStudentPicker() {
@@ -570,10 +573,49 @@ function initChatInput() {
 function askAdvisor(question) {
   appendMessage("user", question);
 
-  setTimeout(() => {
+  // Show typing indicator
+  const container = document.getElementById("chat-messages");
+  const typingBubble = document.createElement("div");
+  typingBubble.className = "bubble assistant";
+  typingBubble.id = "typing-indicator";
+  typingBubble.innerHTML = `<div>⏳ <em>Thinking...</em></div>`;
+  container.appendChild(typingBubble);
+  container.scrollTop = container.scrollHeight;
+
+  // Try live Gemini API via backend
+  const studentId = state.currentStudent ? state.currentStudent.id : "S1001";
+  fetch("/api/chat", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ student_id: studentId, question: question })
+  })
+  .then(res => {
+    const contentType = res.headers.get("content-type") || "";
+    if (contentType.includes("application/json")) {
+      return res.json();
+    }
+    throw new Error("non-json");
+  })
+  .then(data => {
+    // Remove typing indicator
+    const typing = document.getElementById("typing-indicator");
+    if (typing) typing.remove();
+
+    appendMessage("assistant", data.reply || "No response received.", data.citations || []);
+
+    // Save to localStorage as well
+    savePermanentChat(studentId, { role: "user", text: question });
+    savePermanentChat(studentId, { role: "assistant", text: data.reply, citations: data.citations });
+  })
+  .catch(err => {
+    console.log("Backend offline, using local advisor fallback:", err);
+    // Remove typing indicator
+    const typing = document.getElementById("typing-indicator");
+    if (typing) typing.remove();
+
+    // Local fallback
     let reply = "";
     let citations = [];
-
     const q = question.toLowerCase();
     if (q.includes("cs301") || q.includes("algorithm")) {
       reply = `⚠️ **Prerequisite Policy on CS301 (Algorithms)**:\n\nUnder **Course Catalog §4.2**, enrolling in CS301 requires passing **CS201 (Data Structures)** with a grade of C or better and completing **MATH201 (Discrete Mathematics)**.\n\nSince CS301 is a single-term Fall offering, clearing these requirements is critical to prevent graduation delays.`;
@@ -585,9 +627,48 @@ function askAdvisor(question) {
       reply = `🟢 **Academic Progress Summary**:\n\nYou have completed **78 of 120 credits** (65% degree fulfillment) with a cumulative GPA of **3.65**. You are on track for graduation in **Spring 2026**!`;
       citations = ["[Degree Audit Standard §8.3]"];
     }
-
     appendMessage("assistant", reply, citations);
-  }, 400);
+    savePermanentChat(studentId, { role: "user", text: question });
+    savePermanentChat(studentId, { role: "assistant", text: reply, citations: citations });
+  });
+}
+
+function loadChatHistory() {
+  const studentId = state.currentStudent ? state.currentStudent.id : "S1001";
+  const container = document.getElementById("chat-messages");
+  if (!container) return;
+
+  // Reset to welcome message
+  container.innerHTML = `<div class="bubble assistant">👋 Hello! I am your <strong>Academic AI Advisor</strong>. Ask me anything about prerequisite eligibility, degree rules, or course substitutions!</div>`;
+
+  // Try loading from backend MongoDB
+  fetch(`/api/chat/history/${studentId}`)
+  .then(res => {
+    const contentType = res.headers.get("content-type") || "";
+    if (contentType.includes("application/json")) {
+      return res.json();
+    }
+    throw new Error("non-json");
+  })
+  .then(data => {
+    if (data.history && data.history.length > 0) {
+      data.history.forEach(entry => {
+        appendMessage("user", entry.question);
+        appendMessage("assistant", entry.response, entry.citations || []);
+      });
+    }
+  })
+  .catch(() => {
+    // Fallback: load from localStorage
+    try {
+      const raw = localStorage.getItem(STORAGE_KEYS.CHAT_LOGS) || "{}";
+      const logs = JSON.parse(raw);
+      const studentLogs = logs[studentId] || [];
+      studentLogs.forEach(msg => {
+        appendMessage(msg.role, msg.text, msg.citations || []);
+      });
+    } catch (e) {}
+  });
 }
 
 function appendMessage(role, text, citations = []) {

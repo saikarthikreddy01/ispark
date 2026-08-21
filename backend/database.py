@@ -148,5 +148,17 @@ class MongoDBManager:
             with open(self.fallback_file, "w", encoding="utf-8") as f:
                 json.dump(db_data, f, indent=2)
 
+    def get_chat_history(self, student_id: str) -> List[Dict]:
+        student_id = student_id.upper()
+        if self.is_connected:
+            return list(self.db.chat_history.find(
+                {"student_id": {"$regex": f"^{student_id}$", "$options": "i"}},
+                {"_id": 0}
+            ))
+        with open(self.fallback_file, "r", encoding="utf-8") as f:
+            db_data = json.load(f)
+        return [c for c in db_data.get("chat_history", []) if c.get("student_id", "").upper() == student_id]
+
 # Singleton Database Manager
 db_manager = MongoDBManager()
+

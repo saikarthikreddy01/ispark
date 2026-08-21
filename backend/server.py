@@ -188,6 +188,11 @@ def advisor_chat(req: ChatRequest):
         "citations": citations
     }
 
+@app.get("/api/chat/history/{student_id}")
+def get_chat_history(student_id: str):
+    history = db_manager.get_chat_history(student_id)
+    return {"history": history}
+
 # Mount static web directory for full-stack hosting
 WEB_DIR = Path(__file__).resolve().parent.parent / "web"
 if WEB_DIR.exists():
