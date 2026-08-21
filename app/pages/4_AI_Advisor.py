@@ -10,18 +10,24 @@ from src.knowledge_graph.graph_builder import AcademicKnowledgeGraph
 from src.rag.vector_store import AcademicVectorStore
 from src.rag.document_loader import PolicyDocumentLoader
 from src.agents.orchestrator import AcademicAdvisor
-from src.utils.config import DATA_DIR
+from src.utils.config import DATA_DIR, MODEL_NAME
+from app.ui_theme import inject_custom_css, render_hero_banner, render_sidebar_student
 
 st.set_page_config(page_title="AI Advisor | Academic Advisor", page_icon="💬", layout="wide")
-
-st.title("💬 Graph-RAG Academic Advisor AI")
-st.markdown("Ask natural language questions about course eligibility, prerequisite chains, graduation timelines, and university policies with **citation-traceable answers**.")
+inject_custom_css()
 
 if "student" not in st.session_state:
     st.warning("⚠️ No student selected. Please select a student from the main page.")
     st.stop()
 
 student: StudentProfile = st.session_state.student
+render_sidebar_student(student)
+
+render_hero_banner(
+    title="💬 Conversational <span class='gradient-text'>Academic Advisor AI</span>",
+    subtitle=f"Ask natural language questions about course eligibility, prerequisite chains, and university policies for <strong>{student.name}</strong>.",
+    badge_text=f"🤖 Powered by Hybrid Graph-RAG & {MODEL_NAME}"
+)
 
 # Load cached advisor instance
 @st.cache_resource
@@ -46,28 +52,41 @@ if "chat_messages" not in st.session_state:
     st.session_state.chat_messages = [
         {
             "role": "assistant",
-            "content": f"Hello **{student.name}**! 👋 I'm your AI Academic Advisor. I have access to your full transcript ({student.total_credits_earned} credits completed, GPA: {student.gpa:.2f}), the University Knowledge Graph, and official academic policies. How can I assist with your course planning today?",
-            "citations": ["Academic Advising Knowledge Base"],
+            "content": f"Hello **{student.name}**! 👋 I'm your AI Academic Advisor. I have access to your full academic transcript ({student.total_credits_earned} credits completed, GPA: {student.gpa:.2f}), the University Knowledge Graph, and official academic policies.\n\nHow can I help you plan your upcoming semesters or evaluate course prerequisites today?",
+            "citations": ["Academic Advising Knowledge Base: Official Curriculum Catalog"],
             "conflicts": []
         }
     ]
 
-# Quick action sample questions
-st.markdown("##### 💡 Suggested Questions")
+# Header bar with reset button
+h1, h2 = st.columns([4, 1])
+with h1:
+    st.markdown("##### 💡 Suggested Advising Prompts")
+with h2:
+    if st.button("🗑️ Reset Chat", use_container_width=True):
+        st.session_state.chat_messages = [
+            {
+                "role": "assistant",
+                "content": f"Hello **{student.name}**! 👋 How can I assist with your course planning today?",
+                "citations": ["Academic Advising Knowledge Base"],
+                "conflicts": []
+            }
+        ]
+        st.rerun()
+
 q_cols = st.columns(4)
 quick_questions = [
-    f"Can I take CS301 (Algorithms) next term?",
-    f"What are the prerequisites for CS402 (Machine Learning)?",
-    f"Am I at risk of delaying my graduation?",
-    f"What can I take instead of CS350 (Web Dev)?"
+    "Can I take CS301 (Algorithms) next term?",
+    "What are the prerequisites for CS402 (Machine Learning)?",
+    "Am I at risk of delaying my graduation?",
+    "What course can substitute for CS350?"
 ]
 
-def set_quick_prompt(q):
-    st.session_state.current_prompt = q
-
 for i, col in enumerate(q_cols):
-    if col.button(quick_questions[i], use_container_width=True):
+    if col.button(quick_questions[i], use_container_width=True, key=f"quick_btn_{i}"):
         st.session_state.current_prompt = quick_questions[i]
+
+st.markdown("<div style='height: 10px;'></div>", unsafe_allow_html=True)
 
 # Display past messages
 for msg in st.session_state.chat_messages:
@@ -76,7 +95,7 @@ for msg in st.session_state.chat_messages:
         
         if msg.get("conflicts"):
             for conf in msg["conflicts"]:
-                st.error(f"⚠️ {conf}")
+                st.markdown(f"<div style='background: rgba(239, 68, 68, 0.15); border-left: 3px solid #ef4444; padding: 8px 12px; border-radius: 6px; margin: 6px 0; color: #fca5a5;'>⚠️ {conf}</div>", unsafe_allow_html=True)
                 
         if msg.get("citations"):
             with st.expander("📚 Citation Sources & Graph Verification"):
@@ -108,7 +127,7 @@ if user_input:
             
             if conflicts:
                 for conf in conflicts:
-                    st.error(f"⚠️ {conf}")
+                    st.markdown(f"<div style='background: rgba(239, 68, 68, 0.15); border-left: 3px solid #ef4444; padding: 8px 12px; border-radius: 6px; margin: 6px 0; color: #fca5a5;'>⚠️ {conf}</div>", unsafe_allow_html=True)
                     
             if citations:
                 with st.expander("📚 Citation Sources & Graph Verification"):
@@ -121,4 +140,3 @@ if user_input:
                 "citations": citations,
                 "conflicts": conflicts
             })
-
