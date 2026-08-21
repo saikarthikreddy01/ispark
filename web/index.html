@@ -315,7 +315,7 @@
     </div>
   </div>
 
-  <script src="app.js?v=5.0"></script>
+  <script src="app.js?v=6.0"></script>
   <script>
     function setAuthMode(mode) {
       const tabLogin = document.getElementById("auth-tab-login");
@@ -354,31 +354,40 @@
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ regno: regno, password: password })
         });
-        const data = await res.json();
-        if (res.ok && data.student) {
-          if (alertBox) alertBox.style.display = "none";
-          state.currentStudent = data.student;
-          saveActiveUser(data.student.id);
-          savePermanentStudents();
-          initStudentPicker();
-          const picker = document.getElementById("user-select");
-          if (picker) picker.value = data.student.id;
-          renderDashboard();
-          openDashboard('pathway');
-          return;
-        } else if (!res.ok && data.detail) {
-          if (alertBox) {
-            alertBox.className = "auth-alert error";
-            alertBox.textContent = `⚠️ ${data.detail}`;
-            alertBox.style.display = "block";
+        const contentType = res.headers.get("content-type") || "";
+        if (contentType.includes("application/json")) {
+          const data = await res.json();
+          if (res.ok && data.student) {
+            if (alertBox) alertBox.style.display = "none";
+            state.currentStudent = data.student;
+            saveActiveUser(data.student.id);
+            savePermanentStudents();
+            initStudentPicker();
+            const picker = document.getElementById("user-select");
+            if (picker) picker.value = data.student.id;
+            renderDashboard();
+            openDashboard('pathway');
+            return;
+          } else if (!res.ok && data.detail) {
+            if (alertBox) {
+              alertBox.className = "auth-alert error";
+              alertBox.textContent = `⚠️ ${data.detail}`;
+              alertBox.style.display = "block";
+            }
+            return;
           }
-          return;
+        } else {
+          // Server returned HTML (e.g. Netlify), fall through to localStorage
+          console.log("Backend returned non-JSON (Netlify static host), using permanent local storage.");
         }
       } catch (err) {
         console.log("Backend API offline, using permanent local storage.");
       }
 
-      // Client-Side Permanent Fallback
+      // Re-load permanent students from localStorage to ensure we have latest data
+      loadPermanentStudents();
+
+      // Client-Side Permanent Fallback (localStorage)
       const found = APP_DATA.students.find(s => s.id.toUpperCase() === regno);
       if (found) {
         // Verify password if recorded
@@ -420,6 +429,9 @@
 
       if (!name || !regno) return;
 
+      // Re-load from localStorage to check for duplicates across sessions
+      loadPermanentStudents();
+
       const existing = APP_DATA.students.find(s => s.id.toUpperCase() === regno);
       if (existing) {
         if (alertBox) {
@@ -456,9 +468,16 @@
             password: pwd
           })
         });
-        const data = await res.json();
-        if (res.ok && data.student) {
-          newStudent = data.student;
+        const contentType = res.headers.get("content-type") || "";
+        if (contentType.includes("application/json")) {
+          const data = await res.json();
+          if (res.ok && data.student) {
+            newStudent = data.student;
+            // Ensure password is preserved
+            if (!newStudent.password) newStudent.password = pwd || "password123";
+          }
+        } else {
+          console.log("Backend returned non-JSON (Netlify static host), saving to permanent local storage.");
         }
       } catch (err) {
         console.log("Backend offline, saving permanently to browser database.");
@@ -469,6 +488,13 @@
       savePermanentStudents();
       saveActiveUser(newStudent.id);
       initStudentPicker();
+
+      if (alertBox) {
+        alertBox.className = "auth-alert success";
+        alertBox.textContent = `✅ Account '${regno}' created successfully! You are now logged in.`;
+        alertBox.style.display = "block";
+      }
+
       renderDashboard();
       openDashboard('pathway');
     }
