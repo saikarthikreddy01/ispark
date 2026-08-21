@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>PathFinder AI — Academic Pathway & Graph-RAG Advisor</title>
+  <title>PathFinder AI — Academic Pathway & Graph-RAG Platform</title>
   
   <link rel="stylesheet" href="style.css">
   <script type="text/javascript" src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
@@ -11,167 +11,223 @@
 <body>
 
   <!-- ==========================================================================
-       TOP NAVBAR: STUDENT SWITCHER & DEGREE STATS
+       TOP NAVIGATION BAR
        ========================================================================== -->
-  <header class="top-navbar">
-    <div class="brand-section">
-      <div class="brand-logo-icon">🧭</div>
+  <nav class="navbar">
+    <div class="nav-brand">
+      <div class="brand-icon">🧭</div>
       <div>
-        <div class="brand-name">PathFinder <span class="gradient-text">AI</span></div>
-        <div style="font-size: 0.7rem; color: var(--text-muted); line-height: 1;">Graph-RAG Degree Navigator</div>
+        <div class="brand-title">PathFinder <span style="color: #60a5fa;">AI</span></div>
+        <div class="brand-tag">Academic Intelligence</div>
       </div>
     </div>
 
-    <!-- Student Switcher & Progress Header -->
-    <div class="student-controls">
-      <div>
-        <span style="font-size: 0.72rem; color: var(--text-muted); text-transform: uppercase; font-weight: 700; margin-right: 6px;">Student:</span>
-        <select id="top-student-select" class="student-dropdown"></select>
-      </div>
+    <!-- Navigation Tabs -->
+    <div class="nav-links">
+      <button class="nav-tab active" id="tab-btn-pathway" onclick="setMainView('pathway')">
+        <span>🗺️</span> Pathway Roadmap
+      </button>
+      <button class="nav-tab" id="tab-btn-graph" onclick="setMainView('graph')">
+        <span>🕸️</span> Knowledge Graph
+      </button>
+      <button class="nav-tab" id="tab-btn-advisor" onclick="setMainView('advisor')">
+        <span>💬</span> AI Advisor
+      </button>
+      <button class="nav-tab" id="tab-btn-conflicts" onclick="setMainView('conflicts')">
+        <span>⚠️</span> Conflict Auditor
+      </button>
+    </div>
 
-      <div class="progress-chip">
-        <div class="status-ring-circle" id="top-progress-pct">65%</div>
-        <div>
-          <strong id="top-credits-text" style="color: #f8fafc;">78 / 120 cr</strong>
-          <span style="font-size: 0.75rem; color: var(--text-muted); margin-left: 4px;" id="top-grad-horizon">· Spring 2026</span>
-        </div>
-      </div>
-
-      <div class="progress-chip">
-        <span style="font-size: 0.75rem; color: var(--text-muted);">GPA:</span>
-        <strong id="top-gpa-text" style="color: #34d399;">3.65</strong>
+    <!-- Student Switcher -->
+    <div class="nav-profile">
+      <div class="student-selector-wrapper">
+        <span style="font-size: 0.76rem; color: var(--text-muted);">Student:</span>
+        <select id="student-picker" class="student-select"></select>
       </div>
     </div>
-  </header>
+  </nav>
 
   <!-- ==========================================================================
-       SPLIT-PANE WORKSPACE: VISUAL REASONING (LEFT) + AI CHAT (RIGHT)
+       MAIN CONTENT CONTAINER
        ========================================================================== -->
-  <div class="workspace-container">
+  <main class="main-container">
     
-    <!-- LEFT PANE: VISUAL REASONING ENGINE (TIMELINE + GRAPH + RISKS) -->
-    <main class="left-pane">
-      
-      <!-- View Mode Header -->
-      <div class="view-tabs-header">
-        <div>
-          <h2 style="font-size: 1.25rem; font-weight: 800; color: #f8fafc;" id="view-title">🗺️ Degree Pathway Timeline</h2>
-          <p style="font-size: 0.8rem; color: var(--text-muted);" id="view-subtitle">Semester-by-semester sequencing color-coded by prerequisite status.</p>
-        </div>
+    <!-- Dynamic Header & Summary -->
+    <div class="page-header-box">
+      <div>
+        <h1 class="page-title" id="student-heading">Alice Johnson</h1>
+        <p class="page-subtitle" id="student-subheading">Major: Computer Science · Minor: Mathematics · Expected Graduation: Spring 2026</p>
+      </div>
+      <div style="text-align: right;">
+        <span class="stat-badge badge-success" id="student-status-badge">● Good Academic Standing</span>
+      </div>
+    </div>
 
-        <div class="view-tabs">
-          <button class="view-tab-btn active" id="btn-tab-timeline" onclick="switchVisualTab('timeline')">
-            <span>🗺️ Pathway Kanban</span>
-          </button>
-          <button class="view-tab-btn" id="btn-tab-graph" onclick="switchVisualTab('graph')">
-            <span>🕸️ Prerequisite Graph</span>
-          </button>
+    <!-- 4 High-Level Metric Tiles -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-label">Credits Completed</div>
+        <div class="stat-value" id="kpi-credits">78 <span style="font-size: 1rem; color: var(--text-muted);">/ 120 cr</span></div>
+        <div class="stat-badge badge-info" id="kpi-credits-pct">65% Progress</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Cumulative GPA</div>
+        <div class="stat-value" id="kpi-gpa">3.65</div>
+        <div class="stat-badge badge-success">Honor Roll</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Estimated Remaining</div>
+        <div class="stat-value" id="kpi-semesters">3 Terms</div>
+        <div class="stat-badge badge-info">42 Credits Needed</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Bottleneck Risks</div>
+        <div class="stat-value" id="kpi-conflicts" style="color: #f87171;">1 Course</div>
+        <div class="stat-badge badge-danger">Attention Required</div>
+      </div>
+    </div>
+
+    <!-- ==========================================================================
+         VIEW 1: PATHWAY ROADMAP (KANBAN TIMELINE)
+         ========================================================================== -->
+    <section id="section-pathway" class="view-section">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+        <h2 style="font-size: 1.2rem; font-weight: 700; color: #f8fafc;">📅 8-Semester Degree Pathway Timeline</h2>
+        <div style="display: flex; gap: 12px; font-size: 0.78rem;">
+          <span style="display: flex; align-items: center; gap: 6px;"><span style="width: 8px; height: 8px; border-radius: 50%; background: #10b981;"></span> Passed</span>
+          <span style="display: flex; align-items: center; gap: 6px;"><span style="width: 8px; height: 8px; border-radius: 50%; background: #3b82f6;"></span> Planned</span>
+          <span style="display: flex; align-items: center; gap: 6px;"><span style="width: 8px; height: 8px; border-radius: 50%; background: #ef4444;"></span> At-Risk</span>
         </div>
       </div>
 
-      <!-- VIEW 1: SEMESTER KANBAN TIMELINE (HERO SCREENSHOT) -->
-      <div id="view-timeline-container">
-        <div class="kanban-timeline-scroll" id="kanban-columns-feed">
-          <!-- Populated by JavaScript with 8 Semesters -->
-        </div>
-      </div>
+      <div class="kanban-board" id="kanban-feed"></div>
 
-      <!-- VIEW 2: INTERACTIVE PREREQUISITE & CONFLICT GRAPH -->
-      <div id="view-graph-container" style="display: none;">
-        <div id="graph-viewport-container"></div>
-      </div>
-
-      <!-- BOTTLENECK & GRADUATION RISK REPORT STACK (BELOW TIMELINE) -->
-      <section class="risk-report-section">
-        <div class="risk-header">
-          <div class="risk-title">
-            <span>⚡</span>
-            <span>Graduation Risk & Bottleneck Alerts</span>
+      <!-- Bottleneck Alert Card Stack -->
+      <div class="alert-section">
+        <div class="alert-header">
+          <div style="font-weight: 700; font-size: 0.95rem; display: flex; align-items: center; gap: 8px;">
+            <span>⚡</span> Prerequisite Bottlenecks & Graduation Risk Alerts
           </div>
-          <span style="font-size: 0.75rem; color: #fca5a5; font-weight: 700; background: rgba(239, 68, 68, 0.15); padding: 2px 8px; border-radius: 4px;">
-            1 Critical Constraint Flagged
-          </span>
+          <span style="font-size: 0.74rem; color: #fca5a5; font-weight: 700;">1 Constraint Action Required</span>
         </div>
 
-        <div class="risk-card-stack" id="risk-alert-stack">
-          <!-- Populated dynamically -->
-          <div class="risk-alert-card">
-            <div>
-              <strong style="color: #f87171; font-size: 0.9rem;">⚠️ Bottleneck Warning: CS301 (Algorithms)</strong>
-              <div class="risk-alert-text">
-                Course is only offered in <strong>Fall Terms</strong>. Must be completed by <strong>Fall 2025</strong> to prevent delaying Senior Capstone (CS499).
-              </div>
+        <div class="alert-item">
+          <div>
+            <strong style="color: #f87171; font-size: 0.9rem;">⚠️ Bottleneck Course: CS301 (Algorithms)</strong>
+            <div style="font-size: 0.84rem; color: #cbd5e1; margin-top: 2px;">
+              Course is strictly offered in <strong>Fall Semesters</strong>. Missing this term will delay your Senior Capstone (CS499) sequence by 1 full academic year.
             </div>
-            <button class="btn-alt-courses" onclick="openSubstitutionModal('CS301')">See Alternatives</button>
           </div>
+          <button class="alert-btn" onclick="openModal('CS301')">View Approved Alternatives</button>
         </div>
-      </section>
+      </div>
+    </section>
 
-    </main>
-
-    <!-- RIGHT PANE: ADVISOR CHAT PANEL (SPLIT-PANE ADVISING) -->
-    <aside class="right-pane">
-      <div class="chat-panel-header">
-        <div style="font-size: 1.2rem;">💬</div>
+    <!-- ==========================================================================
+         VIEW 2: KNOWLEDGE GRAPH CANVAS
+         ========================================================================== -->
+    <section id="section-graph" class="view-section" style="display: none;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
         <div>
-          <div class="chat-panel-title">PathFinder Advisor AI</div>
-          <div style="font-size: 0.72rem; color: #34d399;">● Graph-RAG Active</div>
+          <h2 style="font-size: 1.2rem; font-weight: 700;">🕸️ Curriculum Prerequisite Knowledge Graph</h2>
+          <p style="font-size: 0.85rem; color: var(--text-muted);">Interactive 2D physics network showing prerequisite directed edges and bottleneck clusters.</p>
         </div>
+      </div>
+
+      <div class="graph-canvas-container" id="graph-canvas"></div>
+    </section>
+
+    <!-- ==========================================================================
+         VIEW 3: AI ADVISOR CHAT INTERFACE
+         ========================================================================== -->
+    <section id="section-advisor" class="view-section" style="display: none;">
+      <div style="margin-bottom: 18px; text-align: center;">
+        <h2 style="font-size: 1.3rem; font-weight: 800;">💬 Conversational AI Academic Advisor</h2>
+        <p style="font-size: 0.88rem; color: var(--text-muted);">Ask questions about prerequisite eligibility, degree rules, and academic policy.</p>
       </div>
 
       <!-- Quick Suggested Prompts -->
-      <div class="chat-quick-prompts">
-        <div style="font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase; font-weight: 700;">Suggested Questions:</div>
-        <button class="quick-prompt-chip" onclick="askAdvisorQuestion('Why cannot I take CS301 Algorithms next term?')">
-          ❓ Why can't I take CS301 Algorithms?
+      <div style="display: flex; gap: 10px; justify-content: center; margin-bottom: 20px; flex-wrap: wrap;">
+        <button class="nav-tab" style="background: rgba(30, 41, 59, 0.7); border: 1px solid var(--border);" onclick="sendAdvisorPrompt('Why cannot I take CS301 Algorithms next term?')">
+          💡 Why can't I take CS301 Algorithms?
         </button>
-        <button class="quick-prompt-chip" onclick="askAdvisorQuestion('What are the prerequisites for CS402 Machine Learning?')">
-          ❓ What are the prerequisites for CS402 (ML)?
+        <button class="nav-tab" style="background: rgba(30, 41, 59, 0.7); border: 1px solid var(--border);" onclick="sendAdvisorPrompt('What are the prerequisites for CS402 Machine Learning?')">
+          💡 Prerequisites for CS402 (ML)?
         </button>
-        <button class="quick-prompt-chip" onclick="askAdvisorQuestion('Am I on track to graduate in Spring 2026?')">
-          ❓ Am I on track to graduate on time?
+        <button class="nav-tab" style="background: rgba(30, 41, 59, 0.7); border: 1px solid var(--border);" onclick="sendAdvisorPrompt('Am I on track to graduate in Spring 2026?')">
+          💡 Am I on track to graduate on time?
         </button>
       </div>
 
-      <!-- Chat History Stream -->
-      <div class="chat-history-feed" id="chat-messages-stream">
-        <div class="msg-bubble assistant">
-          👋 Hello! I am your <strong>PathFinder Academic Advisor</strong>. Ask any question about prerequisite chains, graduation risks, or course alternatives. I will cite university catalog rules and highlight the graph for you!
+      <div class="chat-wrapper">
+        <div class="chat-messages" id="chat-stream">
+          <div class="chat-bubble assistant">
+            👋 Hello! I am your <strong>PathFinder AI Advisor</strong>. Ask me anything about course prerequisites, degree completion, or university academic policies!
+          </div>
+        </div>
+        <div class="chat-input-container">
+          <input type="text" id="chat-input-box" class="chat-input" placeholder="Type your academic question...">
+          <button id="chat-submit-btn" class="chat-send-btn">Ask Advisor</button>
         </div>
       </div>
+    </section>
 
-      <!-- Chat Input Area -->
-      <div class="chat-input-area">
-        <input type="text" id="advisor-user-input" class="chat-text-input" placeholder="Ask about prerequisites, risks, substitutions...">
-        <button id="advisor-send-btn" class="chat-btn-send">Send</button>
+    <!-- ==========================================================================
+         VIEW 4: CONFLICT AUDITOR SIMULATOR
+         ========================================================================== -->
+    <section id="section-conflicts" class="view-section" style="display: none;">
+      <div style="margin-bottom: 18px;">
+        <h2 style="font-size: 1.2rem; font-weight: 700;">⚠️ Prerequisite & Schedule Conflict Auditor</h2>
+        <p style="font-size: 0.85rem; color: var(--text-muted);">Simulate next term's schedule to catch prerequisite violations and credit overload caps.</p>
       </div>
-    </aside>
 
-  </div>
+      <div style="background: var(--bg-surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 24px;">
+        <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 20px; margin-bottom: 20px;">
+          <div>
+            <label style="font-size: 0.85rem; color: var(--text-muted); display: block; margin-bottom: 8px;">Select Courses for Upcoming Semester:</label>
+            <select id="auditor-courses-select" multiple size="6" style="width: 100%; background: #090d16; border: 1px solid var(--border); border-radius: 8px; color: white; padding: 10px;"></select>
+          </div>
+          <div>
+            <label style="font-size: 0.85rem; color: var(--text-muted); display: block; margin-bottom: 8px;">Offering Semester:</label>
+            <select id="auditor-sem-select" style="width: 100%; background: #090d16; border: 1px solid var(--border); border-radius: 8px; color: white; padding: 10px; margin-bottom: 14px;">
+              <option value="FALL">Fall Semester</option>
+              <option value="SPRING">Spring Semester</option>
+            </select>
+            <button class="chat-send-btn" style="width: 100%;" onclick="runScheduleAudit()">⚡ Run Verification</button>
+          </div>
+        </div>
+
+        <div id="audit-results-box" style="padding: 16px; background: rgba(15, 23, 42, 0.6); border-radius: 8px; border: 1px solid var(--border);">
+          <div style="color: var(--text-muted); font-size: 0.88rem;">Select courses above and click 'Run Verification' to simulate your schedule.</div>
+        </div>
+      </div>
+    </section>
+
+  </main>
 
   <!-- ==========================================================================
-       COURSE DETAIL & SUBSTITUTION MODAL
+       COURSE DETAILS & SUBSTITUTION MODAL
        ========================================================================== -->
-  <div class="modal-overlay" id="course-modal-overlay">
-    <div class="modal-content-card">
-      <div class="modal-header">
+  <div class="modal-overlay" id="course-modal">
+    <div class="modal-card">
+      <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 14px;">
         <div>
-          <h3 id="modal-course-title" style="color: #60a5fa; font-size: 1.15rem;">CS301: Algorithms</h3>
-          <div id="modal-course-dept" style="font-size: 0.78rem; color: var(--text-muted);">Computer Science · 3 Credits</div>
+          <h3 id="modal-code-title" style="font-size: 1.2rem; color: #60a5fa;">CS301: Algorithms</h3>
+          <div id="modal-meta" style="font-size: 0.8rem; color: var(--text-muted);">Computer Science · 3 Credits</div>
         </div>
-        <button class="modal-close-btn" onclick="closeModal()">&times;</button>
+        <button style="background: transparent; border: none; color: var(--text-muted); font-size: 1.4rem; cursor: pointer;" onclick="closeModal()">&times;</button>
       </div>
 
-      <div id="modal-course-desc" style="font-size: 0.85rem; color: #cbd5e1; margin-bottom: 14px; line-height: 1.45;"></div>
+      <p id="modal-desc" style="font-size: 0.86rem; color: #cbd5e1; line-height: 1.5; margin-bottom: 16px;"></p>
 
-      <div style="background: rgba(15, 23, 42, 0.6); padding: 12px; border-radius: 8px; margin-bottom: 14px;">
-        <div style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; font-weight: 700; margin-bottom: 4px;">Prerequisites Required:</div>
-        <div id="modal-course-prereqs" style="font-size: 0.88rem; font-weight: 700; color: #f8fafc;">CS201, MATH201</div>
+      <div style="background: rgba(15, 23, 42, 0.7); padding: 12px; border-radius: 8px; margin-bottom: 12px;">
+        <div style="font-size: 0.74rem; color: var(--text-muted); text-transform: uppercase; font-weight: 700; margin-bottom: 4px;">Prerequisites Required:</div>
+        <div id="modal-prereqs" style="font-size: 0.88rem; font-weight: 600; color: #f8fafc;">CS201, MATH201</div>
       </div>
 
-      <div style="background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.3); padding: 12px; border-radius: 8px;">
-        <div style="font-size: 0.75rem; color: #34d399; text-transform: uppercase; font-weight: 700; margin-bottom: 4px;">Approved Substitutions (§2.1):</div>
-        <div id="modal-course-subs" style="font-size: 0.85rem; color: #cbd5e1;">CS305 (Applied Algorithm Design)</div>
+      <div style="background: var(--emerald-bg); border: 1px solid rgba(16, 185, 129, 0.3); padding: 12px; border-radius: 8px;">
+        <div style="font-size: 0.74rem; color: var(--emerald-text); text-transform: uppercase; font-weight: 700; margin-bottom: 4px;">Approved Substitutions (§2.1):</div>
+        <div id="modal-subs" style="font-size: 0.85rem; color: #e2e8f0;">CS305 (Applied Algorithm Design)</div>
       </div>
     </div>
   </div>
