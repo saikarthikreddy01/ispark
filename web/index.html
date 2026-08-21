@@ -3,39 +3,50 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Academic AI Advisor</title>
+  <title>Academic AI Advisor — 3D Graph-RAG Platform</title>
   
   <link rel="stylesheet" href="style.css">
+  <!-- Three.js for Minimalist 3D Animations (like alltimehigh.ai) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <!-- Vis.js for 2D Prerequisite Knowledge Graph -->
   <script type="text/javascript" src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
 </head>
 <body>
 
+  <!-- Ambient 3D Background Canvas Layer -->
+  <canvas id="three-bg-canvas"></canvas>
+
   <!-- ==========================================================================
-       1. MINIMAL CLEAN LANDING PAGE
+       1. MINIMAL 3D HERO LANDING PAGE
        ========================================================================== -->
   <div id="landing-screen" class="landing-container">
-    <div class="landing-badge">
-      <span>✨</span>
-      <span>Graph-RAG Academic Platform</span>
+    <!-- 3D Interactive Geometric Constellation Canvas -->
+    <canvas id="three-landing-canvas"></canvas>
+
+    <div class="landing-content">
+      <div class="landing-badge">
+        <span>✨</span>
+        <span>Graph-RAG Academic Platform</span>
+      </div>
+
+      <h1 class="landing-title">
+        Academic AI <span class="gradient-text">Advisor</span>
+      </h1>
+
+      <p class="landing-subtitle">
+        Automated degree sequencing, prerequisite conflict detection, and policy-grounded academic advising.
+      </p>
+
+      <button class="btn-launch" onclick="openDashboard('pathway')">
+        <span>Launch Advisor</span>
+        <span style="font-size: 0.75rem; background: rgba(0,0,0,0.15); padding: 2px 8px; border-radius: 6px; font-family: monospace;">ENTER ↵</span>
+      </button>
+      <div class="landing-hint">Press <kbd style="background: rgba(255,255,255,0.08); padding: 3px 8px; border-radius: 6px;">Enter</kbd> or click to open</div>
     </div>
-
-    <h1 class="landing-title">
-      Academic AI <span class="gradient-text">Advisor</span>
-    </h1>
-
-    <p class="landing-subtitle">
-      Automated degree sequencing, prerequisite conflict detection, and policy-grounded academic advising.
-    </p>
-
-    <button class="btn-launch" onclick="openDashboard('pathway')">
-      <span>Launch Advisor</span>
-      <span style="font-size: 0.75rem; background: rgba(0,0,0,0.15); padding: 2px 6px; border-radius: 4px; font-family: monospace;">ENTER ↵</span>
-    </button>
-    <div class="landing-hint">Press <kbd style="background: rgba(255,255,255,0.08); padding: 2px 6px; border-radius: 4px;">Enter</kbd> or click to open</div>
   </div>
 
   <!-- ==========================================================================
-       2. CLEAN MINIMAL DASHBOARD
+       2. CLEAN MINIMAL DASHBOARD WITH 3D DEPTH
        ========================================================================== -->
   <div id="dashboard-screen" style="display: none;">
     
@@ -81,11 +92,11 @@
         <div class="kpi-tag tag-green" id="ui-student-standing">● Good Standing</div>
       </div>
 
-      <!-- 4 Clean KPI Tiles -->
+      <!-- 4 Clean KPI Tiles with 3D Hover Tilt -->
       <div class="kpi-row">
         <div class="kpi-box">
           <div class="kpi-title">Credits Completed</div>
-          <div class="kpi-number" id="ui-kpi-credits">78 <span style="font-size: 0.9rem; color: var(--text-dim);">/ 120</span></div>
+          <div class="kpi-number" id="ui-kpi-credits">78 <span style="font-size: 0.95rem; color: var(--text-dim);">/ 120</span></div>
           <div class="kpi-tag tag-blue" id="ui-kpi-pct">65% Progress</div>
         </div>
         <div class="kpi-box">
@@ -107,12 +118,12 @@
 
       <!-- ================= TAB 1: PATHWAY ROADMAP (KANBAN) ================= -->
       <section id="view-pathway">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-          <h2 style="font-size: 1.05rem; font-weight: 600;">Semester Roadmap</h2>
-          <div style="display: flex; gap: 12px; font-size: 0.75rem;">
-            <span style="color: var(--accent-green);">● Passed</span>
-            <span style="color: var(--accent-blue);">● Planned</span>
-            <span style="color: var(--accent-rose);">● At-Risk</span>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
+          <h2 style="font-size: 1.1rem; font-weight: 700;">Semester Roadmap</h2>
+          <div style="display: flex; gap: 12px; font-size: 0.78rem;">
+            <span style="color: var(--accent-green); font-weight: 600;">● Passed</span>
+            <span style="color: var(--accent-blue); font-weight: 600;">● Planned</span>
+            <span style="color: var(--accent-rose); font-weight: 600;">● At-Risk</span>
           </div>
         </div>
 
@@ -121,8 +132,8 @@
         <!-- Bottleneck Alert -->
         <div class="alert-card">
           <div>
-            <div style="font-weight: 600; font-size: 0.88rem; color: var(--accent-rose);">⚠️ Bottleneck Notice: CS301 (Algorithms)</div>
-            <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 2px;">
+            <div style="font-weight: 700; font-size: 0.92rem; color: var(--accent-rose);">⚠️ Bottleneck Notice: CS301 (Algorithms)</div>
+            <div style="font-size: 0.82rem; color: var(--text-muted); margin-top: 2px;">
               Only offered in Fall. Complete early to ensure on-time enrollment in Capstone (CS499).
             </div>
           </div>
@@ -132,9 +143,9 @@
 
       <!-- ================= TAB 2: KNOWLEDGE GRAPH ================= -->
       <section id="view-graph" style="display: none;">
-        <div style="margin-bottom: 12px;">
-          <h2 style="font-size: 1.05rem; font-weight: 600;">Prerequisite Knowledge Graph</h2>
-          <div style="font-size: 0.8rem; color: var(--text-muted);">Interactive curriculum network showing prerequisite dependency chains.</div>
+        <div style="margin-bottom: 14px;">
+          <h2 style="font-size: 1.1rem; font-weight: 700;">Prerequisite Knowledge Graph</h2>
+          <div style="font-size: 0.82rem; color: var(--text-muted);">Interactive curriculum network showing prerequisite dependency chains.</div>
         </div>
 
         <div class="graph-box" id="graph-container"></div>
@@ -142,7 +153,7 @@
 
       <!-- ================= TAB 3: AI ADVISOR CHAT ================= -->
       <section id="view-advisor" style="display: none;">
-        <div style="display: flex; gap: 8px; justify-content: center; margin-bottom: 16px; flex-wrap: wrap;">
+        <div style="display: flex; gap: 10px; justify-content: center; margin-bottom: 18px; flex-wrap: wrap;">
           <button class="tab-link" style="background: var(--bg-card); border: 1px solid var(--border);" onclick="askAdvisor('Why cannot I take CS301 Algorithms next term?')">
             💡 Why can't I take CS301 Algorithms?
           </button>
@@ -169,20 +180,20 @@
 
       <!-- ================= TAB 4: CONFLICT AUDITOR ================= -->
       <section id="view-conflicts" style="display: none;">
-        <div style="margin-bottom: 12px;">
-          <h2 style="font-size: 1.05rem; font-weight: 600;">Schedule Conflict Auditor</h2>
-          <div style="font-size: 0.8rem; color: var(--text-muted);">Simulate next term's registration to verify prerequisite compliance.</div>
+        <div style="margin-bottom: 14px;">
+          <h2 style="font-size: 1.1rem; font-weight: 700;">Schedule Conflict Auditor</h2>
+          <div style="font-size: 0.82rem; color: var(--text-muted);">Simulate next term's registration to verify prerequisite compliance.</div>
         </div>
 
-        <div style="background: var(--bg-surface); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 20px;">
+        <div style="background: rgba(11, 17, 32, 0.85); backdrop-filter: blur(12px); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 22px;">
           <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 16px; margin-bottom: 16px;">
             <div>
-              <label style="font-size: 0.8rem; color: var(--text-muted); display: block; margin-bottom: 6px;">Select Proposed Courses:</label>
-              <select id="audit-course-select" multiple size="6" style="width: 100%; background: var(--bg-card); border: 1px solid var(--border); border-radius: 6px; color: white; padding: 8px;"></select>
+              <label style="font-size: 0.82rem; color: var(--text-muted); display: block; margin-bottom: 6px;">Select Proposed Courses:</label>
+              <select id="audit-course-select" multiple size="6" style="width: 100%; background: var(--bg-card); border: 1px solid var(--border); border-radius: 6px; color: white; padding: 10px;"></select>
             </div>
             <div>
-              <label style="font-size: 0.8rem; color: var(--text-muted); display: block; margin-bottom: 6px;">Target Semester:</label>
-              <select id="audit-sem-select" style="width: 100%; background: var(--bg-card); border: 1px solid var(--border); border-radius: 6px; color: white; padding: 8px; margin-bottom: 12px;">
+              <label style="font-size: 0.82rem; color: var(--text-muted); display: block; margin-bottom: 6px;">Target Semester:</label>
+              <select id="audit-sem-select" style="width: 100%; background: var(--bg-card); border: 1px solid var(--border); border-radius: 6px; color: white; padding: 10px; margin-bottom: 12px;">
                 <option value="FALL">Fall Semester</option>
                 <option value="SPRING">Spring Semester</option>
               </select>
@@ -190,7 +201,7 @@
             </div>
           </div>
 
-          <div id="audit-output" style="padding: 12px; background: var(--bg-card); border-radius: 6px; border: 1px solid var(--border); font-size: 0.85rem; color: var(--text-muted);">
+          <div id="audit-output" style="padding: 14px; background: var(--bg-card); border-radius: 6px; border: 1px solid var(--border); font-size: 0.86rem; color: var(--text-muted);">
             Select courses above and click 'Run Verification' to test prerequisites.
           </div>
         </div>
@@ -205,19 +216,19 @@
   <div class="modal-backdrop" id="modal-box">
     <div class="modal-box">
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-        <h3 id="modal-title" style="font-size: 1.1rem; color: var(--accent-blue);">CS301: Algorithms</h3>
-        <button style="background: transparent; border: none; color: var(--text-muted); font-size: 1.2rem; cursor: pointer;" onclick="closeModal()">&times;</button>
+        <h3 id="modal-title" style="font-size: 1.15rem; color: var(--accent-blue);">CS301: Algorithms</h3>
+        <button style="background: transparent; border: none; color: var(--text-muted); font-size: 1.3rem; cursor: pointer;" onclick="closeModal()">&times;</button>
       </div>
 
-      <div id="modal-credits" style="font-size: 0.78rem; color: var(--text-dim); margin-bottom: 10px;">Core · 3 Credits</div>
-      <p id="modal-desc" style="font-size: 0.84rem; color: var(--text-muted); line-height: 1.45; margin-bottom: 12px;"></p>
+      <div id="modal-credits" style="font-size: 0.8rem; color: var(--text-dim); margin-bottom: 10px;">Core · 3 Credits</div>
+      <p id="modal-desc" style="font-size: 0.86rem; color: var(--text-muted); line-height: 1.5; margin-bottom: 14px;"></p>
 
-      <div style="background: var(--bg-card); padding: 10px; border-radius: 6px; margin-bottom: 10px; font-size: 0.82rem;">
+      <div style="background: var(--bg-card); padding: 10px; border-radius: 6px; margin-bottom: 10px; font-size: 0.84rem;">
         <span style="color: var(--text-dim); font-weight: 600;">Prerequisites:</span>
         <span id="modal-prereqs" style="color: var(--text-main); font-weight: 600; margin-left: 4px;">CS201, MATH201</span>
       </div>
 
-      <div style="background: rgba(52, 211, 153, 0.1); border: 1px solid rgba(52, 211, 153, 0.25); padding: 10px; border-radius: 6px; font-size: 0.82rem;">
+      <div style="background: rgba(52, 211, 153, 0.1); border: 1px solid rgba(52, 211, 153, 0.25); padding: 10px; border-radius: 6px; font-size: 0.84rem;">
         <span style="color: var(--accent-green); font-weight: 600;">Approved Substitutions:</span>
         <div id="modal-subs" style="color: var(--text-main); margin-top: 2px;">CS305 (Applied Algorithm Design)</div>
       </div>

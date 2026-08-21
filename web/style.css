@@ -1,31 +1,36 @@
 /* ==========================================================================
-   Academic AI Advisor — Minimalist, Clean & Clear SaaS Design
+   Academic AI Advisor — Minimalist 3D SaaS Design
+   Inspired by alltimehigh.ai, Linear & Vercel
    ========================================================================== */
 
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap');
 
 :root {
-  --bg-main: #0b0f19;
-  --bg-surface: #111827;
-  --bg-card: #161f30;
-  --bg-card-hover: #1c283f;
+  --bg-main: #060913;
+  --bg-surface: #0b1120;
+  --bg-card: rgba(16, 24, 40, 0.7);
+  --bg-card-hover: rgba(24, 35, 58, 0.9);
   
-  --border: rgba(255, 255, 255, 0.07);
+  --border: rgba(255, 255, 255, 0.08);
   --border-focus: #38bdf8;
   
   --accent-blue: #38bdf8;
+  --accent-cyan: #22d3ee;
   --accent-green: #34d399;
   --accent-amber: #fbbf24;
   --accent-rose: #f87171;
   
   --text-main: #f9fafb;
-  --text-muted: #9ca3af;
-  --text-dim: #6b7280;
+  --text-muted: #94a3b8;
+  --text-dim: #64748b;
   
-  --radius-sm: 6px;
-  --radius-md: 10px;
-  --radius-lg: 14px;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
   --radius-full: 9999px;
+  
+  --shadow-glow-blue: 0 0 30px rgba(56, 189, 248, 0.3);
+  --shadow-card: 0 10px 30px -10px rgba(0, 0, 0, 0.6);
 }
 
 * {
@@ -35,12 +40,13 @@
 }
 
 body {
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
   background-color: var(--bg-main);
   color: var(--text-main);
   min-height: 100vh;
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
 }
 
 code, pre {
@@ -49,7 +55,7 @@ code, pre {
 
 /* Minimal Gradient */
 .gradient-text {
-  background: linear-gradient(135deg, #38bdf8 0%, #34d399 100%);
+  background: linear-gradient(135deg, #38bdf8 0%, #34d399 50%, #818cf8 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   font-weight: 800;
@@ -57,7 +63,31 @@ code, pre {
 }
 
 /* ==========================================================================
-   1. MINIMAL CLEAN LANDING PAGE
+   3D BACKGROUND CANVAS LAYERS (Three.js)
+   ========================================================================== */
+#three-landing-canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  pointer-events: none;
+}
+
+#three-bg-canvas {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0.45;
+}
+
+/* ==========================================================================
+   1. MINIMAL 3D HERO LANDING PAGE
    ========================================================================== */
 .landing-container {
   min-height: 100vh;
@@ -67,81 +97,98 @@ code, pre {
   justify-content: center;
   padding: 40px 20px;
   text-align: center;
-  background: radial-gradient(circle at 50% 30%, #172136 0%, #0b0f19 75%);
+  position: relative;
+  overflow: hidden;
+  background: radial-gradient(circle at 50% 30%, #0d1527 0%, #060913 80%);
+}
+
+.landing-content {
+  position: relative;
+  z-index: 2;
+  max-width: 760px;
+  margin: 0 auto;
 }
 
 .landing-badge {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  padding: 4px 14px;
+  gap: 8px;
+  padding: 6px 18px;
   border-radius: var(--radius-full);
-  background: rgba(56, 189, 248, 0.1);
-  border: 1px solid rgba(56, 189, 248, 0.25);
+  background: rgba(56, 189, 248, 0.08);
+  border: 1px solid rgba(56, 189, 248, 0.3);
   color: var(--accent-blue);
-  font-size: 0.75rem;
-  font-weight: 600;
-  letter-spacing: 0.04em;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
   text-transform: uppercase;
-  margin-bottom: 20px;
+  margin-bottom: 24px;
+  backdrop-filter: blur(8px);
+  box-shadow: 0 0 25px rgba(56, 189, 248, 0.2);
+  animation: float-badge 3s ease-in-out infinite alternate;
+}
+
+@keyframes float-badge {
+  0% { transform: translateY(0px); }
+  100% { transform: translateY(-5px); }
 }
 
 .landing-title {
-  font-size: 3.2rem;
+  font-size: 4rem;
   font-weight: 800;
-  letter-spacing: -0.03em;
+  letter-spacing: -0.04em;
   color: #ffffff;
-  margin-bottom: 14px;
-  line-height: 1.15;
+  margin-bottom: 18px;
+  line-height: 1.1;
 }
 
 .landing-subtitle {
-  font-size: 1.1rem;
+  font-size: 1.18rem;
   color: var(--text-muted);
-  max-width: 580px;
-  margin: 0 auto 32px auto;
-  line-height: 1.55;
+  max-width: 620px;
+  margin: 0 auto 36px auto;
+  line-height: 1.6;
 }
 
 .btn-launch {
   display: inline-flex;
   align-items: center;
-  gap: 10px;
-  padding: 14px 32px;
-  font-size: 1rem;
-  font-weight: 600;
-  color: #0b0f19;
-  background: #38bdf8;
+  gap: 12px;
+  padding: 16px 38px;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #060913;
+  background: linear-gradient(135deg, #38bdf8 0%, #34d399 100%);
   border: none;
   border-radius: var(--radius-full);
   cursor: pointer;
-  box-shadow: 0 4px 20px rgba(56, 189, 248, 0.35);
-  transition: all 0.2s ease;
+  box-shadow: 0 4px 30px rgba(56, 189, 248, 0.5), 0 0 20px rgba(52, 211, 153, 0.3);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .btn-launch:hover {
-  background: #7dd3fc;
-  transform: translateY(-2px);
-  box-shadow: 0 6px 24px rgba(56, 189, 248, 0.5);
+  transform: translateY(-3px) scale(1.03);
+  box-shadow: 0 8px 36px rgba(56, 189, 248, 0.7);
 }
 
 .landing-hint {
-  font-size: 0.8rem;
+  font-size: 0.82rem;
   color: var(--text-dim);
-  margin-top: 14px;
+  margin-top: 18px;
 }
 
 /* ==========================================================================
-   2. CLEAN MINIMAL TOPBAR
+   2. TOPBAR & NAVIGATION
    ========================================================================== */
 .topbar {
-  height: 64px;
-  background: var(--bg-surface);
+  height: 66px;
+  background: rgba(11, 17, 32, 0.85);
+  backdrop-filter: blur(16px);
   border-bottom: 1px solid var(--border);
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 28px;
+  padding: 0 32px;
   position: sticky;
   top: 0;
   z-index: 50;
@@ -155,20 +202,21 @@ code, pre {
 }
 
 .topbar-logo {
-  width: 32px;
-  height: 32px;
-  border-radius: 8px;
-  background: #38bdf8;
-  color: #0b0f19;
+  width: 34px;
+  height: 34px;
+  border-radius: 9px;
+  background: linear-gradient(135deg, #38bdf8, #34d399);
+  color: #060913;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.1rem;
+  font-size: 1.15rem;
   font-weight: 800;
+  box-shadow: 0 0 15px rgba(56, 189, 248, 0.4);
 }
 
 .topbar-title {
-  font-size: 1.05rem;
+  font-size: 1.1rem;
   font-weight: 700;
   color: var(--text-main);
 }
@@ -176,23 +224,23 @@ code, pre {
 /* Tabs */
 .topbar-tabs {
   display: flex;
-  background: rgba(11, 15, 25, 0.8);
+  background: rgba(6, 9, 19, 0.8);
   border: 1px solid var(--border);
   border-radius: var(--radius-full);
-  padding: 3px 5px;
+  padding: 4px 6px;
   gap: 4px;
 }
 
 .tab-link {
-  padding: 6px 16px;
+  padding: 7px 18px;
   border-radius: var(--radius-full);
-  font-size: 0.84rem;
-  font-weight: 500;
+  font-size: 0.86rem;
+  font-weight: 600;
   color: var(--text-muted);
   background: transparent;
   border: none;
   cursor: pointer;
-  transition: all 0.15s ease;
+  transition: all 0.2s ease;
   display: flex;
   align-items: center;
   gap: 6px;
@@ -204,25 +252,26 @@ code, pre {
 
 .tab-link.active {
   background: #38bdf8;
-  color: #0b0f19;
+  color: #060913;
   font-weight: 700;
+  box-shadow: 0 2px 10px rgba(56, 189, 248, 0.4);
 }
 
-/* Student Switcher */
+/* User Profile */
 .topbar-user {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
 }
 
 .user-select {
-  background: var(--bg-card);
+  background: rgba(16, 24, 40, 0.8);
   border: 1px solid var(--border);
   border-radius: var(--radius-sm);
-  padding: 6px 12px;
+  padding: 7px 14px;
   color: var(--text-main);
-  font-size: 0.84rem;
-  font-weight: 500;
+  font-size: 0.85rem;
+  font-weight: 600;
   outline: none;
   cursor: pointer;
 }
@@ -231,81 +280,95 @@ code, pre {
   background: transparent;
   border: 1px solid var(--border);
   border-radius: var(--radius-sm);
-  padding: 6px 12px;
+  padding: 7px 14px;
   color: var(--text-muted);
-  font-size: 0.82rem;
+  font-size: 0.84rem;
   cursor: pointer;
+  transition: all 0.15s ease;
 }
 
 .btn-home:hover {
   color: var(--text-main);
-  background: rgba(255, 255, 255, 0.05);
+  background: rgba(255, 255, 255, 0.06);
 }
 
 /* ==========================================================================
-   3. CLEAN MAIN CONTENT
+   3. MAIN CONTENT CONTAINER (With 3D Card Hover Depth)
    ========================================================================== */
 .content-wrapper {
-  max-width: 1280px;
+  max-width: 1300px;
   margin: 0 auto;
-  padding: 28px 20px 60px 20px;
+  padding: 32px 24px 60px 24px;
+  position: relative;
+  z-index: 1;
 }
 
 .student-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 24px;
-  padding-bottom: 16px;
+  margin-bottom: 26px;
+  padding-bottom: 18px;
   border-bottom: 1px solid var(--border);
 }
 
 .student-name {
-  font-size: 1.6rem;
-  font-weight: 700;
+  font-size: 1.75rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
   color: var(--text-main);
 }
 
 .student-details {
-  font-size: 0.88rem;
+  font-size: 0.9rem;
   color: var(--text-muted);
-  margin-top: 2px;
+  margin-top: 3px;
 }
 
-/* 4 Simple KPI Cards */
+/* 4 KPI Cards with 3D Tilt */
 .kpi-row {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 14px;
-  margin-bottom: 24px;
+  gap: 16px;
+  margin-bottom: 28px;
+  perspective: 1000px;
 }
 
 .kpi-box {
   background: var(--bg-card);
+  backdrop-filter: blur(12px);
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
-  padding: 16px 18px;
+  padding: 18px 20px;
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.2s, box-shadow 0.2s;
+  will-change: transform;
+}
+
+.kpi-box:hover {
+  transform: translateY(-4px) rotateX(2deg) rotateY(-2deg);
+  border-color: rgba(56, 189, 248, 0.5);
+  box-shadow: var(--shadow-card), 0 0 20px rgba(56, 189, 248, 0.15);
 }
 
 .kpi-title {
-  font-size: 0.76rem;
-  font-weight: 600;
+  font-size: 0.78rem;
+  font-weight: 700;
   color: var(--text-dim);
   text-transform: uppercase;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.05em;
   margin-bottom: 4px;
 }
 
 .kpi-number {
-  font-size: 1.5rem;
-  font-weight: 700;
+  font-size: 1.65rem;
+  font-weight: 800;
   color: var(--text-main);
 }
 
 .kpi-tag {
-  font-size: 0.72rem;
+  font-size: 0.74rem;
   font-weight: 600;
-  margin-top: 4px;
+  margin-top: 6px;
   display: inline-block;
 }
 
@@ -314,26 +377,27 @@ code, pre {
 .tag-red { color: var(--accent-rose); }
 
 /* ==========================================================================
-   4. VIEW 1: CLEAN KANBAN TIMELINE
+   4. VIEW 1: KANBAN TIMELINE (3D Depth)
    ========================================================================== */
 .kanban-scroll {
   display: flex;
-  gap: 14px;
+  gap: 16px;
   overflow-x: auto;
-  padding-bottom: 14px;
-  margin-bottom: 24px;
+  padding-bottom: 16px;
+  margin-bottom: 26px;
 }
 
 .kanban-col {
-  min-width: 260px;
-  max-width: 260px;
-  background: var(--bg-surface);
+  min-width: 270px;
+  max-width: 270px;
+  background: rgba(11, 17, 32, 0.75);
+  backdrop-filter: blur(12px);
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
-  padding: 14px;
+  padding: 16px;
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 12px;
   flex-shrink: 0;
 }
 
@@ -341,56 +405,58 @@ code, pre {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding-bottom: 8px;
+  padding-bottom: 10px;
   border-bottom: 1px solid var(--border);
-  font-size: 0.85rem;
-  font-weight: 600;
+  font-size: 0.88rem;
+  font-weight: 700;
   color: var(--text-main);
 }
 
 .col-credits {
-  font-size: 0.72rem;
+  font-size: 0.74rem;
   color: var(--text-dim);
 }
 
 .card-item {
-  background: var(--bg-card);
+  background: rgba(16, 24, 40, 0.8);
   border: 1px solid var(--border);
   border-radius: var(--radius-sm);
-  padding: 10px 12px;
+  padding: 12px 14px;
   cursor: pointer;
-  transition: border-color 0.15s ease;
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.2s, box-shadow 0.2s;
 }
 
 .card-item:hover {
-  border-color: var(--border-focus);
+  transform: translateY(-3px) scale(1.01);
+  border-color: rgba(56, 189, 248, 0.6);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.4);
 }
 
 .card-item.is-passed { border-left: 3px solid var(--accent-green); }
 .card-item.is-planned { border-left: 3px solid var(--accent-blue); }
-.card-item.is-risk { border-left: 3px solid var(--accent-rose); }
+.card-item.is-risk { border-left: 3px solid var(--accent-rose); background: rgba(248, 113, 113, 0.08); }
 
 .item-top {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 2px;
+  margin-bottom: 4px;
 }
 
 .item-code {
-  font-size: 0.85rem;
-  font-weight: 600;
+  font-size: 0.88rem;
+  font-weight: 700;
   color: var(--text-main);
 }
 
 .item-status {
-  font-size: 0.65rem;
-  font-weight: 600;
+  font-size: 0.66rem;
+  font-weight: 700;
   text-transform: uppercase;
 }
 
 .item-name {
-  font-size: 0.78rem;
+  font-size: 0.8rem;
   color: var(--text-muted);
   line-height: 1.35;
 }
@@ -400,42 +466,44 @@ code, pre {
    ========================================================================== */
 .graph-box {
   width: 100%;
-  height: 540px;
-  background: var(--bg-surface);
+  height: 560px;
+  background: rgba(11, 17, 32, 0.85);
+  backdrop-filter: blur(12px);
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
-  margin-bottom: 24px;
+  margin-bottom: 26px;
 }
 
 /* ==========================================================================
    6. VIEW 3: CHAT ADVISOR
    ========================================================================== */
 .chat-card {
-  max-width: 860px;
+  max-width: 880px;
   margin: 0 auto;
-  background: var(--bg-surface);
+  background: rgba(11, 17, 32, 0.85);
+  backdrop-filter: blur(16px);
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  height: 560px;
+  height: 580px;
 }
 
 .chat-log {
   flex: 1;
-  padding: 20px;
+  padding: 24px;
   overflow-y: auto;
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 16px;
 }
 
 .bubble {
-  padding: 12px 16px;
+  padding: 14px 18px;
   border-radius: var(--radius-sm);
-  font-size: 0.88rem;
-  line-height: 1.5;
+  font-size: 0.9rem;
+  line-height: 1.55;
   max-width: 85%;
 }
 
@@ -448,39 +516,40 @@ code, pre {
 
 .bubble.user {
   align-self: flex-end;
-  background: #38bdf8;
-  color: #0b0f19;
-  font-weight: 500;
+  background: linear-gradient(135deg, #38bdf8, #2563eb);
+  color: #ffffff;
+  font-weight: 600;
+  box-shadow: 0 4px 14px rgba(56, 189, 248, 0.3);
 }
 
 .citation-chip {
   display: inline-block;
   background: rgba(56, 189, 248, 0.12);
-  border: 1px solid rgba(56, 189, 248, 0.3);
+  border: 1px solid rgba(56, 189, 248, 0.35);
   color: var(--accent-blue);
-  font-size: 0.72rem;
+  font-size: 0.74rem;
   font-weight: 600;
-  padding: 2px 6px;
+  padding: 2px 8px;
   border-radius: 4px;
-  margin-top: 6px;
+  margin-top: 8px;
 }
 
 .chat-input-bar {
-  padding: 14px 18px;
-  background: var(--bg-surface);
+  padding: 16px 20px;
+  background: rgba(11, 17, 32, 0.95);
   border-top: 1px solid var(--border);
   display: flex;
-  gap: 8px;
+  gap: 10px;
 }
 
 .chat-textfield {
   flex: 1;
-  background: var(--bg-card);
+  background: rgba(16, 24, 40, 0.8);
   border: 1px solid var(--border);
   border-radius: var(--radius-sm);
-  padding: 8px 12px;
+  padding: 10px 14px;
   color: var(--text-main);
-  font-size: 0.88rem;
+  font-size: 0.9rem;
   outline: none;
 }
 
@@ -489,28 +558,31 @@ code, pre {
 }
 
 .chat-submit {
-  background: #38bdf8;
-  color: #0b0f19;
+  background: linear-gradient(135deg, #38bdf8, #34d399);
+  color: #060913;
   border: none;
   border-radius: var(--radius-sm);
-  padding: 8px 16px;
-  font-size: 0.86rem;
-  font-weight: 600;
+  padding: 10px 20px;
+  font-size: 0.88rem;
+  font-weight: 700;
   cursor: pointer;
+  transition: all 0.2s ease;
 }
 
 .chat-submit:hover {
-  background: #7dd3fc;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 14px rgba(56, 189, 248, 0.4);
 }
 
 /* ==========================================================================
    7. BOTTLENECK ALERT CARD
    ========================================================================== */
 .alert-card {
-  background: var(--bg-card);
+  background: rgba(16, 24, 40, 0.7);
+  backdrop-filter: blur(12px);
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
-  padding: 16px 20px;
+  padding: 18px 22px;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -518,22 +590,23 @@ code, pre {
 
 .btn-sub {
   background: rgba(248, 113, 113, 0.15);
-  border: 1px solid rgba(248, 113, 113, 0.3);
+  border: 1px solid rgba(248, 113, 113, 0.35);
   color: var(--accent-rose);
-  font-size: 0.78rem;
+  font-size: 0.82rem;
   font-weight: 600;
-  padding: 6px 12px;
+  padding: 8px 16px;
   border-radius: var(--radius-sm);
   cursor: pointer;
+  transition: all 0.2s ease;
 }
 
 .btn-sub:hover {
   background: var(--accent-rose);
-  color: #0b0f19;
+  color: #060913;
 }
 
 /* ==========================================================================
-   8. CLEAN MODAL
+   8. MODAL
    ========================================================================== */
 .modal-backdrop {
   position: fixed;
@@ -541,7 +614,8 @@ code, pre {
   left: 0;
   width: 100vw;
   height: 100vh;
-  background: rgba(0, 0, 0, 0.7);
+  background: rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(8px);
   z-index: 1000;
   display: none;
   align-items: center;
@@ -553,16 +627,17 @@ code, pre {
 }
 
 .modal-box {
-  width: 480px;
+  width: 500px;
   max-width: 90vw;
   background: var(--bg-surface);
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
-  padding: 22px;
+  padding: 24px;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8);
 }
 
-@media (max-width: 900px) {
+@media (max-width: 960px) {
   .kpi-row { grid-template-columns: 1fr 1fr; }
   .topbar-tabs { display: none; }
-  .landing-title { font-size: 2.3rem; }
+  .landing-title { font-size: 2.8rem; }
 }

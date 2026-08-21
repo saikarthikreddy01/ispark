@@ -1,5 +1,6 @@
 /* ==========================================================================
-   Academic AI Advisor — Clean & High-Performance Client Logic
+   Academic AI Advisor — Minimalist 3D Three.js Engine & Client Logic
+   Inspired by alltimehigh.ai
    ========================================================================== */
 
 const APP_DATA = {
@@ -68,22 +69,173 @@ const APP_DATA = {
   }
 };
 
-// State
+// Global State
 let state = {
   currentStudent: APP_DATA.students[0],
   currentTab: "pathway",
   network: null
 };
 
-// Lifecycle Init
+// Lifecycle
 document.addEventListener("DOMContentLoaded", () => {
   initStudentPicker();
   renderDashboard();
   initChatInput();
   initAuditorOptions();
+  initThreeJSAnimations();
 });
 
-// Tab Switcher
+// ==========================================================================
+// 3D THREE.JS ANIMATIONS (Inspired by alltimehigh.ai)
+// ==========================================================================
+function initThreeJSAnimations() {
+  initLanding3D();
+  initBackgroundParticles();
+}
+
+function initLanding3D() {
+  const canvas = document.getElementById("three-landing-canvas");
+  if (!canvas || typeof THREE === "undefined") return;
+
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
+  camera.position.z = 32;
+
+  const renderer = new THREE.WebGLRenderer({ canvas: canvas, alpha: true, antialias: true });
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+  // 1. Glowing 3D Wireframe Icosahedron / Geodesic Sphere
+  const geometry = new THREE.IcosahedronGeometry(9, 2);
+  const wireframeMaterial = new THREE.MeshBasicMaterial({
+    color: 0x38bdf8,
+    wireframe: true,
+    transparent: true,
+    opacity: 0.22
+  });
+  const sphereMesh = new THREE.Mesh(geometry, wireframeMaterial);
+  scene.add(sphereMesh);
+
+  // 2. Vertex Points (Glowing Particles on Sphere)
+  const pointsMaterial = new THREE.PointsMaterial({
+    color: 0x34d399,
+    size: 0.28,
+    transparent: true,
+    opacity: 0.85
+  });
+  const pointsMesh = new THREE.Points(geometry, pointsMaterial);
+  scene.add(pointsMesh);
+
+  // 3. Surrounding Floating Outer Constellation Particles
+  const particleCount = 140;
+  const particleGeo = new THREE.BufferGeometry();
+  const positions = new Float32Array(particleCount * 3);
+
+  for (let i = 0; i < particleCount * 3; i += 3) {
+    positions[i] = (Math.random() - 0.5) * 45;
+    positions[i + 1] = (Math.random() - 0.5) * 35;
+    positions[i + 2] = (Math.random() - 0.5) * 30;
+  }
+
+  particleGeo.setAttribute("position", new THREE.BufferAttribute(positions, 3));
+  const outerParticleMat = new THREE.PointsMaterial({
+    color: 0x60a5fa,
+    size: 0.18,
+    transparent: true,
+    opacity: 0.5
+  });
+  const outerParticles = new THREE.Points(particleGeo, outerParticleMat);
+  scene.add(outerParticles);
+
+  // Mouse Parallax
+  let mouseX = 0, mouseY = 0;
+  let targetX = 0, targetY = 0;
+
+  window.addEventListener("mousemove", (e) => {
+    mouseX = (e.clientX - window.innerWidth / 2) * 0.001;
+    mouseY = (e.clientY - window.innerHeight / 2) * 0.001;
+  });
+
+  window.addEventListener("resize", () => {
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+  });
+
+  // Render Loop
+  function animate() {
+    requestAnimationFrame(animate);
+
+    targetX += (mouseX - targetX) * 0.05;
+    targetY += (mouseY - targetY) * 0.05;
+
+    sphereMesh.rotation.y += 0.002;
+    sphereMesh.rotation.x += 0.001;
+    pointsMesh.rotation.y = sphereMesh.rotation.y;
+    pointsMesh.rotation.x = sphereMesh.rotation.x;
+
+    sphereMesh.rotation.y += targetX * 0.5;
+    sphereMesh.rotation.x += targetY * 0.5;
+
+    outerParticles.rotation.y -= 0.0008;
+
+    renderer.render(scene, camera);
+  }
+  animate();
+}
+
+function initBackgroundParticles() {
+  const canvas = document.getElementById("three-bg-canvas");
+  if (!canvas || typeof THREE === "undefined") return;
+
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 1000);
+  camera.position.z = 40;
+
+  const renderer = new THREE.WebGLRenderer({ canvas: canvas, alpha: true });
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+  const count = 180;
+  const geo = new THREE.BufferGeometry();
+  const pos = new Float32Array(count * 3);
+
+  for (let i = 0; i < count * 3; i += 3) {
+    pos[i] = (Math.random() - 0.5) * 80;
+    pos[i + 1] = (Math.random() - 0.5) * 80;
+    pos[i + 2] = (Math.random() - 0.5) * 40;
+  }
+
+  geo.setAttribute("position", new THREE.BufferAttribute(pos, 3));
+  const mat = new THREE.PointsMaterial({
+    color: 0x38bdf8,
+    size: 0.22,
+    transparent: true,
+    opacity: 0.35
+  });
+
+  const particles = new THREE.Points(geo, mat);
+  scene.add(particles);
+
+  window.addEventListener("resize", () => {
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+  });
+
+  function animate() {
+    requestAnimationFrame(animate);
+    particles.rotation.y += 0.0004;
+    particles.rotation.x += 0.0002;
+    renderer.render(scene, camera);
+  }
+  animate();
+}
+
+// ==========================================================================
+// CORE DASHBOARD CONTROLS
+// ==========================================================================
+
 function switchTab(tabName) {
   state.currentTab = tabName;
 
@@ -101,7 +253,6 @@ function switchTab(tabName) {
   }
 }
 
-// Student Picker
 function initStudentPicker() {
   const select = document.getElementById("user-select");
   if (!select) return;
@@ -123,7 +274,6 @@ function initStudentPicker() {
   });
 }
 
-// Master Render
 function renderDashboard() {
   const s = state.currentStudent;
   const completedSet = new Set(s.completed);
@@ -138,7 +288,7 @@ function renderDashboard() {
   standingBadge.textContent = `● ${s.standing}`;
   standingBadge.className = `kpi-tag ${s.gpa >= 3.0 ? "tag-green" : (s.gpa >= 2.0 ? "tag-blue" : "tag-red")}`;
 
-  document.getElementById("ui-kpi-credits").innerHTML = `${earnedCredits} <span style="font-size: 0.9rem; color: var(--text-dim);">/ 120</span>`;
+  document.getElementById("ui-kpi-credits").innerHTML = `${earnedCredits} <span style="font-size: 0.95rem; color: var(--text-dim);">/ 120</span>`;
   document.getElementById("ui-kpi-pct").textContent = `${pct}% Progress`;
   document.getElementById("ui-kpi-gpa").textContent = s.gpa.toFixed(2);
   document.getElementById("ui-kpi-terms").textContent = `${Math.ceil(remainingCredits / 15)} Semesters`;
@@ -150,7 +300,6 @@ function renderDashboard() {
   }
 }
 
-// Render Kanban
 function renderKanban() {
   const container = document.getElementById("kanban-container");
   if (!container) return;
@@ -214,7 +363,6 @@ function renderKanban() {
   }
 }
 
-// Render Graph (Vis.js)
 function renderGraph() {
   const container = document.getElementById("graph-container");
   if (!container) return;
@@ -280,7 +428,6 @@ function renderGraph() {
   });
 }
 
-// Chat Advisor
 function initChatInput() {
   const btn = document.getElementById("chat-send-btn");
   const input = document.getElementById("chat-text");
@@ -346,7 +493,6 @@ function appendMessage(role, text, citations = []) {
   container.scrollTop = container.scrollHeight;
 }
 
-// Conflict Auditor
 function initAuditorOptions() {
   const select = document.getElementById("audit-course-select");
   if (!select) return;
@@ -408,7 +554,6 @@ function runAudit() {
   }
 }
 
-// Modal
 function openModal(cid) {
   const c = APP_DATA.courses.find(x => x.id === cid);
   if (!c) return;
