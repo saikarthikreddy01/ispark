@@ -80,7 +80,8 @@
         </div>
       </div>
 
-      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 24px;">
+      <!-- Step 1 and Step 2 in Normal Top-to-Bottom Flow -->
+      <div style="display: flex; flex-direction: column; gap: 20px; margin-bottom: 24px;">
         <div class="glass-card">
           <h3 style="margin-bottom: 12px;">1. Select Proposed Courses</h3>
           <select id="conflict-course-select" multiple size="7" style="margin-bottom: 12px;"></select>
@@ -98,7 +99,7 @@
         <div class="glass-card">
           <h3 style="margin-bottom: 12px;">2. Real-Time Diagnostics</h3>
           <div id="conflict-results">
-            <div style="color: var(--text-muted); font-size: 0.9rem;">Select courses on the left and click Verify to test constraints.</div>
+            <div style="color: var(--text-muted); font-size: 0.9rem;">Select courses above and click Verify to test constraints.</div>
           </div>
         </div>
       </div>

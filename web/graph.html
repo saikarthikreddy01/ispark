@@ -81,10 +81,8 @@
         </div>
       </div>
 
-      <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 20px;">
-        <div>
-          <div id="network-graph-container"></div>
-        </div>
+      <!-- Interactive Graph and Inspector in Normal Top-to-Bottom Flow -->
+      <div style="display: flex; flex-direction: column; gap: 20px;">
         <div class="glass-card">
           <h3 style="margin-bottom: 12px;">📖 Course Inspector</h3>
           <select id="course-inspect-select" style="margin-bottom: 14px;"></select>
@@ -92,7 +90,7 @@
           <h4 id="inspect-title" style="color: var(--primary-blue); margin-bottom: 6px;">CS101</h4>
           <p id="inspect-desc" style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 14px; line-height: 1.5;"></p>
           
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; font-size: 0.82rem; margin-bottom: 12px;">
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 8px; font-size: 0.82rem; margin-bottom: 12px;">
             <div style="background: rgba(15, 23, 42, 0.6); padding: 8px; border-radius: 6px;">
               <span style="color: var(--text-muted);">Credits:</span> <strong id="inspect-credits">3 cr</strong>
             </div>
@@ -110,6 +108,11 @@
           <div style="font-size: 0.85rem;">
             <span style="color: var(--text-muted);">Prerequisites:</span> <strong id="inspect-prereqs" style="color: #93c5fd;">None</strong>
           </div>
+        </div>
+
+        <div>
+          <h3 style="margin-bottom: 10px; font-size: 1.05rem;">🕸️ 2D Interactive Physics Knowledge Graph</h3>
+          <div id="network-graph-container"></div>
         </div>
       </div>
     </main>
