@@ -117,6 +117,7 @@ let state = {
 
 // --- DOM References ---
 document.addEventListener("DOMContentLoaded", () => {
+  initLandingScreen();
   initStudentSwitcher();
   initNavigation();
   renderAllViews();
@@ -124,6 +125,35 @@ document.addEventListener("DOMContentLoaded", () => {
   initConflictChecker();
   initSubstitutions();
 });
+
+// --- Landing Screen (Press Enter or Click) ---
+function initLandingScreen() {
+  const landing = document.getElementById("landing-screen");
+  const enterBtn = document.getElementById("enter-portal-btn");
+  const exitBtn = document.getElementById("exit-to-landing-btn");
+
+  function enterPortal() {
+    if (landing) {
+      landing.classList.add("hidden");
+    }
+  }
+
+  function exitToLanding() {
+    if (landing) {
+      landing.classList.remove("hidden");
+    }
+  }
+
+  if (enterBtn) enterBtn.addEventListener("click", enterPortal);
+  if (exitBtn) exitBtn.addEventListener("click", exitToLanding);
+
+  // Enter Key Trigger
+  window.addEventListener("keydown", (e) => {
+    if (landing && !landing.classList.contains("hidden") && e.key === "Enter") {
+      enterPortal();
+    }
+  });
+}
 
 // --- Student Selector ---
 function initStudentSwitcher() {
@@ -212,6 +242,8 @@ function renderDashboard() {
   document.getElementById("dash-gpa-badge").className = `kpi-delta ${s.gpa >= 2.0 ? "delta-success" : "delta-danger"}`;
   document.getElementById("dash-standing").textContent = `Year ${s.current_year}`;
   document.getElementById("dash-completed-cnt").textContent = s.completed_courses.length;
+  const bCountEl = document.getElementById("dash-bottleneck-count");
+  if (bCountEl) bCountEl.textContent = "1 Course";
 
   const pct = Math.min(Math.round((earned / 120) * 100), 100);
   document.getElementById("dash-overall-bar").style.width = `${pct}%`;

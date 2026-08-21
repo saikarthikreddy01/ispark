@@ -3,36 +3,82 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>🎓 Decentralized Graph-RAG Academic Advisor AI</title>
+  <title>🎓 Academic Pathway Advisor — Decentralized Graph-RAG AI</title>
   
-  <!-- Google Fonts & Vis.js for Network Knowledge Graph -->
   <link rel="stylesheet" href="style.css">
   <script type="text/javascript" src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
 </head>
 <body>
 
-  <div class="app-layout">
+  <!-- ==========================================================================
+       WELCOME / LANDING SCREEN (Press ENTER or Click to Open)
+       ========================================================================== -->
+  <div id="landing-screen">
+    <div class="landing-badge">
+      <span>⚡</span>
+      <span>Decentralized Graph-RAG Platform · v2.5 Enterprise</span>
+    </div>
+
+    <h1 class="landing-title">
+      Academic Pathway <span class="gradient-text">Advisor AI</span>
+    </h1>
+
+    <p class="landing-subtitle">
+      Autonomous multi-semester degree sequencing, topological prerequisite conflict detection, and policy-grounded academic advising for college students.
+    </p>
+
+    <button id="enter-portal-btn" class="landing-enter-btn">
+      <span>ENTER ADVISOR PORTAL</span>
+      <span class="enter-kbd">ENTER ↵</span>
+    </button>
+    <div class="landing-key-hint">Press <kbd class="enter-kbd">Enter</kbd> on your keyboard or click the button above to launch.</div>
+
+    <!-- Feature Highlights -->
+    <div class="landing-features">
+      <div class="landing-feature-card">
+        <div class="landing-feature-icon">🕸️</div>
+        <div class="landing-feature-title">Knowledge Graph DAGs</div>
+        <div class="landing-feature-desc">44+ indexed courses with topological sorting, prerequisite chains, and bottleneck analytics.</div>
+      </div>
+      <div class="landing-feature-card">
+        <div class="landing-feature-icon">💬</div>
+        <div class="landing-feature-title">Citation-Traceable RAG</div>
+        <div class="landing-feature-desc">Conversational advising with expandable citations grounded in institutional regulations (§1.1, §5.2).</div>
+      </div>
+      <div class="landing-feature-card">
+        <div class="landing-feature-icon">⚖️</div>
+        <div class="landing-feature-title">Constraint Verification</div>
+        <div class="landing-feature-desc">Instant schedule simulation, credit cap verification, and formal faculty waiver petitions.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==========================================================================
+       MAIN PORTAL INTERFACE
+       ========================================================================== -->
+  <div class="app-layout" id="app-layout">
     
     <!-- Left Navigation Sidebar -->
     <aside class="sidebar">
       <div class="brand-header">
         <div class="brand-logo">
           <span>🎓</span>
-          <span class="gradient-text">Graph-RAG AI</span>
+          <span class="gradient-text">Pathway Advisor</span>
         </div>
-        <div class="brand-caption">Decentralized Academic Intelligence</div>
+        <div class="brand-caption">Graph-RAG Academic Platform</div>
       </div>
 
       <!-- Student Profile Card in Sidebar -->
       <div class="student-card">
         <div style="font-size: 0.72rem; color: var(--text-muted); text-transform: uppercase; font-weight: 700; margin-bottom: 8px;">Active Student Profile</div>
-        <select id="student-select" style="margin-bottom: 14px;"></select>
+        <select id="student-select" style="margin-bottom: 12px;"></select>
         
-        <div style="display: flex; align-items: center; margin-bottom: 12px;">
+        <div style="display: flex; align-items: center; margin-bottom: 10px;">
           <div class="student-avatar" id="profile-avatar">A</div>
           <div>
             <div style="font-weight: 700; color: var(--text-main); font-size: 0.95rem;" id="profile-name">Alice Johnson</div>
-            <div style="font-size: 0.78rem; color: var(--text-muted);" id="profile-major">Computer Science</div>
+            <div style="font-size: 0.76rem; color: var(--text-muted);" id="profile-major">Major: Computer Science</div>
+            <div style="font-size: 0.72rem; color: var(--text-subtle);">Minor: Mathematics</div>
           </div>
         </div>
 
@@ -42,12 +88,12 @@
             <div style="font-size: 1rem; font-weight: 700; color: #34d399;" id="profile-gpa">3.65</div>
           </div>
           <div style="background: rgba(15, 23, 42, 0.6); padding: 6px; border-radius: 6px; text-align: center;">
-            <div style="font-size: 0.68rem; color: var(--text-muted); text-transform: uppercase;">Standing</div>
-            <div style="font-size: 1rem; font-weight: 700; color: #818cf8;" id="profile-year">Year 3</div>
+            <div style="font-size: 0.68rem; color: var(--text-muted); text-transform: uppercase;">Grad Horizon</div>
+            <div style="font-size: 0.85rem; font-weight: 700; color: #93c5fd;">Spring 2026</div>
           </div>
         </div>
 
-        <div style="display: flex; justify-content: space-between; font-size: 0.75rem; color: var(--text-muted);">
+        <div style="display: flex; justify-content: space-between; font-size: 0.74rem; color: var(--text-muted);">
           <span>Degree Progress</span>
           <span id="profile-progress-text">0/120 cr</span>
         </div>
@@ -56,39 +102,38 @@
         </div>
       </div>
 
-      <!-- Navigation Tabs -->
+      <!-- Navigation Tabs (Exact 6 Sections) -->
       <nav class="nav-menu">
-        <a href="#" class="nav-item active" data-tab="dashboard"><span>📊</span> 1. Degree Audit Dashboard</a>
-        <a href="#" class="nav-item" data-tab="pathway"><span>🗺️</span> 2. Pathway Planner</a>
-        <a href="#" class="nav-item" data-tab="graph"><span>🕸️</span> 3. Knowledge Graph</a>
-        <a href="#" class="nav-item" data-tab="advisor"><span>💬</span> 4. AI Advisor (Gemini)</a>
-        <a href="#" class="nav-item" data-tab="conflict"><span>⚠️</span> 5. Conflict Checker</a>
-        <a href="#" class="nav-item" data-tab="substitutions"><span>📝</span> 6. Substitutions & Waivers</a>
+        <a href="#" class="nav-item active" data-tab="dashboard"><span>📊</span> 1. Student Dashboard</a>
+        <a href="#" class="nav-item" data-tab="advisor"><span>💬</span> 2. Ask My Advisor</a>
+        <a href="#" class="nav-item" data-tab="graph"><span>🕸️</span> 3. Knowledge Graph Explorer</a>
+        <a href="#" class="nav-item" data-tab="pathway"><span>🗺️</span> 4. Pathway Generator</a>
+        <a href="#" class="nav-item" data-tab="conflict"><span>⚠️</span> 5. Conflict & Bottlenecks</a>
+        <a href="#" class="nav-item" data-tab="faculty"><span>📝</span> 6. Faculty Approval Panel</a>
       </nav>
+
+      <!-- Return to Intro Screen -->
+      <div style="margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--border-subtle);">
+        <button id="exit-to-landing-btn" class="btn btn-secondary" style="width: 100%; font-size: 0.82rem;">
+          <span>🏠 Return to Welcome Screen</span>
+        </button>
+      </div>
     </aside>
 
-    <!-- Main Content -->
+    <!-- Main Content Panel -->
     <main class="main-content">
       
-      <!-- ================= 1. TAB: DASHBOARD ================= -->
+      <!-- ================= 1. TAB: STUDENT DASHBOARD ================= -->
       <div id="tab-dashboard" class="tab-content">
         <div class="page-header">
-          <div class="badge-pill">⚡ Real-Time Degree Audit Engine</div>
-          <h1 class="page-title">📊 Student Academic <span class="gradient-text">Dashboard</span></h1>
-          <p class="page-subtitle">Degree requirement tracking, GPA audit, and prerequisite bottleneck detection.</p>
-        </div>
-
-        <!-- 3-Step Beginner Guide -->
-        <div class="glass-card" style="background: rgba(30, 41, 59, 0.4); border-color: rgba(99, 102, 241, 0.25);">
-          <div style="font-weight: 700; color: #c7d2fe; font-size: 1rem; margin-bottom: 8px;">💡 Quick Guide for Students:</div>
-          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; font-size: 0.85rem; color: #cbd5e1;">
-            <div><strong>1. Check Earned Credits:</strong> Track your completed core classes toward the 120 credit requirement.</div>
-            <div><strong>2. Monitor Bottlenecks:</strong> Clear foundational prerequisites early to avoid delaying graduation.</div>
-            <div><strong>3. Generate Your Path:</strong> Head to the Pathway Planner to see your auto-sequenced roadmap.</div>
+          <div>
+            <div class="badge-pill">Section 1 · Student Academic Profile</div>
+            <h1 class="page-title">📊 Student Academic <span class="gradient-text">Dashboard</span></h1>
+            <p class="page-subtitle">Degree requirement tracking, GPA audit, and prerequisite bottleneck detection.</p>
           </div>
         </div>
 
-        <!-- KPI Grid -->
+        <!-- KPI Summary Cards -->
         <div class="kpi-grid">
           <div class="kpi-card">
             <div>
@@ -96,7 +141,7 @@
               <div class="kpi-value" id="dash-earned-cr">0 / 120</div>
               <div class="kpi-delta delta-info" id="dash-rem-cr">120 remaining</div>
             </div>
-            <div style="font-size: 2.2rem;">🎓</div>
+            <div style="font-size: 2rem;">🎓</div>
           </div>
           <div class="kpi-card">
             <div>
@@ -104,23 +149,23 @@
               <div class="kpi-value" id="dash-gpa">0.00</div>
               <div class="kpi-delta delta-success" id="dash-gpa-badge">Good Standing</div>
             </div>
-            <div style="font-size: 2.2rem;">⭐</div>
+            <div style="font-size: 2rem;">⭐</div>
           </div>
           <div class="kpi-card">
             <div>
-              <div class="kpi-title">Academic Year</div>
-              <div class="kpi-value" id="dash-standing">Year 1</div>
-              <div class="kpi-delta delta-info">Active Term</div>
+              <div class="kpi-title">Flagged Conflicts</div>
+              <div class="kpi-value">0 Issues</div>
+              <div class="kpi-delta delta-success">Schedule Clear</div>
             </div>
-            <div style="font-size: 2.2rem;">🏛️</div>
+            <div style="font-size: 2rem;">⚠️</div>
           </div>
           <div class="kpi-card">
             <div>
-              <div class="kpi-title">Completed Units</div>
-              <div class="kpi-value" id="dash-completed-cnt">0</div>
-              <div class="kpi-delta delta-success">Transcript Verified</div>
+              <div class="kpi-title">Bottlenecks to Clear</div>
+              <div class="kpi-value" id="dash-bottleneck-count">0</div>
+              <div class="kpi-delta delta-warning">Monitored</div>
             </div>
-            <div style="font-size: 2.2rem;">✅</div>
+            <div style="font-size: 2rem;">⚡</div>
           </div>
         </div>
 
@@ -128,23 +173,23 @@
         <div style="display: grid; grid-template-columns: 3fr 2fr; gap: 20px; margin-bottom: 24px;">
           
           <div class="glass-card">
-            <h3 style="margin-bottom: 12px; font-size: 1.15rem;">🎓 Degree Requirement Completion</h3>
+            <h3 style="margin-bottom: 12px; font-size: 1.1rem;">🎓 Overall Degree Completion Progress</h3>
             <div style="display: flex; justify-content: space-between; font-size: 0.9rem; margin-bottom: 4px;">
-              <span>Overall Progress toward B.S.</span>
-              <strong id="dash-overall-pct" style="color: var(--primary-indigo);">0%</strong>
+              <span>Progress toward 120 credits</span>
+              <strong id="dash-overall-pct" style="color: var(--primary-blue);">0%</strong>
             </div>
-            <div class="progress-bar-container" style="height: 10px; margin-bottom: 20px;">
+            <div class="progress-bar-container" style="height: 10px; margin-bottom: 18px;">
               <div class="progress-bar-fill" id="dash-overall-bar" style="width: 0%;"></div>
             </div>
 
-            <div style="display: flex; flex-direction: column; gap: 10px; font-size: 0.88rem;">
+            <div style="display: flex; flex-direction: column; gap: 8px; font-size: 0.86rem;">
               <div style="background: rgba(15, 23, 42, 0.5); padding: 10px 14px; border-radius: 8px; display: flex; justify-content: space-between;">
                 <span>📘 Core Computer Science (48 cr required)</span>
                 <strong style="color: #34d399;">In Progress</strong>
               </div>
               <div style="background: rgba(15, 23, 42, 0.5); padding: 10px 14px; border-radius: 8px; display: flex; justify-content: space-between;">
-                <span>📐 Mathematics & Sciences (24 cr required)</span>
-                <strong style="color: #818cf8;">In Progress</strong>
+                <span>📐 Mathematics & Natural Sciences (24 cr required)</span>
+                <strong style="color: #93c5fd;">In Progress</strong>
               </div>
               <div style="background: rgba(15, 23, 42, 0.5); padding: 10px 14px; border-radius: 8px; display: flex; justify-content: space-between;">
                 <span>🌐 General Education & Electives (48 cr required)</span>
@@ -154,12 +199,12 @@
           </div>
 
           <div class="glass-card">
-            <h3 style="margin-bottom: 12px; font-size: 1.15rem;">⚠️ Bottleneck & Delay Risk</h3>
-            <div style="background: rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.3); padding: 12px; border-radius: 8px; margin-bottom: 14px;">
+            <h3 style="margin-bottom: 12px; font-size: 1.1rem;">⚠️ Bottleneck & Delay Risk</h3>
+            <div style="background: rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.3); padding: 12px; border-radius: 8px; margin-bottom: 12px;">
               <div style="font-weight: 700; color: #34d399;">🟢 Low Risk Score (0.18)</div>
               <div style="font-size: 0.8rem; color: #a7f3d0;">Estimated 3 semesters remaining to graduation.</div>
             </div>
-            <div style="font-size: 0.88rem; font-weight: 700; color: var(--text-muted); margin-bottom: 8px;">Prerequisite Bottlenecks to Clear:</div>
+            <div style="font-size: 0.85rem; font-weight: 700; color: var(--text-muted); margin-bottom: 8px;">Prerequisite Bottlenecks to Clear:</div>
             <div id="dash-bottlenecks"></div>
           </div>
         </div>
@@ -183,22 +228,43 @@
         </div>
       </div>
 
-      <!-- ================= 2. TAB: PATHWAY PLANNER ================= -->
-      <div id="tab-pathway" class="tab-content" style="display: none;">
+      <!-- ================= 2. TAB: ASK MY ADVISOR ================= -->
+      <div id="tab-advisor" class="tab-content" style="display: none;">
         <div class="page-header">
-          <div class="badge-pill">🗺️ Topological Load Balancer</div>
-          <h1 class="page-title">🗺️ Degree <span class="gradient-text">Pathway Planner</span></h1>
-          <p class="page-subtitle">Automated multi-semester course sequencing with zero prerequisite conflicts.</p>
+          <div>
+            <div class="badge-pill">Section 2 · AI Conversational Advising</div>
+            <h1 class="page-title">💬 Ask My <span class="gradient-text">Advisor</span></h1>
+            <p class="page-subtitle">Chatbot interface grounded in university regulations with expandable inline citations.</p>
+          </div>
         </div>
-        <div id="pathway-timeline"></div>
+
+        <div style="display: flex; gap: 8px; margin-bottom: 14px; flex-wrap: wrap;">
+          <button class="btn btn-secondary" onclick="handleSendMessage('Can I take Data Structures before Discrete Math?')">💡 Can I take Data Structures before Discrete Math?</button>
+          <button class="btn btn-secondary" onclick="handleSendMessage('Can I take CS301 (Algorithms) next term?')">💡 Can I take CS301 (Algorithms)?</button>
+          <button class="btn btn-secondary" onclick="handleSendMessage('What are the prerequisites for CS402 Machine Learning?')">💡 Prerequisites for CS402 (ML)?</button>
+        </div>
+
+        <div class="chat-container">
+          <div class="chat-messages" id="chat-messages-container">
+            <div class="chat-bubble assistant">
+              👋 Hello! I am your AI Academic Advisor. Ask me anything about course prerequisites, degree completion, or university academic policies!
+            </div>
+          </div>
+          <div class="chat-input-bar">
+            <input type="text" id="chat-input" placeholder="Type your advising question (e.g. Can I take Data Structures before Discrete Math?)...">
+            <button class="btn btn-primary" id="chat-send-btn">Send</button>
+          </div>
+        </div>
       </div>
 
-      <!-- ================= 3. TAB: KNOWLEDGE GRAPH ================= -->
+      <!-- ================= 3. TAB: KNOWLEDGE GRAPH EXPLORER ================= -->
       <div id="tab-graph" class="tab-content" style="display: none;">
         <div class="page-header">
-          <div class="badge-pill">🕸️ Interactive Graph AI</div>
-          <h1 class="page-title">🔍 Academic <span class="gradient-text">Knowledge Graph</span></h1>
-          <p class="page-subtitle">Explore 2D physics prerequisite network, curriculum topologies, and course catalogs.</p>
+          <div>
+            <div class="badge-pill">Section 3 · Interactive Curriculum Network</div>
+            <h1 class="page-title">🕸️ Knowledge Graph <span class="gradient-text">Explorer</span></h1>
+            <p class="page-subtitle">2D physics network color-coded by status: Completed (Green), Available (Blue), Locked (Red).</p>
+          </div>
         </div>
 
         <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 20px;">
@@ -209,7 +275,7 @@
             <h3 style="margin-bottom: 12px;">📖 Course Inspector</h3>
             <select id="course-inspect-select" style="margin-bottom: 14px;"></select>
             
-            <h4 id="inspect-title" style="color: var(--primary-indigo); margin-bottom: 6px;">CS101</h4>
+            <h4 id="inspect-title" style="color: var(--primary-blue); margin-bottom: 6px;">CS101</h4>
             <p id="inspect-desc" style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 14px; line-height: 1.5;"></p>
             
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; font-size: 0.82rem; margin-bottom: 12px;">
@@ -228,51 +294,71 @@
             </div>
 
             <div style="font-size: 0.85rem;">
-              <span style="color: var(--text-muted);">Prerequisites:</span> <strong id="inspect-prereqs" style="color: #c7d2fe;">None</strong>
+              <span style="color: var(--text-muted);">Prerequisites:</span> <strong id="inspect-prereqs" style="color: #93c5fd;">None</strong>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- ================= 4. TAB: AI ADVISOR ================= -->
-      <div id="tab-advisor" class="tab-content" style="display: none;">
+      <!-- ================= 4. TAB: PATHWAY GENERATOR ================= -->
+      <div id="tab-pathway" class="tab-content" style="display: none;">
         <div class="page-header">
-          <div class="badge-pill">🤖 Graph-RAG & Gemini 3.6 Flash</div>
-          <h1 class="page-title">💬 Conversational <span class="gradient-text">AI Academic Advisor</span></h1>
-          <p class="page-subtitle">Ask questions about courses, prerequisite eligibility, and policies with verified citations.</p>
+          <div>
+            <div class="badge-pill">Section 4 · Automated Degree Sequencing</div>
+            <h1 class="page-title">🗺️ Pathway <span class="gradient-text">Generator</span></h1>
+            <p class="page-subtitle">Multi-semester timeline balancing credit loads, career tracks, and prerequisite chains.</p>
+          </div>
         </div>
 
-        <div style="display: flex; gap: 8px; margin-bottom: 14px; flex-wrap: wrap;">
-          <button class="btn btn-secondary" onclick="handleSendMessage('Can I take CS301 Algorithms next term?')">💡 Can I take CS301 (Algorithms)?</button>
-          <button class="btn btn-secondary" onclick="handleSendMessage('What are the prerequisites for CS402 Machine Learning?')">💡 Prerequisites for CS402 (ML)?</button>
-          <button class="btn btn-secondary" onclick="handleSendMessage('Am I at risk of delaying graduation?')">💡 Am I at risk of delay?</button>
-        </div>
-
-        <div class="chat-container">
-          <div class="chat-messages" id="chat-messages-container">
-            <div class="chat-bubble assistant">
-              👋 Hello! I am your AI Academic Advisor. Ask me anything about course prerequisites, degree completion, or university academic policies!
+        <div class="glass-card" style="margin-bottom: 20px;">
+          <h3 style="margin-bottom: 12px;">🎛️ Pathway Optimization Parameters</h3>
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px;">
+            <div>
+              <label style="font-size: 0.82rem; color: var(--text-muted); display: block; margin-bottom: 4px;">Career Goal:</label>
+              <select id="pathway-goal-select">
+                <option>AI/ML Engineer & Data Science</option>
+                <option>Full-Stack Web Development</option>
+                <option>Cloud & Distributed Systems</option>
+                <option>Cybersecurity & Cryptography</option>
+              </select>
+            </div>
+            <div>
+              <label style="font-size: 0.82rem; color: var(--text-muted); display: block; margin-bottom: 4px;">Target Graduation Term:</label>
+              <select id="pathway-grad-select">
+                <option>Spring 2026</option>
+                <option>Fall 2025</option>
+                <option>Spring 2027</option>
+              </select>
+            </div>
+            <div>
+              <label style="font-size: 0.82rem; color: var(--text-muted); display: block; margin-bottom: 4px;">Max Credits / Term:</label>
+              <select id="pathway-credits-select">
+                <option value="16">16 Credits (Standard)</option>
+                <option value="18">18 Credits (Max Allowed)</option>
+                <option value="14">14 Credits (Light Load)</option>
+                <option value="20">20 Credits (Dean Waiver Required)</option>
+              </select>
             </div>
           </div>
-          <div class="chat-input-bar">
-            <input type="text" id="chat-input" placeholder="Ask about prerequisites, schedules, substitutions...">
-            <button class="btn btn-primary" id="chat-send-btn">Send</button>
-          </div>
         </div>
+
+        <div id="pathway-timeline"></div>
       </div>
 
-      <!-- ================= 5. TAB: CONFLICT CHECKER ================= -->
+      <!-- ================= 5. TAB: CONFLICT & BOTTLENECK DETECTOR ================= -->
       <div id="tab-conflict" class="tab-content" style="display: none;">
         <div class="page-header">
-          <div class="badge-pill">⚠️ Real-Time Schedule Simulation</div>
-          <h1 class="page-title">⚠️ Prerequisite & <span class="gradient-text">Conflict Checker</span></h1>
-          <p class="page-subtitle">Simulate upcoming term courses to detect prerequisite violations or credit overload issues.</p>
+          <div>
+            <div class="badge-pill">Section 5 · Constraint Verification & Bottlenecks</div>
+            <h1 class="page-title">⚠️ Conflict & <span class="gradient-text">Bottleneck Detector</span></h1>
+            <p class="page-subtitle">Detect prerequisite violations, term mismatches, and discover substitute courses.</p>
+          </div>
         </div>
 
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 24px;">
           <div class="glass-card">
             <h3 style="margin-bottom: 12px;">1. Select Proposed Courses</h3>
-            <select id="conflict-course-select" multiple size="7" style="margin-bottom: 14px;"></select>
+            <select id="conflict-course-select" multiple size="7" style="margin-bottom: 12px;"></select>
             
             <label style="font-size: 0.85rem; color: var(--text-muted); display: block; margin-bottom: 6px;">Target Semester:</label>
             <select id="conflict-sem-select" style="margin-bottom: 16px;">
@@ -291,14 +377,50 @@
             </div>
           </div>
         </div>
+
+        <div class="glass-card">
+          <h3 style="margin-bottom: 12px;">⚡ Top Bottleneck Courses & Substitutions</h3>
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Course ID</th>
+                <th>Course Title</th>
+                <th>Impact</th>
+                <th>Approved Alternatives</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong style="color: #f87171;">CS201</strong></td>
+                <td>Data Structures</td>
+                <td><span class="status-badge badge-locked">Unlocks 5 Courses</span></td>
+                <td>CS205 (Advanced Data Structures)</td>
+              </tr>
+              <tr>
+                <td><strong style="color: #f87171;">CS301</strong></td>
+                <td>Algorithms</td>
+                <td><span class="status-badge badge-locked">Unlocks 3 Courses</span></td>
+                <td>CS305 (Applied Algorithm Design)</td>
+              </tr>
+              <tr>
+                <td><strong style="color: #fbbf24;">MATH201</strong></td>
+                <td>Discrete Mathematics</td>
+                <td><span class="status-badge badge-progress">Unlocks 3 Courses</span></td>
+                <td>MATH203 (Discrete Structures)</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
       </div>
 
-      <!-- ================= 6. TAB: SUBSTITUTIONS & WAIVERS ================= -->
-      <div id="tab-substitutions" class="tab-content" style="display: none;">
+      <!-- ================= 6. TAB: FACULTY APPROVAL PANEL ================= -->
+      <div id="tab-faculty" class="tab-content" style="display: none;">
         <div class="page-header">
-          <div class="badge-pill">📝 Exceptions & Governance</div>
-          <h1 class="page-title">📝 Substitutions & <span class="gradient-text">Faculty Waivers</span></h1>
-          <p class="page-subtitle">Find approved alternative courses and submit formal exception petitions.</p>
+          <div>
+            <div class="badge-pill">Section 6 · Administrative Governance & Overrides</div>
+            <h1 class="page-title">📝 Faculty Approval <span class="gradient-text">Panel</span></h1>
+            <p class="page-subtitle">Review student override requests, prerequisite waivers, and record formal decisions.</p>
+          </div>
         </div>
 
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 24px;">
@@ -312,23 +434,23 @@
             <h3 style="margin-bottom: 10px;">✍️ Submit Waiver Petition</h3>
             <select id="petition-type" style="margin-bottom: 10px;">
               <option>Prerequisite Waiver (Policy §1.2)</option>
-              <option>Credit Overload (Policy §5.2)</option>
+              <option>Credit Overload Exception - 20 cr (Policy §5.2)</option>
               <option>Course Substitution (Policy §2.2)</option>
             </select>
             <select id="petition-course" style="margin-bottom: 10px;"></select>
-            <textarea id="petition-just" rows="3" placeholder="Enter justification for exception..." style="margin-bottom: 12px;"></textarea>
-            <button class="btn btn-primary" id="submit-petition-btn" style="width: 100%;">⚖️ Submit for Faculty Review</button>
+            <textarea id="petition-just" rows="3" placeholder="Enter academic justification..." style="margin-bottom: 12px;"></textarea>
+            <button class="btn btn-primary" id="submit-petition-btn" style="width: 100%;">⚖️ Submit Exception Request</button>
           </div>
         </div>
 
         <div class="glass-card">
-          <h3 style="margin-bottom: 14px;">📜 Faculty Approval & Waiver Audit Log</h3>
+          <h3 style="margin-bottom: 14px;">📜 Faculty Decision & Waiver Audit Log</h3>
           <table class="data-table">
             <thead>
               <tr>
                 <th>Student</th>
                 <th>Petition Type</th>
-                <th>Course / Action</th>
+                <th>Target Course</th>
                 <th>Verdict Status</th>
                 <th>Term</th>
               </tr>
@@ -341,7 +463,6 @@
     </main>
   </div>
 
-  <!-- Core App Scripts -->
   <script src="app.js"></script>
 </body>
 </html>
