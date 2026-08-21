@@ -118,34 +118,69 @@ def signup(req: SignUpRequest):
 
 @app.post("/api/chat")
 def advisor_chat(req: ChatRequest):
-    q = req.question.lower()
-    citations = []
+    student = db_manager.get_student_by_id(req.student_id)
+    student_ctx = ""
+    if student:
+        student_ctx = (
+            f"Student: {student.get('name', 'Student')} (ID: {student.get('id', req.student_id)})\n"
+            f"Major: {student.get('major', 'Computer Science')}\n"
+            f"GPA: {student.get('gpa', 3.5)}\n"
+            f"Completed Courses: {', '.join(student.get('completed', []))}\n"
+            f"Planned Courses: {', '.join(student.get('planned', []))}\n"
+            f"Expected Graduation: {student.get('expected_grad', 'Spring 2027')}\n"
+        )
+
+    api_key = os.getenv("GEMINI_API_KEY")
     reply = ""
+    citations = []
 
-    if "cs301" in q or "algorithm" in q:
-        reply = (
-            "⚠️ **Prerequisite Policy on CS301 (Algorithms)**:\n\n"
-            "Under **Course Catalog §4.2**, enrolling in CS301 requires passing **CS201 (Data Structures)** "
-            "with a grade of C or better and completing **MATH201 (Discrete Mathematics)**.\n\n"
-            "Since CS301 is a single-term Fall offering, clearing these requirements is critical to prevent graduation delays."
-        )
-        citations = ["[Course Catalog 2026, §4.2]", "[Academic Regulation §1.1]"]
-    elif "cs402" in q or "machine learning" in q or "ml" in q:
-        reply = (
-            "📘 **Prerequisites for CS402 (Machine Learning)**:\n\n"
-            "CS402 requires **CS301 (Algorithms)** and **MATH202 (Linear Algebra)**. "
-            "Your transcript confirms MATH202 is already satisfied. Once you clear CS301, you are eligible to enroll immediately."
-        )
-        citations = ["[Course Catalog 2026, Electives §7.1]"]
-    else:
-        reply = (
-            "🟢 **Academic Progress Summary**:\n\n"
-            "You have completed **78 of 120 credits** (65% degree fulfillment) with a cumulative GPA of **3.65**. "
-            "You are on track for graduation in **Spring 2026**!"
-        )
-        citations = ["[Degree Audit Standard §8.3]"]
+    if api_key:
+        try:
+            from google import genai
+            client = genai.Client(api_key=api_key)
+            prompt = (
+                "You are an expert Academic AI Advisor specializing in degree sequencing, prerequisite validation, and university policies.\n"
+                "Ground your answers using official institutional standards. Include specific course codes and formal section citations like [Course Catalog §4.2] or [Academic Policy §2.1].\n\n"
+                f"--- STUDENT PROFILE ---\n{student_ctx}\n\n"
+                f"--- STUDENT QUESTION ---\n{req.question}\n\n"
+                "Provide a clear, structured, encouraging, and policy-grounded academic advising response:"
+            )
+            response = client.models.generate_content(
+                model="gemini-3.6-flash",
+                contents=prompt
+            )
+            reply = response.text
+            citations = ["[Course Catalog 2026, §4.2]", "[Academic Regulation §1.1]"]
+        except Exception as e:
+            print(f"[WARN] Gemini API error ({e}), using rule-based advisor fallback.")
 
-    # Log to MongoDB
+    # Fallback if API was unavailable
+    if not reply:
+        q = req.question.lower()
+        if "cs301" in q or "algorithm" in q:
+            reply = (
+                "⚠️ **Prerequisite Policy on CS301 (Algorithms)**:\n\n"
+                "Under **Course Catalog §4.2**, enrolling in CS301 requires passing **CS201 (Data Structures)** "
+                "with a grade of C or better and completing **MATH201 (Discrete Mathematics)**.\n\n"
+                "Since CS301 is a single-term Fall offering, clearing these requirements is critical to prevent graduation delays."
+            )
+            citations = ["[Course Catalog 2026, §4.2]", "[Academic Regulation §1.1]"]
+        elif "cs402" in q or "machine learning" in q or "ml" in q:
+            reply = (
+                "📘 **Prerequisites for CS402 (Machine Learning)**:\n\n"
+                "CS402 requires **CS301 (Algorithms)** and **MATH202 (Linear Algebra)**. "
+                "Your transcript confirms MATH202 is already satisfied. Once you clear CS301, you are eligible to enroll immediately."
+            )
+            citations = ["[Course Catalog 2026, Electives §7.1]"]
+        else:
+            reply = (
+                "🟢 **Academic Progress Summary**:\n\n"
+                f"You have completed **{len(student.get('completed', [])) if student else 8} courses** with a cumulative GPA of **{student.get('gpa', 3.65) if student else 3.65}**. "
+                f"You are on track for graduation in **{student.get('expected_grad', 'Spring 2027') if student else 'Spring 2027'}**!"
+            )
+            citations = ["[Degree Audit Standard §8.3]"]
+
+    # Log conversation to MongoDB
     db_manager.save_chat_log(req.student_id, req.question, reply, citations)
 
     return {
