@@ -3,74 +3,179 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>🎓 Academic Pathway Advisor</title>
+  <title>PathFinder AI — Academic Pathway & Graph-RAG Advisor</title>
+  
   <link rel="stylesheet" href="style.css">
+  <script type="text/javascript" src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
 </head>
 <body>
 
-  <!-- Clean Minimal Welcome Screen -->
-  <div id="landing-screen" style="position: relative; height: 100vh;">
-    <div class="landing-badge">
-      <span>⚡</span>
-      <span>Graph-RAG Academic Platform</span>
+  <!-- ==========================================================================
+       TOP NAVBAR: STUDENT SWITCHER & DEGREE STATS
+       ========================================================================== -->
+  <header class="top-navbar">
+    <div class="brand-section">
+      <div class="brand-logo-icon">🧭</div>
+      <div>
+        <div class="brand-name">PathFinder <span class="gradient-text">AI</span></div>
+        <div style="font-size: 0.7rem; color: var(--text-muted); line-height: 1;">Graph-RAG Degree Navigator</div>
+      </div>
     </div>
 
-    <h1 class="landing-title">
-      Academic Pathway <span class="gradient-text">Advisor</span>
-    </h1>
+    <!-- Student Switcher & Progress Header -->
+    <div class="student-controls">
+      <div>
+        <span style="font-size: 0.72rem; color: var(--text-muted); text-transform: uppercase; font-weight: 700; margin-right: 6px;">Student:</span>
+        <select id="top-student-select" class="student-dropdown"></select>
+      </div>
 
-    <p class="landing-subtitle">
-      Automated degree sequencing, prerequisite conflict detection, and policy-grounded academic advising.
-    </p>
+      <div class="progress-chip">
+        <div class="status-ring-circle" id="top-progress-pct">65%</div>
+        <div>
+          <strong id="top-credits-text" style="color: #f8fafc;">78 / 120 cr</strong>
+          <span style="font-size: 0.75rem; color: var(--text-muted); margin-left: 4px;" id="top-grad-horizon">· Spring 2026</span>
+        </div>
+      </div>
 
-    <a href="dashboard.html" id="enter-portal-btn" class="landing-enter-btn" style="text-decoration: none;">
-      <span>ENTER ADVISOR PORTAL</span>
-      <span class="enter-kbd">ENTER ↵</span>
-    </a>
-    <div class="landing-key-hint">Press <kbd class="enter-kbd">Enter</kbd> or click above to launch.</div>
+      <div class="progress-chip">
+        <span style="font-size: 0.75rem; color: var(--text-muted);">GPA:</span>
+        <strong id="top-gpa-text" style="color: #34d399;">3.65</strong>
+      </div>
+    </div>
+  </header>
 
-    <!-- 6 Direct Navigation Modules -->
-    <div class="landing-features" style="margin-top: 36px;">
-      <a href="dashboard.html" class="landing-feature-card" style="text-decoration: none; display: block;">
-        <div class="landing-feature-icon">📊</div>
-        <div class="landing-feature-title">1. Student Dashboard</div>
-        <div class="landing-feature-desc">Degree progress, GPA audit, and bottlenecks.</div>
-      </a>
-      <a href="advisor.html" class="landing-feature-card" style="text-decoration: none; display: block;">
-        <div class="landing-feature-icon">💬</div>
-        <div class="landing-feature-title">2. Ask My Advisor</div>
-        <div class="landing-feature-desc">AI chatbot with verified policy citations.</div>
-      </a>
-      <a href="graph.html" class="landing-feature-card" style="text-decoration: none; display: block;">
-        <div class="landing-feature-icon">🕸️</div>
-        <div class="landing-feature-title">3. Knowledge Graph</div>
-        <div class="landing-feature-desc">Interactive 2D curriculum prerequisite DAG.</div>
-      </a>
-      <a href="pathway.html" class="landing-feature-card" style="text-decoration: none; display: block;">
-        <div class="landing-feature-icon">🗺️</div>
-        <div class="landing-feature-title">4. Pathway Generator</div>
-        <div class="landing-feature-desc">Multi-semester timeline & credit load planning.</div>
-      </a>
-      <a href="conflict.html" class="landing-feature-card" style="text-decoration: none; display: block;">
-        <div class="landing-feature-icon">⚠️</div>
-        <div class="landing-feature-title">5. Conflict Detector</div>
-        <div class="landing-feature-desc">Prerequisite checks & course substitutions.</div>
-      </a>
-      <a href="faculty.html" class="landing-feature-card" style="text-decoration: none; display: block;">
-        <div class="landing-feature-icon">📝</div>
-        <div class="landing-feature-title">6. Faculty Panel</div>
-        <div class="landing-feature-desc">Student waiver review & exception audit log.</div>
-      </a>
+  <!-- ==========================================================================
+       SPLIT-PANE WORKSPACE: VISUAL REASONING (LEFT) + AI CHAT (RIGHT)
+       ========================================================================== -->
+  <div class="workspace-container">
+    
+    <!-- LEFT PANE: VISUAL REASONING ENGINE (TIMELINE + GRAPH + RISKS) -->
+    <main class="left-pane">
+      
+      <!-- View Mode Header -->
+      <div class="view-tabs-header">
+        <div>
+          <h2 style="font-size: 1.25rem; font-weight: 800; color: #f8fafc;" id="view-title">🗺️ Degree Pathway Timeline</h2>
+          <p style="font-size: 0.8rem; color: var(--text-muted);" id="view-subtitle">Semester-by-semester sequencing color-coded by prerequisite status.</p>
+        </div>
+
+        <div class="view-tabs">
+          <button class="view-tab-btn active" id="btn-tab-timeline" onclick="switchVisualTab('timeline')">
+            <span>🗺️ Pathway Kanban</span>
+          </button>
+          <button class="view-tab-btn" id="btn-tab-graph" onclick="switchVisualTab('graph')">
+            <span>🕸️ Prerequisite Graph</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- VIEW 1: SEMESTER KANBAN TIMELINE (HERO SCREENSHOT) -->
+      <div id="view-timeline-container">
+        <div class="kanban-timeline-scroll" id="kanban-columns-feed">
+          <!-- Populated by JavaScript with 8 Semesters -->
+        </div>
+      </div>
+
+      <!-- VIEW 2: INTERACTIVE PREREQUISITE & CONFLICT GRAPH -->
+      <div id="view-graph-container" style="display: none;">
+        <div id="graph-viewport-container"></div>
+      </div>
+
+      <!-- BOTTLENECK & GRADUATION RISK REPORT STACK (BELOW TIMELINE) -->
+      <section class="risk-report-section">
+        <div class="risk-header">
+          <div class="risk-title">
+            <span>⚡</span>
+            <span>Graduation Risk & Bottleneck Alerts</span>
+          </div>
+          <span style="font-size: 0.75rem; color: #fca5a5; font-weight: 700; background: rgba(239, 68, 68, 0.15); padding: 2px 8px; border-radius: 4px;">
+            1 Critical Constraint Flagged
+          </span>
+        </div>
+
+        <div class="risk-card-stack" id="risk-alert-stack">
+          <!-- Populated dynamically -->
+          <div class="risk-alert-card">
+            <div>
+              <strong style="color: #f87171; font-size: 0.9rem;">⚠️ Bottleneck Warning: CS301 (Algorithms)</strong>
+              <div class="risk-alert-text">
+                Course is only offered in <strong>Fall Terms</strong>. Must be completed by <strong>Fall 2025</strong> to prevent delaying Senior Capstone (CS499).
+              </div>
+            </div>
+            <button class="btn-alt-courses" onclick="openSubstitutionModal('CS301')">See Alternatives</button>
+          </div>
+        </div>
+      </section>
+
+    </main>
+
+    <!-- RIGHT PANE: ADVISOR CHAT PANEL (SPLIT-PANE ADVISING) -->
+    <aside class="right-pane">
+      <div class="chat-panel-header">
+        <div style="font-size: 1.2rem;">💬</div>
+        <div>
+          <div class="chat-panel-title">PathFinder Advisor AI</div>
+          <div style="font-size: 0.72rem; color: #34d399;">● Graph-RAG Active</div>
+        </div>
+      </div>
+
+      <!-- Quick Suggested Prompts -->
+      <div class="chat-quick-prompts">
+        <div style="font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase; font-weight: 700;">Suggested Questions:</div>
+        <button class="quick-prompt-chip" onclick="askAdvisorQuestion('Why cannot I take CS301 Algorithms next term?')">
+          ❓ Why can't I take CS301 Algorithms?
+        </button>
+        <button class="quick-prompt-chip" onclick="askAdvisorQuestion('What are the prerequisites for CS402 Machine Learning?')">
+          ❓ What are the prerequisites for CS402 (ML)?
+        </button>
+        <button class="quick-prompt-chip" onclick="askAdvisorQuestion('Am I on track to graduate in Spring 2026?')">
+          ❓ Am I on track to graduate on time?
+        </button>
+      </div>
+
+      <!-- Chat History Stream -->
+      <div class="chat-history-feed" id="chat-messages-stream">
+        <div class="msg-bubble assistant">
+          👋 Hello! I am your <strong>PathFinder Academic Advisor</strong>. Ask any question about prerequisite chains, graduation risks, or course alternatives. I will cite university catalog rules and highlight the graph for you!
+        </div>
+      </div>
+
+      <!-- Chat Input Area -->
+      <div class="chat-input-area">
+        <input type="text" id="advisor-user-input" class="chat-text-input" placeholder="Ask about prerequisites, risks, substitutions...">
+        <button id="advisor-send-btn" class="chat-btn-send">Send</button>
+      </div>
+    </aside>
+
+  </div>
+
+  <!-- ==========================================================================
+       COURSE DETAIL & SUBSTITUTION MODAL
+       ========================================================================== -->
+  <div class="modal-overlay" id="course-modal-overlay">
+    <div class="modal-content-card">
+      <div class="modal-header">
+        <div>
+          <h3 id="modal-course-title" style="color: #60a5fa; font-size: 1.15rem;">CS301: Algorithms</h3>
+          <div id="modal-course-dept" style="font-size: 0.78rem; color: var(--text-muted);">Computer Science · 3 Credits</div>
+        </div>
+        <button class="modal-close-btn" onclick="closeModal()">&times;</button>
+      </div>
+
+      <div id="modal-course-desc" style="font-size: 0.85rem; color: #cbd5e1; margin-bottom: 14px; line-height: 1.45;"></div>
+
+      <div style="background: rgba(15, 23, 42, 0.6); padding: 12px; border-radius: 8px; margin-bottom: 14px;">
+        <div style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; font-weight: 700; margin-bottom: 4px;">Prerequisites Required:</div>
+        <div id="modal-course-prereqs" style="font-size: 0.88rem; font-weight: 700; color: #f8fafc;">CS201, MATH201</div>
+      </div>
+
+      <div style="background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.3); padding: 12px; border-radius: 8px;">
+        <div style="font-size: 0.75rem; color: #34d399; text-transform: uppercase; font-weight: 700; margin-bottom: 4px;">Approved Substitutions (§2.1):</div>
+        <div id="modal-course-subs" style="font-size: 0.85rem; color: #cbd5e1;">CS305 (Applied Algorithm Design)</div>
+      </div>
     </div>
   </div>
 
-  <script>
-    // Listen for Enter key on landing page
-    window.addEventListener("keydown", (e) => {
-      if (e.key === "Enter") {
-        window.location.href = "dashboard.html";
-      }
-    });
-  </script>
+  <script src="app.js"></script>
 </body>
 </html>
