@@ -17,7 +17,7 @@
   <canvas id="three-bg-canvas"></canvas>
 
   <!-- ==========================================================================
-       1. MINIMAL 3D HERO LANDING PAGE
+       1. MINIMAL 3D HERO LANDING & STUDENT LOGIN
        ========================================================================== -->
   <div id="landing-screen" class="landing-container">
     <!-- 3D Interactive Geometric Constellation Canvas -->
@@ -34,14 +34,49 @@
       </h1>
 
       <p class="landing-subtitle">
-        Automated degree sequencing, prerequisite conflict detection, and policy-grounded academic advising.
+        Automated degree sequencing, prerequisite conflict detection, and policy-grounded advising.
       </p>
 
-      <button class="btn-launch" onclick="openDashboard('pathway')">
-        <span>Launch Advisor</span>
-        <span style="font-size: 0.75rem; background: rgba(0,0,0,0.15); padding: 2px 8px; border-radius: 6px; font-family: monospace;">ENTER ↵</span>
-      </button>
-      <div class="landing-hint">Press <kbd style="background: rgba(255,255,255,0.08); padding: 3px 8px; border-radius: 6px;">Enter</kbd> or click to open</div>
+      <!-- Student Login Card -->
+      <div class="login-card">
+        <div class="login-card-header">
+          <span style="font-size: 1.3rem;">🔐</span>
+          <div>
+            <div style="font-size: 1rem; font-weight: 700; color: #f8fafc;">Student Portal Login</div>
+            <div style="font-size: 0.76rem; color: var(--text-muted);">Enter your university credentials to continue</div>
+          </div>
+        </div>
+
+        <div id="login-error-alert" class="login-alert">⚠️ Please enter a valid Register Number.</div>
+
+        <form id="student-login-form" onsubmit="handleStudentLogin(event)">
+          <div class="login-field-group">
+            <label class="login-label" for="login-regno">Register Number / Student ID</label>
+            <input type="text" id="login-regno" class="login-input" placeholder="e.g. S1001" required autocomplete="username">
+          </div>
+
+          <div class="login-field-group">
+            <label class="login-label" for="login-password">Password</label>
+            <input type="password" id="login-password" class="login-input" placeholder="••••••••" required autocomplete="current-password">
+          </div>
+
+          <button type="submit" class="btn-signin">
+            <span>Sign In to Advisor Portal</span>
+            <span style="font-size: 1rem;">➔</span>
+          </button>
+        </form>
+
+        <!-- Quick 1-Click Demo Logins for Judges -->
+        <div class="quick-login-row">
+          <div class="quick-login-title">Quick Demo Logins:</div>
+          <div class="quick-chips">
+            <button type="button" class="quick-chip-btn" onclick="quickFillLogin('S1001')">👤 Alice (Senior CS)</button>
+            <button type="button" class="quick-chip-btn" onclick="quickFillLogin('S1002')">👤 Bob (At-Risk)</button>
+            <button type="button" class="quick-chip-btn" onclick="quickFillLogin('S1003')">👤 Charlie (Honor Roll)</button>
+          </div>
+        </div>
+      </div>
+
     </div>
   </div>
 
@@ -52,7 +87,7 @@
     
     <!-- Top Navigation Bar -->
     <header class="topbar">
-      <div class="topbar-brand" onclick="openLanding()">
+      <div class="topbar-brand" onclick="signOut()">
         <div class="topbar-logo">🎓</div>
         <div class="topbar-title">Academic AI <span style="color: var(--accent-blue);">Advisor</span></div>
       </div>
@@ -73,10 +108,10 @@
         </button>
       </nav>
 
-      <!-- Student Picker & Home -->
+      <!-- Student Switcher & Sign Out -->
       <div class="topbar-user">
         <select id="user-select" class="user-select"></select>
-        <button class="btn-home" onclick="openLanding()">Home</button>
+        <button class="btn-home" onclick="signOut()" title="Log out to welcome screen">Sign Out</button>
       </div>
     </header>
 
@@ -235,25 +270,51 @@
     </div>
   </div>
 
-  <script src="app.js?v=3.0"></script>
+  <script src="app.js?v=3.1"></script>
   <script>
+    function handleStudentLogin(e) {
+      if (e) e.preventDefault();
+      const regnoInput = document.getElementById("login-regno");
+      const errAlert = document.getElementById("login-error-alert");
+      const regno = regnoInput ? regnoInput.value.trim().toUpperCase() : "";
+
+      const found = APP_DATA.students.find(s => s.id === regno);
+      if (found) {
+        if (errAlert) errAlert.style.display = "none";
+        state.currentStudent = found;
+        const picker = document.getElementById("user-select");
+        if (picker) picker.value = found.id;
+        renderDashboard();
+        openDashboard('pathway');
+      } else {
+        // Fallback demo matching
+        if (errAlert) {
+          errAlert.textContent = `⚠️ Register Number '${regno}' not recognized. Try S1001, S1002, or S1003.`;
+          errAlert.style.display = "block";
+        }
+      }
+    }
+
+    function quickFillLogin(regno) {
+      const regnoInput = document.getElementById("login-regno");
+      const pwdInput = document.getElementById("login-password");
+      if (regnoInput) regnoInput.value = regno;
+      if (pwdInput) pwdInput.value = "password123";
+      handleStudentLogin();
+    }
+
     function openDashboard(tabName = 'pathway') {
       document.getElementById("landing-screen").style.display = "none";
       document.getElementById("dashboard-screen").style.display = "block";
       switchTab(tabName);
     }
 
-    function openLanding() {
+    function signOut() {
       document.getElementById("dashboard-screen").style.display = "none";
       document.getElementById("landing-screen").style.display = "flex";
+      const errAlert = document.getElementById("login-error-alert");
+      if (errAlert) errAlert.style.display = "none";
     }
-
-    window.addEventListener("keydown", (e) => {
-      const landing = document.getElementById("landing-screen");
-      if (landing && landing.style.display !== "none" && e.key === "Enter") {
-        openDashboard('pathway');
-      }
-    });
   </script>
 </body>
 </html>
