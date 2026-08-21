@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Academic AI Advisor — Decentralized Graph-RAG Platform</title>
+  <title>Academic AI Advisor</title>
   
   <link rel="stylesheet" href="style.css">
   <script type="text/javascript" src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
@@ -11,249 +11,187 @@
 <body>
 
   <!-- ==========================================================================
-       HERO LANDING PAGE (World-Class SaaS Aesthetic)
+       1. MINIMAL CLEAN LANDING PAGE
        ========================================================================== -->
-  <div id="view-landing" class="landing-view-container">
-    <div class="landing-glow-orb"></div>
-
-    <div class="landing-content">
-      <div class="landing-badge">
-        <span>✨</span>
-        <span>Decentralized Graph-RAG Platform · v2.5</span>
-      </div>
-
-      <h1 class="landing-title">
-        Academic AI <span class="gradient-text">Advisor</span>
-      </h1>
-
-      <p class="landing-subtitle">
-        Autonomous multi-semester degree sequencing, real-time prerequisite conflict detection, and citation-backed advising powered by university Knowledge Graphs.
-      </p>
-
-      <div class="landing-cta-group">
-        <button class="btn-hero-primary" onclick="launchApp('pathway')">
-          <span>🚀 Launch Advisor Dashboard</span>
-          <span style="font-size: 0.8rem; background: rgba(255,255,255,0.2); padding: 2px 8px; border-radius: 6px; font-family: 'JetBrains Mono', monospace;">ENTER ↵</span>
-        </button>
-        <button class="btn-hero-secondary" onclick="launchApp('graph')">
-          <span>🕸️ Explore Knowledge Graph</span>
-        </button>
-      </div>
-
-      <!-- 4 Feature Pillars -->
-      <div class="landing-grid">
-        <div class="landing-card" onclick="launchApp('pathway')" style="cursor: pointer;">
-          <div class="landing-card-icon">🗺️</div>
-          <div class="landing-card-title">Pathway Sequencing</div>
-          <div class="landing-card-desc">Topological load balancing to map conflict-free semester schedules toward on-time graduation.</div>
-        </div>
-
-        <div class="landing-card" onclick="launchApp('graph')" style="cursor: pointer;">
-          <div class="landing-card-icon">🕸️</div>
-          <div class="landing-card-title">Knowledge Graph DAGs</div>
-          <div class="landing-card-desc">44+ indexed courses with interactive prerequisite dependency chains and bottleneck detection.</div>
-        </div>
-
-        <div class="landing-card" onclick="launchApp('advisor')" style="cursor: pointer;">
-          <div class="landing-card-icon">💬</div>
-          <div class="landing-card-title">Citation-Traceable RAG</div>
-          <div class="landing-card-desc">Conversational advising grounded in official academic regulations (§1.1, §2.2, §5.2).</div>
-        </div>
-
-        <div class="landing-card" onclick="launchApp('conflicts')" style="cursor: pointer;">
-          <div class="landing-card-icon">⚠️</div>
-          <div class="landing-card-title">Conflict Auditor</div>
-          <div class="landing-card-desc">Instant schedule simulation with pre-approved course substitution recommendations.</div>
-        </div>
-      </div>
+  <div id="landing-screen" class="landing-container">
+    <div class="landing-badge">
+      <span>✨</span>
+      <span>Graph-RAG Academic Platform</span>
     </div>
+
+    <h1 class="landing-title">
+      Academic AI <span class="gradient-text">Advisor</span>
+    </h1>
+
+    <p class="landing-subtitle">
+      Automated degree sequencing, prerequisite conflict detection, and policy-grounded academic advising.
+    </p>
+
+    <button class="btn-launch" onclick="openDashboard('pathway')">
+      <span>Launch Advisor</span>
+      <span style="font-size: 0.75rem; background: rgba(0,0,0,0.15); padding: 2px 6px; border-radius: 4px; font-family: monospace;">ENTER ↵</span>
+    </button>
+    <div class="landing-hint">Press <kbd style="background: rgba(255,255,255,0.08); padding: 2px 6px; border-radius: 4px;">Enter</kbd> or click to open</div>
   </div>
 
   <!-- ==========================================================================
-       MAIN DASHBOARD APPLICATION
+       2. CLEAN MINIMAL DASHBOARD
        ========================================================================== -->
-  <div id="view-dashboard" style="display: none;">
+  <div id="dashboard-screen" style="display: none;">
     
     <!-- Top Navigation Bar -->
-    <nav class="navbar">
-      <div class="nav-brand" onclick="returnToLanding()">
-        <div class="brand-icon">🎓</div>
-        <div>
-          <div class="brand-title">Academic <span style="color: #60a5fa;">AI Advisor</span></div>
-          <div class="brand-tag">Graph-RAG Platform</div>
-        </div>
+    <header class="topbar">
+      <div class="topbar-brand" onclick="openLanding()">
+        <div class="topbar-logo">🎓</div>
+        <div class="topbar-title">Academic AI <span style="color: var(--accent-blue);">Advisor</span></div>
       </div>
 
       <!-- Navigation Tabs -->
-      <div class="nav-links">
-        <button class="nav-tab active" id="tab-btn-pathway" onclick="setMainView('pathway')">
-          <span>🗺️</span> Pathway Roadmap
+      <nav class="topbar-tabs">
+        <button class="tab-link active" id="tab-pathway" onclick="switchTab('pathway')">
+          <span>🗺️</span> Pathway
         </button>
-        <button class="nav-tab" id="tab-btn-graph" onclick="setMainView('graph')">
-          <span>🕸️</span> Knowledge Graph
+        <button class="tab-link" id="tab-graph" onclick="switchTab('graph')">
+          <span>🕸️</span> Graph
         </button>
-        <button class="nav-tab" id="tab-btn-advisor" onclick="setMainView('advisor')">
-          <span>💬</span> AI Advisor
+        <button class="tab-link" id="tab-advisor" onclick="switchTab('advisor')">
+          <span>💬</span> Advisor
         </button>
-        <button class="nav-tab" id="tab-btn-conflicts" onclick="setMainView('conflicts')">
-          <span>⚠️</span> Conflict Auditor
+        <button class="tab-link" id="tab-conflicts" onclick="switchTab('conflicts')">
+          <span>⚠️</span> Conflicts
         </button>
-      </div>
+      </nav>
 
-      <!-- Student Switcher & Home Button -->
-      <div class="nav-profile">
-        <div class="student-selector-wrapper">
-          <span style="font-size: 0.76rem; color: var(--text-muted);">Student:</span>
-          <select id="student-picker" class="student-select"></select>
-        </div>
-        <button class="nav-tab" style="background: rgba(255,255,255,0.05); border: 1px solid var(--border);" onclick="returnToLanding()">
-          <span>🏠 Home</span>
-        </button>
+      <!-- Student Picker & Home -->
+      <div class="topbar-user">
+        <select id="user-select" class="user-select"></select>
+        <button class="btn-home" onclick="openLanding()">Home</button>
       </div>
-    </nav>
+    </header>
 
-    <!-- Main Content Container -->
-    <main class="main-container">
+    <!-- Main Content -->
+    <main class="content-wrapper">
       
-      <!-- Dynamic Header & Summary -->
-      <div class="page-header-box">
+      <!-- Student Summary Header -->
+      <div class="student-header">
         <div>
-          <h1 class="page-title" id="student-heading">Alice Johnson</h1>
-          <p class="page-subtitle" id="student-subheading">Major: Computer Science · Minor: Mathematics · Expected Graduation: Spring 2026</p>
+          <h1 class="student-name" id="ui-student-name">Alice Johnson</h1>
+          <div class="student-details" id="ui-student-details">Computer Science · Expected Graduation: Spring 2026</div>
         </div>
-        <div style="text-align: right;">
-          <span class="stat-badge badge-success" id="student-status-badge">● Good Academic Standing</span>
+        <div class="kpi-tag tag-green" id="ui-student-standing">● Good Standing</div>
+      </div>
+
+      <!-- 4 Clean KPI Tiles -->
+      <div class="kpi-row">
+        <div class="kpi-box">
+          <div class="kpi-title">Credits Completed</div>
+          <div class="kpi-number" id="ui-kpi-credits">78 <span style="font-size: 0.9rem; color: var(--text-dim);">/ 120</span></div>
+          <div class="kpi-tag tag-blue" id="ui-kpi-pct">65% Progress</div>
+        </div>
+        <div class="kpi-box">
+          <div class="kpi-title">Cumulative GPA</div>
+          <div class="kpi-number" id="ui-kpi-gpa">3.65</div>
+          <div class="kpi-tag tag-green">Honor Roll</div>
+        </div>
+        <div class="kpi-box">
+          <div class="kpi-title">Remaining Terms</div>
+          <div class="kpi-number" id="ui-kpi-terms">3 Semesters</div>
+          <div class="kpi-tag tag-blue">42 Credits Left</div>
+        </div>
+        <div class="kpi-box">
+          <div class="kpi-title">Flagged Bottlenecks</div>
+          <div class="kpi-number" id="ui-kpi-conflicts" style="color: var(--accent-rose);">1 Course</div>
+          <div class="kpi-tag tag-red">Action Required</div>
         </div>
       </div>
 
-      <!-- 4 High-Level Metric Tiles -->
-      <div class="stats-grid">
-        <div class="stat-card">
-          <div class="stat-label">Credits Completed</div>
-          <div class="stat-value" id="kpi-credits">78 <span style="font-size: 1rem; color: var(--text-muted);">/ 120 cr</span></div>
-          <div class="stat-badge badge-info" id="kpi-credits-pct">65% Progress</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-label">Cumulative GPA</div>
-          <div class="stat-value" id="kpi-gpa">3.65</div>
-          <div class="stat-badge badge-success">Honor Roll</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-label">Estimated Remaining</div>
-          <div class="stat-value" id="kpi-semesters">3 Terms</div>
-          <div class="stat-badge badge-info">42 Credits Needed</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-label">Bottleneck Risks</div>
-          <div class="stat-value" id="kpi-conflicts" style="color: #f87171;">1 Course</div>
-          <div class="stat-badge badge-danger">Attention Required</div>
-        </div>
-      </div>
-
-      <!-- ================= 1. PATHWAY ROADMAP (KANBAN TIMELINE) ================= -->
-      <section id="section-pathway" class="view-section">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
-          <h2 style="font-size: 1.2rem; font-weight: 700; color: #f8fafc;">📅 8-Semester Degree Pathway Timeline</h2>
-          <div style="display: flex; gap: 12px; font-size: 0.78rem;">
-            <span style="display: flex; align-items: center; gap: 6px;"><span style="width: 8px; height: 8px; border-radius: 50%; background: #10b981;"></span> Passed</span>
-            <span style="display: flex; align-items: center; gap: 6px;"><span style="width: 8px; height: 8px; border-radius: 50%; background: #3b82f6;"></span> Planned</span>
-            <span style="display: flex; align-items: center; gap: 6px;"><span style="width: 8px; height: 8px; border-radius: 50%; background: #ef4444;"></span> At-Risk</span>
+      <!-- ================= TAB 1: PATHWAY ROADMAP (KANBAN) ================= -->
+      <section id="view-pathway">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+          <h2 style="font-size: 1.05rem; font-weight: 600;">Semester Roadmap</h2>
+          <div style="display: flex; gap: 12px; font-size: 0.75rem;">
+            <span style="color: var(--accent-green);">● Passed</span>
+            <span style="color: var(--accent-blue);">● Planned</span>
+            <span style="color: var(--accent-rose);">● At-Risk</span>
           </div>
         </div>
 
-        <div class="kanban-board" id="kanban-feed"></div>
+        <div class="kanban-scroll" id="kanban-container"></div>
 
-        <!-- Bottleneck Alert Card Stack -->
-        <div class="alert-section">
-          <div class="alert-header">
-            <div style="font-weight: 700; font-size: 0.95rem; display: flex; align-items: center; gap: 8px;">
-              <span>⚡</span> Prerequisite Bottlenecks & Graduation Risk Alerts
-            </div>
-            <span style="font-size: 0.74rem; color: #fca5a5; font-weight: 700;">1 Constraint Action Required</span>
-          </div>
-
-          <div class="alert-item">
-            <div>
-              <strong style="color: #f87171; font-size: 0.9rem;">⚠️ Bottleneck Course: CS301 (Algorithms)</strong>
-              <div style="font-size: 0.84rem; color: #cbd5e1; margin-top: 2px;">
-                Course is strictly offered in <strong>Fall Semesters</strong>. Missing this term will delay your Senior Capstone (CS499) sequence by 1 full academic year.
-              </div>
-            </div>
-            <button class="alert-btn" onclick="openModal('CS301')">View Approved Alternatives</button>
-          </div>
-        </div>
-      </section>
-
-      <!-- ================= 2. KNOWLEDGE GRAPH CANVAS ================= -->
-      <section id="section-graph" class="view-section" style="display: none;">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
+        <!-- Bottleneck Alert -->
+        <div class="alert-card">
           <div>
-            <h2 style="font-size: 1.2rem; font-weight: 700;">🕸️ Curriculum Prerequisite Knowledge Graph</h2>
-            <p style="font-size: 0.85rem; color: var(--text-muted);">Interactive 2D physics network showing prerequisite directed edges and bottleneck clusters.</p>
+            <div style="font-weight: 600; font-size: 0.88rem; color: var(--accent-rose);">⚠️ Bottleneck Notice: CS301 (Algorithms)</div>
+            <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 2px;">
+              Only offered in Fall. Complete early to ensure on-time enrollment in Capstone (CS499).
+            </div>
           </div>
+          <button class="btn-sub" onclick="openModal('CS301')">View Substitutes</button>
         </div>
-
-        <div class="graph-canvas-container" id="graph-canvas"></div>
       </section>
 
-      <!-- ================= 3. AI ADVISOR CHAT INTERFACE ================= -->
-      <section id="section-advisor" class="view-section" style="display: none;">
-        <div style="margin-bottom: 18px; text-align: center;">
-          <h2 style="font-size: 1.3rem; font-weight: 800;">💬 Conversational AI Academic Advisor</h2>
-          <p style="font-size: 0.88rem; color: var(--text-muted);">Ask questions about prerequisite eligibility, degree rules, and academic policy.</p>
+      <!-- ================= TAB 2: KNOWLEDGE GRAPH ================= -->
+      <section id="view-graph" style="display: none;">
+        <div style="margin-bottom: 12px;">
+          <h2 style="font-size: 1.05rem; font-weight: 600;">Prerequisite Knowledge Graph</h2>
+          <div style="font-size: 0.8rem; color: var(--text-muted);">Interactive curriculum network showing prerequisite dependency chains.</div>
         </div>
 
-        <!-- Quick Suggested Prompts -->
-        <div style="display: flex; gap: 10px; justify-content: center; margin-bottom: 20px; flex-wrap: wrap;">
-          <button class="nav-tab" style="background: rgba(30, 41, 59, 0.7); border: 1px solid var(--border);" onclick="sendAdvisorPrompt('Why cannot I take CS301 Algorithms next term?')">
+        <div class="graph-box" id="graph-container"></div>
+      </section>
+
+      <!-- ================= TAB 3: AI ADVISOR CHAT ================= -->
+      <section id="view-advisor" style="display: none;">
+        <div style="display: flex; gap: 8px; justify-content: center; margin-bottom: 16px; flex-wrap: wrap;">
+          <button class="tab-link" style="background: var(--bg-card); border: 1px solid var(--border);" onclick="askAdvisor('Why cannot I take CS301 Algorithms next term?')">
             💡 Why can't I take CS301 Algorithms?
           </button>
-          <button class="nav-tab" style="background: rgba(30, 41, 59, 0.7); border: 1px solid var(--border);" onclick="sendAdvisorPrompt('What are the prerequisites for CS402 Machine Learning?')">
+          <button class="tab-link" style="background: var(--bg-card); border: 1px solid var(--border);" onclick="askAdvisor('What are the prerequisites for CS402 Machine Learning?')">
             💡 Prerequisites for CS402 (ML)?
           </button>
-          <button class="nav-tab" style="background: rgba(30, 41, 59, 0.7); border: 1px solid var(--border);" onclick="sendAdvisorPrompt('Am I on track to graduate in Spring 2026?')">
+          <button class="tab-link" style="background: var(--bg-card); border: 1px solid var(--border);" onclick="askAdvisor('Am I on track to graduate in Spring 2026?')">
             💡 Am I on track to graduate on time?
           </button>
         </div>
 
-        <div class="chat-wrapper">
-          <div class="chat-messages" id="chat-stream">
-            <div class="chat-bubble assistant">
-              👋 Hello! I am your <strong>Academic AI Advisor</strong>. Ask me anything about course prerequisites, degree completion, or university academic policies!
+        <div class="chat-card">
+          <div class="chat-log" id="chat-messages">
+            <div class="bubble assistant">
+              👋 Hello! I am your <strong>Academic AI Advisor</strong>. Ask me anything about prerequisite eligibility, degree rules, or course substitutions!
             </div>
           </div>
-          <div class="chat-input-container">
-            <input type="text" id="chat-input-box" class="chat-input" placeholder="Type your academic question...">
-            <button id="chat-submit-btn" class="chat-send-btn">Ask Advisor</button>
+          <div class="chat-input-bar">
+            <input type="text" id="chat-text" class="chat-textfield" placeholder="Ask an academic question...">
+            <button id="chat-send-btn" class="chat-submit">Ask</button>
           </div>
         </div>
       </section>
 
-      <!-- ================= 4. CONFLICT AUDITOR SIMULATOR ================= -->
-      <section id="section-conflicts" class="view-section" style="display: none;">
-        <div style="margin-bottom: 18px;">
-          <h2 style="font-size: 1.2rem; font-weight: 700;">⚠️ Prerequisite & Schedule Conflict Auditor</h2>
-          <p style="font-size: 0.85rem; color: var(--text-muted);">Simulate next term's schedule to catch prerequisite violations and credit overload caps.</p>
+      <!-- ================= TAB 4: CONFLICT AUDITOR ================= -->
+      <section id="view-conflicts" style="display: none;">
+        <div style="margin-bottom: 12px;">
+          <h2 style="font-size: 1.05rem; font-weight: 600;">Schedule Conflict Auditor</h2>
+          <div style="font-size: 0.8rem; color: var(--text-muted);">Simulate next term's registration to verify prerequisite compliance.</div>
         </div>
 
-        <div style="background: var(--bg-surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 24px;">
-          <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 20px; margin-bottom: 20px;">
+        <div style="background: var(--bg-surface); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 20px;">
+          <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 16px; margin-bottom: 16px;">
             <div>
-              <label style="font-size: 0.85rem; color: var(--text-muted); display: block; margin-bottom: 8px;">Select Courses for Upcoming Semester:</label>
-              <select id="auditor-courses-select" multiple size="6" style="width: 100%; background: #090d16; border: 1px solid var(--border); border-radius: 8px; color: white; padding: 10px;"></select>
+              <label style="font-size: 0.8rem; color: var(--text-muted); display: block; margin-bottom: 6px;">Select Proposed Courses:</label>
+              <select id="audit-course-select" multiple size="6" style="width: 100%; background: var(--bg-card); border: 1px solid var(--border); border-radius: 6px; color: white; padding: 8px;"></select>
             </div>
             <div>
-              <label style="font-size: 0.85rem; color: var(--text-muted); display: block; margin-bottom: 8px;">Offering Semester:</label>
-              <select id="auditor-sem-select" style="width: 100%; background: #090d16; border: 1px solid var(--border); border-radius: 8px; color: white; padding: 10px; margin-bottom: 14px;">
+              <label style="font-size: 0.8rem; color: var(--text-muted); display: block; margin-bottom: 6px;">Target Semester:</label>
+              <select id="audit-sem-select" style="width: 100%; background: var(--bg-card); border: 1px solid var(--border); border-radius: 6px; color: white; padding: 8px; margin-bottom: 12px;">
                 <option value="FALL">Fall Semester</option>
                 <option value="SPRING">Spring Semester</option>
               </select>
-              <button class="chat-send-btn" style="width: 100%;" onclick="runScheduleAudit()">⚡ Run Verification</button>
+              <button class="chat-submit" style="width: 100%;" onclick="runAudit()">Run Verification</button>
             </div>
           </div>
 
-          <div id="audit-results-box" style="padding: 16px; background: rgba(15, 23, 42, 0.6); border-radius: 8px; border: 1px solid var(--border);">
-            <div style="color: var(--text-muted); font-size: 0.88rem;">Select courses above and click 'Run Verification' to simulate your schedule.</div>
+          <div id="audit-output" style="padding: 12px; background: var(--bg-card); border-radius: 6px; border: 1px solid var(--border); font-size: 0.85rem; color: var(--text-muted);">
+            Select courses above and click 'Run Verification' to test prerequisites.
           </div>
         </div>
       </section>
@@ -262,52 +200,47 @@
   </div>
 
   <!-- ==========================================================================
-       COURSE DETAILS & SUBSTITUTION MODAL
+       COURSE DETAIL MODAL
        ========================================================================== -->
-  <div class="modal-overlay" id="course-modal">
-    <div class="modal-card">
-      <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 14px;">
-        <div>
-          <h3 id="modal-code-title" style="font-size: 1.2rem; color: #60a5fa;">CS301: Algorithms</h3>
-          <div id="modal-meta" style="font-size: 0.8rem; color: var(--text-muted);">Computer Science · 3 Credits</div>
-        </div>
-        <button style="background: transparent; border: none; color: var(--text-muted); font-size: 1.4rem; cursor: pointer;" onclick="closeModal()">&times;</button>
+  <div class="modal-backdrop" id="modal-box">
+    <div class="modal-box">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+        <h3 id="modal-title" style="font-size: 1.1rem; color: var(--accent-blue);">CS301: Algorithms</h3>
+        <button style="background: transparent; border: none; color: var(--text-muted); font-size: 1.2rem; cursor: pointer;" onclick="closeModal()">&times;</button>
       </div>
 
-      <p id="modal-desc" style="font-size: 0.86rem; color: #cbd5e1; line-height: 1.5; margin-bottom: 16px;"></p>
+      <div id="modal-credits" style="font-size: 0.78rem; color: var(--text-dim); margin-bottom: 10px;">Core · 3 Credits</div>
+      <p id="modal-desc" style="font-size: 0.84rem; color: var(--text-muted); line-height: 1.45; margin-bottom: 12px;"></p>
 
-      <div style="background: rgba(15, 23, 42, 0.7); padding: 12px; border-radius: 8px; margin-bottom: 12px;">
-        <div style="font-size: 0.74rem; color: var(--text-muted); text-transform: uppercase; font-weight: 700; margin-bottom: 4px;">Prerequisites Required:</div>
-        <div id="modal-prereqs" style="font-size: 0.88rem; font-weight: 600; color: #f8fafc;">CS201, MATH201</div>
+      <div style="background: var(--bg-card); padding: 10px; border-radius: 6px; margin-bottom: 10px; font-size: 0.82rem;">
+        <span style="color: var(--text-dim); font-weight: 600;">Prerequisites:</span>
+        <span id="modal-prereqs" style="color: var(--text-main); font-weight: 600; margin-left: 4px;">CS201, MATH201</span>
       </div>
 
-      <div style="background: var(--emerald-bg); border: 1px solid rgba(16, 185, 129, 0.3); padding: 12px; border-radius: 8px;">
-        <div style="font-size: 0.74rem; color: var(--emerald-text); text-transform: uppercase; font-weight: 700; margin-bottom: 4px;">Approved Substitutions (§2.1):</div>
-        <div id="modal-subs" style="font-size: 0.85rem; color: #e2e8f0;">CS305 (Applied Algorithm Design)</div>
+      <div style="background: rgba(52, 211, 153, 0.1); border: 1px solid rgba(52, 211, 153, 0.25); padding: 10px; border-radius: 6px; font-size: 0.82rem;">
+        <span style="color: var(--accent-green); font-weight: 600;">Approved Substitutions:</span>
+        <div id="modal-subs" style="color: var(--text-main); margin-top: 2px;">CS305 (Applied Algorithm Design)</div>
       </div>
     </div>
   </div>
 
   <script src="app.js"></script>
   <script>
-    // Launch app from landing view
-    function launchApp(initialTab = 'pathway') {
-      document.getElementById("view-landing").style.display = "none";
-      document.getElementById("view-dashboard").style.display = "block";
-      setMainView(initialTab);
+    function openDashboard(tabName = 'pathway') {
+      document.getElementById("landing-screen").style.display = "none";
+      document.getElementById("dashboard-screen").style.display = "block";
+      switchTab(tabName);
     }
 
-    // Return to Landing view
-    function returnToLanding() {
-      document.getElementById("view-dashboard").style.display = "none";
-      document.getElementById("view-landing").style.display = "flex";
+    function openLanding() {
+      document.getElementById("dashboard-screen").style.display = "none";
+      document.getElementById("landing-screen").style.display = "flex";
     }
 
-    // Enter key launch trigger on landing view
     window.addEventListener("keydown", (e) => {
-      const landing = document.getElementById("view-landing");
+      const landing = document.getElementById("landing-screen");
       if (landing && landing.style.display !== "none" && e.key === "Enter") {
-        launchApp('pathway');
+        openDashboard('pathway');
       }
     });
   </script>
