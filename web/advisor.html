@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>💬 Ask My Advisor — Academic Pathway Advisor</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <div class="app-layout">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="brand-header">
+        <a href="index.html" style="text-decoration: none;" class="brand-logo">
+          <span>🎓</span>
+          <span class="gradient-text">Advisor</span>
+        </a>
+        <div class="brand-caption">Academic Intelligence Platform</div>
+      </div>
+
+      <!-- Student Profile Card in Sidebar -->
+      <div class="student-card">
+        <div style="font-size: 0.72rem; color: var(--text-muted); text-transform: uppercase; font-weight: 700; margin-bottom: 8px;">Active Student</div>
+        <select id="student-select" style="margin-bottom: 12px;"></select>
+        
+        <div style="display: flex; align-items: center; margin-bottom: 10px;">
+          <div class="student-avatar" id="profile-avatar">A</div>
+          <div>
+            <div style="font-weight: 700; color: var(--text-main); font-size: 0.95rem;" id="profile-name">Alice Johnson</div>
+            <div style="font-size: 0.76rem; color: var(--text-muted);" id="profile-major">Major: Computer Science</div>
+            <div style="font-size: 0.72rem; color: var(--text-subtle);">Minor: Mathematics</div>
+          </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 10px;">
+          <div style="background: rgba(15, 23, 42, 0.6); padding: 6px; border-radius: 6px; text-align: center;">
+            <div style="font-size: 0.68rem; color: var(--text-muted); text-transform: uppercase;">GPA</div>
+            <div style="font-size: 1rem; font-weight: 700; color: #34d399;" id="profile-gpa">3.65</div>
+          </div>
+          <div style="background: rgba(15, 23, 42, 0.6); padding: 6px; border-radius: 6px; text-align: center;">
+            <div style="font-size: 0.68rem; color: var(--text-muted); text-transform: uppercase;">Graduation</div>
+            <div style="font-size: 0.85rem; font-weight: 700; color: #93c5fd;">Spring 2026</div>
+          </div>
+        </div>
+
+        <div style="display: flex; justify-content: space-between; font-size: 0.74rem; color: var(--text-muted);">
+          <span>Degree Progress</span>
+          <span id="profile-progress-text">0/120 cr</span>
+        </div>
+        <div class="progress-bar-container">
+          <div class="progress-bar-fill" id="profile-progress-bar" style="width: 0%;"></div>
+        </div>
+      </div>
+
+      <!-- Navigation Links -->
+      <nav class="nav-menu">
+        <a href="dashboard.html" class="nav-item"><span>📊</span> 1. Student Dashboard</a>
+        <a href="advisor.html" class="nav-item active"><span>💬</span> 2. Ask My Advisor</a>
+        <a href="graph.html" class="nav-item"><span>🕸️</span> 3. Knowledge Graph</a>
+        <a href="pathway.html" class="nav-item"><span>🗺️</span> 4. Pathway Generator</a>
+        <a href="conflict.html" class="nav-item"><span>⚠️</span> 5. Conflict Detector</a>
+        <a href="faculty.html" class="nav-item"><span>📝</span> 6. Faculty Panel</a>
+      </nav>
+
+      <div style="margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--border-subtle);">
+        <a href="index.html" class="btn btn-secondary" style="width: 100%; text-decoration: none; font-size: 0.82rem;">
+          <span>🏠 Welcome Screen</span>
+        </a>
+      </div>
+    </aside>
+
+    <!-- Main Advisor View -->
+    <main class="main-content">
+      <div class="page-header">
+        <div>
+          <div class="badge-pill">Section 2 · AI Conversational Advising</div>
+          <h1 class="page-title">💬 Ask My <span class="gradient-text">Advisor</span></h1>
+          <p class="page-subtitle">Chatbot interface grounded in university regulations with expandable inline citations.</p>
+        </div>
+      </div>
+
+      <div style="display: flex; gap: 8px; margin-bottom: 14px; flex-wrap: wrap;">
+        <button class="btn btn-secondary" onclick="handleSendMessage('Can I take Data Structures before Discrete Math?')">💡 Can I take Data Structures before Discrete Math?</button>
+        <button class="btn btn-secondary" onclick="handleSendMessage('Can I take CS301 (Algorithms) next term?')">💡 Can I take CS301 (Algorithms)?</button>
+        <button class="btn btn-secondary" onclick="handleSendMessage('What are the prerequisites for CS402 Machine Learning?')">💡 Prerequisites for CS402 (ML)?</button>
+      </div>
+
+      <div class="chat-container">
+        <div class="chat-messages" id="chat-messages-container">
+          <div class="chat-bubble assistant">
+            👋 Hello! I am your AI Academic Advisor. Ask me anything about course prerequisites, degree completion, or university academic policies!
+          </div>
+        </div>
+        <div class="chat-input-bar">
+          <input type="text" id="chat-input" placeholder="Type your advising question (e.g. Can I take Data Structures before Discrete Math?)...">
+          <button class="btn btn-primary" id="chat-send-btn">Send</button>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
