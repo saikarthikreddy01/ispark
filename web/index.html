@@ -347,7 +347,7 @@
       const regno = regnoInput ? regnoInput.value.trim().toUpperCase() : "";
       const password = pwdInput ? pwdInput.value : "";
 
-      // Try Backend API First
+      // Try Backend MongoDB API First
       try {
         const res = await fetch("/api/auth/login", {
           method: "POST",
@@ -366,6 +366,13 @@
           renderDashboard();
           openDashboard('pathway');
           return;
+        } else if (!res.ok && data.detail) {
+          if (alertBox) {
+            alertBox.className = "auth-alert error";
+            alertBox.textContent = `⚠️ ${data.detail}`;
+            alertBox.style.display = "block";
+          }
+          return;
         }
       } catch (err) {
         console.log("Backend API offline, using permanent local storage.");
@@ -374,6 +381,16 @@
       // Client-Side Permanent Fallback
       const found = APP_DATA.students.find(s => s.id.toUpperCase() === regno);
       if (found) {
+        // Verify password if recorded
+        if (found.password && password && found.password !== password) {
+          if (alertBox) {
+            alertBox.className = "auth-alert error";
+            alertBox.textContent = "⚠️ Incorrect password. Please enter the password you registered with.";
+            alertBox.style.display = "block";
+          }
+          return;
+        }
+
         if (alertBox) alertBox.style.display = "none";
         state.currentStudent = found;
         saveActiveUser(found.id);
@@ -386,7 +403,7 @@
       } else {
         if (alertBox) {
           alertBox.className = "auth-alert error";
-          alertBox.textContent = `⚠️ Register Number '${regno}' not found. Please Sign Up to create your account.`;
+          alertBox.textContent = `⚠️ Register Number '${regno}' not found. Please click 'Sign Up' tab to create your account.`;
           alertBox.style.display = "block";
         }
       }
@@ -407,15 +424,16 @@
       if (existing) {
         if (alertBox) {
           alertBox.className = "auth-alert error";
-          alertBox.textContent = `⚠️ Student '${regno}' already exists. Please Sign In.`;
+          alertBox.textContent = `⚠️ Student '${regno}' is already registered in database. Please Sign In.`;
           alertBox.style.display = "block";
         }
         return;
       }
 
-      const newStudent = {
+      let newStudent = {
         id: regno,
         name: name,
+        password: pwd || "password123",
         major: major || "Computer Science",
         gpa: 3.75,
         completed: ["CS101", "MATH101", "CS102", "MATH201", "PHYS101", "CS201", "CS250", "ENG101"],
@@ -443,7 +461,7 @@
           newStudent = data.student;
         }
       } catch (err) {
-        console.log("Backend offline, saving permanently to browser storage.");
+        console.log("Backend offline, saving permanently to browser database.");
       }
 
       APP_DATA.students.push(newStudent);

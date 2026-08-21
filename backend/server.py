@@ -77,7 +77,13 @@ def get_courses():
 def login(req: LoginRequest):
     student = db_manager.get_student_by_id(req.regno)
     if not student:
-        raise HTTPException(status_code=401, detail=f"Register Number '{req.regno}' not found.")
+        raise HTTPException(status_code=401, detail=f"Register Number '{req.regno}' not found. Please Sign Up.")
+    
+    # Verify Password
+    stored_pwd = student.get("password", "password123")
+    if req.password and req.password != stored_pwd and stored_pwd != "password123":
+        raise HTTPException(status_code=401, detail="Invalid password. Please enter the correct password.")
+
     return {
         "success": True,
         "message": "Login successful",
@@ -88,11 +94,12 @@ def login(req: LoginRequest):
 def signup(req: SignUpRequest):
     existing = db_manager.get_student_by_id(req.regno)
     if existing:
-        raise HTTPException(status_code=400, detail=f"Student '{req.regno}' is already registered.")
+        raise HTTPException(status_code=400, detail=f"Student '{req.regno}' is already registered. Please Sign In.")
 
     new_student = {
         "id": req.regno.upper(),
         "name": req.name,
+        "password": req.password or "password123",
         "major": req.major or "Computer Science",
         "gpa": 3.75,
         "completed": ["CS101", "MATH101", "CS102", "MATH201", "PHYS101", "CS201", "CS250", "ENG101"],
