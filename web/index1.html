@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Academic AI Advisor — 3D Graph-RAG Platform</title>
+  
+  <link rel="stylesheet" href="style.css?v=6.0">
+  <!-- Local Three.js & Vis.js (Zero CDN dependencies) -->
+  <script src="three.min.js"></script>
+  <script src="vis-network.min.js"></script>
+</head>
+<body>
+
+  <!-- Ambient 3D Background Canvas Layer -->
+  <canvas id="three-bg-canvas"></canvas>
+
+  <!-- ==========================================================================
+       1. MINIMAL 3D HERO LANDING (DIAGRAM ON LEFT, AUTH BOX ON RIGHT)
+       ========================================================================== -->
+  <div id="landing-screen" class="landing-container">
+    <!-- 3D Interactive Geometric Constellation Canvas -->
+    <canvas id="three-landing-canvas"></canvas>
+
+    <div class="landing-split-row">
+      
+      <!-- LEFT SIDE: Diagram & Hero Typography (matches user photo) -->
+      <div class="landing-left-hero">
+        <div class="landing-badge">
+          <span style="color: #f59e0b; font-size: 0.88rem;">✦</span>
+          <span>GRAPH-RAG ACADEMIC PLATFORM</span>
+        </div>
+
+        <h1 class="landing-title">
+          Academic AI<br><span class="gradient-text">Advisor</span>
+        </h1>
+
+        <p class="landing-subtitle">
+          Autonomous multi-semester degree sequencing, prerequisite conflict detection, and policy-grounded academic advising.
+        </p>
+
+        <div class="hero-feature-tags">
+          <span class="hero-tag">🕸️ Knowledge Graph DAGs</span>
+          <span class="hero-tag">🗺️ Topological Sequencing</span>
+          <span class="hero-tag">💬 Policy Graph-RAG</span>
+        </div>
+      </div>
+
+      <!-- RIGHT SIDE: Student Auth Card (Login & Sign Up) -->
+      <div class="landing-right-auth">
+        <div class="auth-card">
+          <!-- Auth Mode Tabs -->
+          <div class="auth-tabs">
+            <button type="button" class="auth-tab-btn active" id="auth-tab-login" onclick="setAuthMode('login')">Sign In</button>
+            <button type="button" class="auth-tab-btn" id="auth-tab-signup" onclick="setAuthMode('signup')">Sign Up</button>
+          </div>
+
+          <div id="auth-alert-box" class="auth-alert error"></div>
+
+          <!-- FORM 1: LOGIN -->
+          <form id="form-login" onsubmit="handleStudentLogin(event)">
+            <div class="login-field-group">
+              <label class="login-label" for="login-regno">Register Number / Student ID</label>
+              <input type="text" id="login-regno" class="login-input" placeholder="e.g. 241FA04077 or S1001" required autocomplete="username">
+            </div>
+
+            <div class="login-field-group">
+              <label class="login-label" for="login-password">Password</label>
+              <input type="password" id="login-password" class="login-input" placeholder="••••••••" required autocomplete="current-password">
+            </div>
+
+            <button type="submit" class="btn-signin">
+              <span>Sign In to Advisor Portal</span>
+              <span style="font-size: 1rem;">➔</span>
+            </button>
+
+            <div class="auth-switch-link">
+              Don't have an account? <a onclick="setAuthMode('signup')">Create one here</a>
+            </div>
+          </form>
+
+          <!-- FORM 2: SIGN UP -->
+          <form id="form-signup" style="display: none;" onsubmit="handleStudentSignUp(event)">
+            <div class="login-field-group">
+              <label class="login-label" for="signup-name">Full Student Name</label>
+              <input type="text" id="signup-name" class="login-input" placeholder="e.g. Dana Lee" required>
+            </div>
+
+            <div class="login-field-group">
+              <label class="login-label" for="signup-regno">Register Number</label>
+              <input type="text" id="signup-regno" class="login-input" placeholder="e.g. S1004" required>
+            </div>
+
+            <div class="login-field-group">
+              <label class="login-label" for="signup-major">Major</label>
+              <input type="text" id="signup-major" class="login-input" placeholder="e.g. Computer Science" value="Computer Science" required>
+            </div>
+
+            <div class="login-field-group">
+              <label class="login-label" for="signup-grad">Expected Graduation</label>
+              <input type="text" id="signup-grad" class="login-input" placeholder="e.g. Spring 2027" value="Spring 2027" required>
+            </div>
+
+            <div class="login-field-group">
+              <label class="login-label" for="signup-password">Password</label>
+              <input type="password" id="signup-password" class="login-input" placeholder="••••••••" required autocomplete="new-password">
+            </div>
+
+            <button type="submit" class="btn-signin">
+              <span>Create Student Account</span>
+              <span style="font-size: 1rem;">➔</span>
+            </button>
+
+            <div class="auth-switch-link">
+              Already registered? <a onclick="setAuthMode('login')">Sign In</a>
+            </div>
+          </form>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ==========================================================================
+       2. CLEAN MINIMAL DASHBOARD WITH 3D DEPTH
+       ========================================================================== -->
+  <div id="dashboard-screen" style="display: none;">
+    
+    <!-- Top Navigation Bar -->
+    <header class="topbar">
+      <div class="topbar-brand" onclick="signOut()">
+        <div class="topbar-logo">🎓</div>
+        <div class="topbar-title">Academic AI <span style="color: var(--accent-blue);">Advisor</span></div>
+      </div>
+
+      <!-- Navigation Tabs -->
+      <nav class="topbar-tabs">
+        <button class="tab-link active" id="tab-pathway" onclick="switchTab('pathway')">
+          <span>🗺️</span> Pathway
+        </button>
+        <button class="tab-link" id="tab-graph" onclick="switchTab('graph')">
+          <span>🕸️</span> Knowledge Graph
+        </button>
+        <button class="tab-link" id="tab-advisor" onclick="switchTab('advisor')">
+          <span>💬</span> AI Advisor
+        </button>
+        <button class="tab-link" id="tab-conflicts" onclick="switchTab('conflicts')">
+          <span>⚠️</span> Conflict Auditor
+        </button>
+        <button class="tab-link" id="tab-bottlenecks" onclick="switchTab('bottlenecks')">
+          <span>🚨</span> Bottlenecks & Risk
+        </button>
+        <button class="tab-link" id="tab-governance" onclick="switchTab('governance')">
+          <span>🏛️</span> Faculty Governance
+        </button>
+      </nav>
+
+      <!-- Student Switcher & Sign Out -->
+      <div class="topbar-user">
+        <select id="user-select" class="user-select"></select>
+        <button class="btn-home" onclick="signOut()" title="Log out to welcome screen">Sign Out</button>
+      </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="content-wrapper">
+      
+      <!-- Student Summary Header -->
+      <div class="student-header">
+        <div>
+          <h1 class="student-name" id="ui-student-name">Alice Johnson</h1>
+          <div class="student-details" id="ui-student-details">Computer Science · Expected Graduation: Spring 2026</div>
+        </div>
+        <div class="kpi-tag tag-green" id="ui-student-standing">● Good Standing</div>
+      </div>
+
+      <!-- 4 Clean KPI Tiles with 3D Hover Tilt -->
+      <div class="kpi-row">
+        <div class="kpi-box">
+          <div class="kpi-title">Credits Completed</div>
+          <div class="kpi-number" id="ui-kpi-credits">78 <span style="font-size: 0.95rem; color: var(--text-dim);">/ 120</span></div>
+          <div class="kpi-tag tag-blue" id="ui-kpi-pct">65% Progress</div>
+        </div>
+        <div class="kpi-box">
+          <div class="kpi-title">Cumulative GPA</div>
+          <div class="kpi-number" id="ui-kpi-gpa">3.65</div>
+          <div class="kpi-tag tag-green" id="ui-kpi-gpa-label">Honor Roll</div>
+        </div>
+        <div class="kpi-box">
+          <div class="kpi-title">Remaining Terms</div>
+          <div class="kpi-number" id="ui-kpi-terms">3 Semesters</div>
+          <div class="kpi-tag tag-blue" id="ui-kpi-left">42 Credits Left</div>
+        </div>
+        <div class="kpi-box">
+          <div class="kpi-title">Graduation Risk</div>
+          <div class="kpi-number" id="ui-kpi-conflicts" style="color: var(--accent-green);">Low (12%)</div>
+          <div class="kpi-tag tag-green" id="ui-kpi-risk-tag">On-Time Track</div>
+        </div>
+      </div>
+
+      <!-- ================= TAB 1: PATHWAY ROADMAP (KANBAN) ================= -->
+      <section id="view-pathway">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; flex-wrap: wrap; gap: 10px;">
+          <div>
+            <h2 style="font-size: 1.1rem; font-weight: 700;">Topological Degree Pathway</h2>
+            <div style="font-size: 0.8rem; color: var(--text-muted);">Dynamic multi-semester sequencing based on prerequisite DAG dependencies.</div>
+          </div>
+          <div style="display: flex; gap: 12px; align-items: center;">
+            <div style="display: flex; gap: 12px; font-size: 0.78rem;">
+              <span style="color: var(--accent-green); font-weight: 600;">● Passed</span>
+              <span style="color: var(--accent-blue); font-weight: 600;">● Planned</span>
+              <span style="color: var(--accent-rose); font-weight: 600;">● At-Risk</span>
+            </div>
+            <button class="btn-primary-action" onclick="generateAutomatedPathway()">
+              <span>⚡</span> Auto-Sequence Pathway
+            </button>
+          </div>
+        </div>
+
+        <div class="kanban-scroll" id="kanban-container"></div>
+
+        <!-- Bottleneck Alert -->
+        <div class="alert-card">
+          <div>
+            <div style="font-weight: 700; font-size: 0.92rem; color: var(--accent-rose);">⚠️ Critical Milestone: CS301 (Algorithms) & CS201 (Data Structures)</div>
+            <div style="font-size: 0.82rem; color: var(--text-muted); margin-top: 2px;">
+              CS201 blocks 6 downstream courses. Prioritize clearing prerequisite chains to ensure graduation by target term.
+            </div>
+          </div>
+          <button class="btn-sub" onclick="openModal('CS301')">View Substitutes</button>
+        </div>
+      </section>
+
+      <!-- ================= TAB 2: KNOWLEDGE GRAPH ================= -->
+      <section id="view-graph" style="display: none;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; flex-wrap: wrap; gap: 10px;">
+          <div>
+            <h2 style="font-size: 1.1rem; font-weight: 700;">Prerequisite Knowledge Graph DAG</h2>
+            <div style="font-size: 0.82rem; color: var(--text-muted);">Interactive topological curriculum network with constraint enforcement.</div>
+          </div>
+          <div style="display: flex; gap: 10px;">
+            <input type="text" id="graph-search" placeholder="🔍 Search course..." oninput="searchGraph(this.value)" style="background: var(--bg-card); border: 1px solid var(--border); border-radius: 6px; padding: 6px 12px; color: white; font-size: 0.82rem;">
+            <button class="hud-btn active" onclick="filterGraphDept('ALL')">All</button>
+            <button class="hud-btn" onclick="filterGraphDept('CS')">CS</button>
+            <button class="hud-btn" onclick="filterGraphDept('MATH')">Math</button>
+            <button class="hud-btn" onclick="filterGraphDept('PHYS')">Physics</button>
+          </div>
+        </div>
+
+        <div class="graph-box" id="graph-container"></div>
+      </section>
+
+      <!-- ================= TAB 3: AI ADVISOR CHAT (WITH GEMINI API KEY DETAILS) ================= -->
+      <section id="view-advisor" style="display: none;">
+        <!-- Gemini API Key Live Details Banner -->
+        <div class="api-key-hud-card" style="background: rgba(15, 23, 42, 0.85); border: 1px solid rgba(56, 189, 248, 0.25); border-radius: var(--radius-md); padding: 14px 20px; margin-bottom: 16px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.3);">
+          <div style="display: flex; align-items: center; gap: 12px;">
+            <div style="width: 10px; height: 10px; border-radius: 50%; background: #34d399; box-shadow: 0 0 12px #34d399; animation: pulseGlow 1.8s infinite;"></div>
+            <div>
+              <div style="font-size: 0.9rem; font-weight: 700; color: #ffffff; display: flex; align-items: center; gap: 8px;">
+                <span>Gemini 3.6 Flash Engine</span>
+                <span style="font-size: 0.72rem; padding: 2px 8px; border-radius: 4px; background: rgba(56, 189, 248, 0.15); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.3);">REAL-TIME INTERACTION</span>
+              </div>
+              <div style="font-size: 0.78rem; color: #94a3b8; margin-top: 2px;">
+                Project: <strong style="color: #cbd5e1;">projects/882038538915</strong> &nbsp;|&nbsp; Project No: <strong style="color: #cbd5e1;">882038538915</strong>
+              </div>
+            </div>
+          </div>
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <span style="font-family: monospace; font-size: 0.75rem; background: rgba(0,0,0,0.4); padding: 4px 10px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.08); color: #34d399;">
+              🔑 AQ.Ab8RN6...vUAg
+            </span>
+            <span style="font-size: 0.75rem; color: #38bdf8; font-weight: 600;">🟢 Active</span>
+          </div>
+        </div>
+
+        <div style="display: flex; gap: 8px; justify-content: center; margin-bottom: 16px; flex-wrap: wrap;">
+          <button class="tab-link" style="background: var(--bg-card); border: 1px solid var(--border);" onclick="askAdvisor('Why cannot I take CS301 Algorithms next term?')">
+            💡 Why can't I take CS301 Algorithms?
+          </button>
+          <button class="tab-link" style="background: var(--bg-card); border: 1px solid var(--border);" onclick="askAdvisor('What are the prerequisites for CS402 Machine Learning?')">
+            💡 Prerequisites for CS402 (ML)?
+          </button>
+          <button class="tab-link" style="background: var(--bg-card); border: 1px solid var(--border);" onclick="askAdvisor('What course substitutions are approved for CS350?')">
+            💡 Substitutions for CS350?
+          </button>
+          <button class="tab-link" style="background: var(--bg-card); border: 1px solid var(--border);" onclick="askAdvisor('How do I submit a Prerequisite Waiver Petition?')">
+            💡 How to request a Waiver?
+          </button>
+        </div>
+
+        <div class="chat-card">
+          <div class="chat-log" id="chat-messages">
+            <div class="bubble assistant">
+              👋 Hello! I am your <strong>Academic AI Advisor</strong> powered by real-time <strong>Gemini 3.6 Flash</strong> and institutional <strong>Graph-RAG</strong>. I analyze curriculum dependencies, university policies, and your degree timeline live. Ask me any question or click a prompt above!
+            </div>
+          </div>
+          <div class="chat-input-bar">
+            <input type="text" id="chat-text" class="chat-textfield" placeholder="Ask an academic, prerequisite, or graduation policy question...">
+            <button id="chat-send-btn" class="chat-submit">Ask Advisor</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= TAB 4: CONFLICT AUDITOR ================= -->
+      <section id="view-conflicts" style="display: none;">
+        <div style="margin-bottom: 14px;">
+          <h2 style="font-size: 1.1rem; font-weight: 700;">Formal Schedule Conflict Auditor</h2>
+          <div style="font-size: 0.82rem; color: var(--text-muted);">Simulate next term's registration to verify prerequisite, corequisite, credit limit, and term offering rules.</div>
+        </div>
+
+        <div style="background: rgba(11, 17, 32, 0.85); backdrop-filter: blur(12px); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 22px;">
+          <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 16px; margin-bottom: 16px;">
+            <div>
+              <label style="font-size: 0.82rem; color: var(--text-muted); display: block; margin-bottom: 6px;">Select Proposed Courses (Hold Ctrl / Cmd to multi-select):</label>
+              <select id="audit-course-select" multiple size="7" style="width: 100%; background: var(--bg-card); border: 1px solid var(--border); border-radius: 6px; color: white; padding: 10px;"></select>
+            </div>
+            <div>
+              <label style="font-size: 0.82rem; color: var(--text-muted); display: block; margin-bottom: 6px;">Target Registration Semester:</label>
+              <select id="audit-sem-select" style="width: 100%; background: var(--bg-card); border: 1px solid var(--border); border-radius: 6px; color: white; padding: 10px; margin-bottom: 12px;">
+                <option value="FALL">Fall Semester (18 cr limit)</option>
+                <option value="SPRING">Spring Semester (18 cr limit)</option>
+              </select>
+              <button class="chat-submit" style="width: 100%;" onclick="runAudit()">Run Formal Verification</button>
+            </div>
+          </div>
+
+          <div id="audit-output" style="padding: 16px; background: var(--bg-card); border-radius: 6px; border: 1px solid var(--border); font-size: 0.88rem; color: var(--text-muted);">
+            Select proposed courses and click 'Run Formal Verification' to test against all institutional constraints.
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= TAB 5: BOTTLENECKS & GRADUATION RISK ================= -->
+      <section id="view-bottlenecks" style="display: none;">
+        <div class="risk-meter-box">
+          <div>
+            <div style="font-size: 0.8rem; font-weight: 700; color: var(--text-dim); text-transform: uppercase;">Graduation Risk Assessment</div>
+            <h3 style="font-size: 1.4rem; color: var(--text-main); margin-top: 2px;" id="risk-summary-text">Low Delay Risk (15%)</h3>
+            <div style="font-size: 0.84rem; color: var(--text-muted); margin-top: 4px;" id="risk-projected-delay">Projected graduation: On-Time (0 delay terms)</div>
+          </div>
+          <div>
+            <div style="text-align: right; font-size: 0.8rem; color: var(--text-muted);">Risk Index</div>
+            <div class="risk-bar-bg">
+              <div class="risk-bar-fill" id="risk-bar-fill" style="width: 15%; background: var(--accent-green);"></div>
+            </div>
+          </div>
+        </div>
+
+        <div style="margin-bottom: 14px;">
+          <h2 style="font-size: 1.1rem; font-weight: 700;">Critical Path & Bottleneck Hierarchy</h2>
+          <div style="font-size: 0.82rem; color: var(--text-muted);">Courses with high out-degree blocking multiple downstream degree requirements.</div>
+        </div>
+
+        <div class="bottlenecks-grid" id="bottlenecks-container"></div>
+      </section>
+
+      <!-- ================= TAB 6: FACULTY GOVERNANCE & PETITIONS ================= -->
+      <section id="view-governance" style="display: none;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; flex-wrap: wrap; gap: 10px;">
+          <div>
+            <h2 style="font-size: 1.1rem; font-weight: 700;">Faculty & Advisor Governance Review Board</h2>
+            <div style="font-size: 0.82rem; color: var(--text-muted);">Formal constraint verification, prerequisite waiver approvals, and credit overload exceptions.</div>
+          </div>
+          <button class="btn-primary-action" onclick="openPetitionModal()">
+            <span>📝</span> Submit Exception Petition
+          </button>
+        </div>
+
+        <div class="petition-list" id="petitions-container"></div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- ==========================================================================
+       MODAL 1: COURSE DETAIL & SUBSTITUTION MODAL
+       ========================================================================== -->
+  <div class="modal-backdrop" id="modal-box">
+    <div class="modal-box">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+        <h3 id="modal-title" style="font-size: 1.15rem; color: var(--accent-blue);">CS301: Algorithms</h3>
+        <button style="background: transparent; border: none; color: var(--text-muted); font-size: 1.3rem; cursor: pointer;" onclick="closeModal()">&times;</button>
+      </div>
+
+      <div id="modal-credits" style="font-size: 0.8rem; color: var(--text-dim); margin-bottom: 10px;">Core · 3 Credits</div>
+      <p id="modal-desc" style="font-size: 0.86rem; color: var(--text-muted); line-height: 1.5; margin-bottom: 14px;"></p>
+
+      <div style="background: var(--bg-card); padding: 10px; border-radius: 6px; margin-bottom: 10px; font-size: 0.84rem;">
+        <span style="color: var(--text-dim); font-weight: 600;">Prerequisites:</span>
+        <span id="modal-prereqs" style="color: var(--text-main); font-weight: 600; margin-left: 4px;">CS201, MATH201</span>
+      </div>
+
+      <div style="background: rgba(52, 211, 153, 0.1); border: 1px solid rgba(52, 211, 153, 0.25); padding: 10px; border-radius: 6px; font-size: 0.84rem;">
+        <span style="color: var(--accent-green); font-weight: 600;">Approved Substitutions:</span>
+        <div id="modal-subs" style="color: var(--text-main); margin-top: 2px;">CS305 (Applied Algorithm Design)</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==========================================================================
+       MODAL 2: CITATION POLICY INSPECTOR MODAL
+       ========================================================================== -->
+  <div class="modal-backdrop" id="citation-modal">
+    <div class="modal-box">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+        <h3 id="citation-modal-title" style="font-size: 1.15rem; color: var(--accent-blue);">📚 Policy Citation Inspector</h3>
+        <button style="background: transparent; border: none; color: var(--text-muted); font-size: 1.3rem; cursor: pointer;" onclick="closeCitationModal()">&times;</button>
+      </div>
+
+      <div id="citation-modal-section" style="font-size: 0.78rem; font-weight: 700; color: var(--accent-cyan); margin-bottom: 8px;">§1.1 PREREQUISITE ENFORCEMENT</div>
+      <div id="citation-modal-body" style="font-size: 0.86rem; color: var(--text-muted); line-height: 1.6; background: var(--bg-card); padding: 14px; border-radius: 6px; border: 1px solid var(--border); margin-bottom: 14px;">
+        All course prerequisites must be completed with a minimum grade of D (or C for advanced core).
+      </div>
+
+      <div style="font-size: 0.76rem; color: var(--text-dim);">
+        Authority: <span id="citation-modal-auth" style="color: var(--text-main); font-weight: 600;">Registrar & Academic Standards</span> · Version: 2026-2027
+      </div>
+    </div>
+  </div>
+
+  <!-- ==========================================================================
+       MODAL 3: SUBMIT EXCEPTION PETITION MODAL
+       ========================================================================== -->
+  <div class="modal-backdrop" id="petition-modal">
+    <div class="modal-box">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
+        <h3 style="font-size: 1.15rem; color: var(--accent-blue);">📝 Submit Faculty Exception Petition</h3>
+        <button style="background: transparent; border: none; color: var(--text-muted); font-size: 1.3rem; cursor: pointer;" onclick="closePetitionModal()">&times;</button>
+      </div>
+
+      <form onsubmit="handlePetitionSubmit(event)">
+        <div class="login-field-group" style="margin-bottom: 12px;">
+          <label class="login-label">Petition Type</label>
+          <select id="pet-type" style="width: 100%; background: var(--bg-card); border: 1px solid var(--border); border-radius: 6px; color: white; padding: 10px;">
+            <option value="PREREQUISITE_WAIVER">Prerequisite Waiver (Policy §1.2)</option>
+            <option value="CREDIT_OVERLOAD">Credit Overload to 19-21 cr (Policy §5.2)</option>
+            <option value="COURSE_SUBSTITUTION">Course Substitution Approval (Policy §2.2)</option>
+            <option value="SPECIAL_EXCEPTION">Special Academic Standing Exception</option>
+          </select>
+        </div>
+
+        <div class="login-field-group" style="margin-bottom: 12px;">
+          <label class="login-label">Target Course Code (Optional)</label>
+          <input type="text" id="pet-course" class="login-input" placeholder="e.g. CS301 or CS350">
+        </div>
+
+        <div class="login-field-group" style="margin-bottom: 12px;">
+          <label class="login-label">Target Semester</label>
+          <input type="text" id="pet-semester" class="login-input" placeholder="e.g. Fall 2026" value="Fall 2026">
+        </div>
+
+        <div class="login-field-group" style="margin-bottom: 16px;">
+          <label class="login-label">Academic Rationale & Justification</label>
+          <textarea id="pet-justification" rows="3" class="login-input" placeholder="Explain why this exception is required (e.g. prior equivalent coursework, industry experience, graduation requirement)..." required style="resize: vertical;"></textarea>
+        </div>
+
+        <button type="submit" class="btn-signin">
+          <span>Submit for Formal Faculty Verification</span>
+          <span>➔</span>
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Primary Application Engine -->
+  <script src="app.js?v=6.0"></script>
+
+  <!-- Immediate Direct 3D Animation Script (Guaranteed 60fps Startup) -->
+  <script>
+    (function initLanding3DDirect() {
+      const canvas = document.getElementById("three-landing-canvas");
+      if (!canvas || typeof THREE === "undefined") {
+        console.warn("Canvas or THREE not ready yet, retrying in 50ms...");
+        setTimeout(initLanding3DDirect, 50);
+        return;
+      }
+
+      try {
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
+        camera.position.z = 28;
+
+        const renderer = new THREE.WebGLRenderer({ canvas: canvas, alpha: true, antialias: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+        // Group positioned directly behind left hero text
+        const diagramGroup = new THREE.Group();
+        diagramGroup.position.x = window.innerWidth > 960 ? -8.5 : 0;
+        diagramGroup.position.y = 0;
+        scene.add(diagramGroup);
+
+        // 1. Outer 3D Icosahedron Wireframe Sphere (Cyan)
+        const sphereGeo = new THREE.IcosahedronGeometry(8.5, 3);
+        const origPositions = sphereGeo.attributes.position.clone();
+
+        const wireMat = new THREE.MeshBasicMaterial({
+          color: 0x38bdf8,
+          wireframe: true,
+          transparent: true,
+          opacity: 0.50
+        });
+        const wireMesh = new THREE.Mesh(sphereGeo, wireMat);
+        diagramGroup.add(wireMesh);
+
+        // Glowing Vertex Points (Emerald Cyan)
+        const pointMat = new THREE.PointsMaterial({
+          color: 0x34d399,
+          size: 0.35,
+          transparent: true,
+          opacity: 0.95
+        });
+        const pointMesh = new THREE.Points(sphereGeo, pointMat);
+        diagramGroup.add(pointMesh);
+
+        // 2. Inner Nested Torus Knot (Lavender Purple)
+        const torusGeo = new THREE.TorusKnotGeometry(4.2, 1.1, 80, 16);
+        const torusMat = new THREE.MeshBasicMaterial({
+          color: 0x818cf8,
+          wireframe: true,
+          transparent: true,
+          opacity: 0.30
+        });
+        const torusMesh = new THREE.Mesh(torusGeo, torusMat);
+        diagramGroup.add(torusMesh);
+
+        // 3. Floating Background Constellation Stars
+        const partCount = 180;
+        const partGeo = new THREE.BufferGeometry();
+        const partPos = new Float32Array(partCount * 3);
+        for (let i = 0; i < partCount * 3; i += 3) {
+          partPos[i] = (Math.random() - 0.5) * 75;
+          partPos[i + 1] = (Math.random() - 0.5) * 55;
+          partPos[i + 2] = (Math.random() - 0.5) * 40;
+        }
+        partGeo.setAttribute("position", new THREE.BufferAttribute(partPos, 3));
+        const outerMat = new THREE.PointsMaterial({
+          color: 0x60a5fa,
+          size: 0.25,
+          transparent: true,
+          opacity: 0.75
+        });
+        const outerCloud = new THREE.Points(partGeo, outerMat);
+        scene.add(outerCloud);
+
+        // Mouse Parallax
+        let mouseX = 0, mouseY = 0, targetX = 0, targetY = 0;
+        window.addEventListener("mousemove", (e) => {
+          mouseX = (e.clientX - window.innerWidth / 2) * 0.0012;
+          mouseY = (e.clientY - window.innerHeight / 2) * 0.0012;
+        });
+
+        window.addEventListener("resize", () => {
+          camera.aspect = window.innerWidth / window.innerHeight;
+          camera.updateProjectionMatrix();
+          renderer.setSize(window.innerWidth, window.innerHeight);
+          diagramGroup.position.x = window.innerWidth > 960 ? -8.5 : 0;
+        });
+
+        // 60fps Real-Time Render Loop
+        let clock = new THREE.Clock();
+        function animate() {
+          requestAnimationFrame(animate);
+          const elapsedTime = clock.getElapsedTime();
+
+          targetX += (mouseX - targetX) * 0.06;
+          targetY += (mouseY - targetY) * 0.06;
+
+          wireMesh.rotation.y = elapsedTime * 0.15 + targetX * 1.5;
+          wireMesh.rotation.x = elapsedTime * 0.08 + targetY * 1.5;
+          pointMesh.rotation.y = wireMesh.rotation.y;
+          pointMesh.rotation.x = wireMesh.rotation.x;
+
+          torusMesh.rotation.y = -elapsedTime * 0.25 + targetX;
+          torusMesh.rotation.x = -elapsedTime * 0.15 + targetY;
+
+          outerCloud.rotation.y = -elapsedTime * 0.03;
+
+          // Organic Wave Vertex Pulsing
+          const pos = sphereGeo.attributes.position;
+          for (let i = 0; i < pos.count; i++) {
+            const u = origPositions.getX(i);
+            const v = origPositions.getY(i);
+            const w = origPositions.getZ(i);
+            const wave = Math.sin(elapsedTime * 2.5 + u * 0.5 + v * 0.5) * 0.45;
+            const factor = 1 + wave / 9;
+            pos.setXYZ(i, u * factor, v * factor, w * factor);
+          }
+          pos.needsUpdate = true;
+
+          renderer.render(scene, camera);
+        }
+        animate();
+        console.log("✅ 3D Holographic Landing Canvas successfully initialized!");
+      } catch (err) {
+        console.error("3D init error:", err);
+      }
+    })();
+  </script>
+</body>
+</html>
+

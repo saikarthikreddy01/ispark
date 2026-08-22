@@ -766,10 +766,35 @@ def review_petition(petition_id: str, req: PetitionReviewRequest):
         "petition": reviewed
     }
 
-# Mount static web directory for full-stack hosting
+# Serve root HTML (web/index1.html)
+from fastapi.responses import FileResponse, Response
+
 WEB_DIR = Path(__file__).resolve().parent.parent / "web"
+
+@app.get("/")
+def serve_home():
+    web_index1 = WEB_DIR / "index1.html"
+    if web_index1.exists():
+        return FileResponse(str(web_index1))
+    web_index = WEB_DIR / "index.html"
+    if web_index.exists():
+        return FileResponse(str(web_index))
+    return FileResponse("index.html")
+
+@app.get("/index1.html")
+def serve_index1():
+    web_index1 = WEB_DIR / "index1.html"
+    if web_index1.exists():
+        return FileResponse(str(web_index1))
+    return FileResponse("index.html")
+
+@app.get("/favicon.ico")
+def favicon():
+    return Response(status_code=204)
+
+# Mount static web directory for full-stack hosting (JS, CSS, 3D assets)
 if WEB_DIR.exists():
-    app.mount("/", StaticFiles(directory=str(WEB_DIR), html=True), name="static")
+    app.mount("/", StaticFiles(directory=str(WEB_DIR), html=False), name="static")
 
 if __name__ == "__main__":
     import uvicorn
