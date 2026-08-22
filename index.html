@@ -17,9 +17,6 @@
   <canvas id="three-bg-canvas"></canvas>
 
   <!-- ==========================================================================
-       1. MINIMAL 3D HERO LANDING & STUDENT LOGIN
-       ========================================================================== -->
-  <!-- ==========================================================================
        1. MINIMAL 3D HERO LANDING (DIAGRAM ON LEFT, AUTH BOX ON RIGHT)
        ========================================================================== -->
   <div id="landing-screen" class="landing-container">
@@ -40,13 +37,14 @@
         </h1>
 
         <p class="landing-subtitle">
-          Autonomous multi-semester degree sequencing, prerequisite conflict detection, and policy-grounded academic advising.
+          Autonomous multi-semester degree sequencing, prerequisite conflict detection, bottleneck analysis, and policy-grounded academic advising.
         </p>
 
         <div class="hero-feature-tags">
           <span class="hero-tag">🕸️ Knowledge Graph DAGs</span>
           <span class="hero-tag">🗺️ Topological Sequencing</span>
           <span class="hero-tag">💬 Policy Graph-RAG</span>
+          <span class="hero-tag">🏛️ Faculty Governance</span>
         </div>
       </div>
 
@@ -65,7 +63,7 @@
           <form id="form-login" onsubmit="handleStudentLogin(event)">
             <div class="login-field-group">
               <label class="login-label" for="login-regno">Register Number / Student ID</label>
-              <input type="text" id="login-regno" class="login-input" placeholder="e.g. S1001" required autocomplete="username">
+              <input type="text" id="login-regno" class="login-input" placeholder="e.g. 241FA04077 or S1001" required autocomplete="username">
             </div>
 
             <div class="login-field-group">
@@ -143,13 +141,19 @@
           <span>🗺️</span> Pathway
         </button>
         <button class="tab-link" id="tab-graph" onclick="switchTab('graph')">
-          <span>🕸️</span> Graph
+          <span>🕸️</span> Knowledge Graph
         </button>
         <button class="tab-link" id="tab-advisor" onclick="switchTab('advisor')">
-          <span>💬</span> Advisor
+          <span>💬</span> AI Advisor (3D)
         </button>
         <button class="tab-link" id="tab-conflicts" onclick="switchTab('conflicts')">
-          <span>⚠️</span> Conflicts
+          <span>⚠️</span> Conflict Auditor
+        </button>
+        <button class="tab-link" id="tab-bottlenecks" onclick="switchTab('bottlenecks')">
+          <span>🚨</span> Bottlenecks & Risk
+        </button>
+        <button class="tab-link" id="tab-governance" onclick="switchTab('governance')">
+          <span>🏛️</span> Faculty Governance
         </button>
       </nav>
 
@@ -182,28 +186,36 @@
         <div class="kpi-box">
           <div class="kpi-title">Cumulative GPA</div>
           <div class="kpi-number" id="ui-kpi-gpa">3.65</div>
-          <div class="kpi-tag tag-green">Honor Roll</div>
+          <div class="kpi-tag tag-green" id="ui-kpi-gpa-label">Honor Roll</div>
         </div>
         <div class="kpi-box">
           <div class="kpi-title">Remaining Terms</div>
           <div class="kpi-number" id="ui-kpi-terms">3 Semesters</div>
-          <div class="kpi-tag tag-blue">42 Credits Left</div>
+          <div class="kpi-tag tag-blue" id="ui-kpi-left">42 Credits Left</div>
         </div>
         <div class="kpi-box">
-          <div class="kpi-title">Flagged Bottlenecks</div>
-          <div class="kpi-number" id="ui-kpi-conflicts" style="color: var(--accent-rose);">1 Course</div>
-          <div class="kpi-tag tag-red">Action Required</div>
+          <div class="kpi-title">Graduation Risk</div>
+          <div class="kpi-number" id="ui-kpi-conflicts" style="color: var(--accent-green);">Low (12%)</div>
+          <div class="kpi-tag tag-green" id="ui-kpi-risk-tag">On-Time Track</div>
         </div>
       </div>
 
       <!-- ================= TAB 1: PATHWAY ROADMAP (KANBAN) ================= -->
       <section id="view-pathway">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
-          <h2 style="font-size: 1.1rem; font-weight: 700;">Semester Roadmap</h2>
-          <div style="display: flex; gap: 12px; font-size: 0.78rem;">
-            <span style="color: var(--accent-green); font-weight: 600;">● Passed</span>
-            <span style="color: var(--accent-blue); font-weight: 600;">● Planned</span>
-            <span style="color: var(--accent-rose); font-weight: 600;">● At-Risk</span>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; flex-wrap: wrap; gap: 10px;">
+          <div>
+            <h2 style="font-size: 1.1rem; font-weight: 700;">Topological Degree Pathway</h2>
+            <div style="font-size: 0.8rem; color: var(--text-muted);">Dynamic multi-semester sequencing based on prerequisite DAG dependencies.</div>
+          </div>
+          <div style="display: flex; gap: 12px; align-items: center;">
+            <div style="display: flex; gap: 12px; font-size: 0.78rem;">
+              <span style="color: var(--accent-green); font-weight: 600;">● Passed</span>
+              <span style="color: var(--accent-blue); font-weight: 600;">● Planned</span>
+              <span style="color: var(--accent-rose); font-weight: 600;">● At-Risk</span>
+            </div>
+            <button class="btn-primary-action" onclick="generateAutomatedPathway()">
+              <span>⚡</span> Auto-Sequence Pathway
+            </button>
           </div>
         </div>
 
@@ -212,9 +224,9 @@
         <!-- Bottleneck Alert -->
         <div class="alert-card">
           <div>
-            <div style="font-weight: 700; font-size: 0.92rem; color: var(--accent-rose);">⚠️ Bottleneck Notice: CS301 (Algorithms)</div>
+            <div style="font-weight: 700; font-size: 0.92rem; color: var(--accent-rose);">⚠️ Critical Milestone: CS301 (Algorithms) & CS201 (Data Structures)</div>
             <div style="font-size: 0.82rem; color: var(--text-muted); margin-top: 2px;">
-              Only offered in Fall. Complete early to ensure on-time enrollment in Capstone (CS499).
+              CS201 blocks 6 downstream courses. Prioritize clearing prerequisite chains to ensure graduation by target term.
             </div>
           </div>
           <button class="btn-sub" onclick="openModal('CS301')">View Substitutes</button>
@@ -223,75 +235,151 @@
 
       <!-- ================= TAB 2: KNOWLEDGE GRAPH ================= -->
       <section id="view-graph" style="display: none;">
-        <div style="margin-bottom: 14px;">
-          <h2 style="font-size: 1.1rem; font-weight: 700;">Prerequisite Knowledge Graph</h2>
-          <div style="font-size: 0.82rem; color: var(--text-muted);">Interactive curriculum network showing prerequisite dependency chains.</div>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; flex-wrap: wrap; gap: 10px;">
+          <div>
+            <h2 style="font-size: 1.1rem; font-weight: 700;">Prerequisite Knowledge Graph DAG</h2>
+            <div style="font-size: 0.82rem; color: var(--text-muted);">Interactive topological curriculum network with constraint enforcement.</div>
+          </div>
+          <div style="display: flex; gap: 10px;">
+            <input type="text" id="graph-search" placeholder="🔍 Search course..." oninput="searchGraph(this.value)" style="background: var(--bg-card); border: 1px solid var(--border); border-radius: 6px; padding: 6px 12px; color: white; font-size: 0.82rem;">
+            <button class="hud-btn active" onclick="filterGraphDept('ALL')">All</button>
+            <button class="hud-btn" onclick="filterGraphDept('CS')">CS</button>
+            <button class="hud-btn" onclick="filterGraphDept('MATH')">Math</button>
+            <button class="hud-btn" onclick="filterGraphDept('PHYS')">Physics</button>
+          </div>
         </div>
 
         <div class="graph-box" id="graph-container"></div>
       </section>
 
-      <!-- ================= TAB 3: AI ADVISOR CHAT ================= -->
+      <!-- ================= TAB 3: AI ADVISOR CHAT WITH 3D NEURAL CORE BEHIND ================= -->
       <section id="view-advisor" style="display: none;">
-        <div style="display: flex; gap: 10px; justify-content: center; margin-bottom: 18px; flex-wrap: wrap;">
-          <button class="tab-link" style="background: var(--bg-card); border: 1px solid var(--border);" onclick="askAdvisor('Why cannot I take CS301 Algorithms next term?')">
-            💡 Why can't I take CS301 Algorithms?
-          </button>
-          <button class="tab-link" style="background: var(--bg-card); border: 1px solid var(--border);" onclick="askAdvisor('What are the prerequisites for CS402 Machine Learning?')">
-            💡 Prerequisites for CS402 (ML)?
-          </button>
-          <button class="tab-link" style="background: var(--bg-card); border: 1px solid var(--border);" onclick="askAdvisor('Am I on track to graduate in Spring 2026?')">
-            💡 Am I on track to graduate on time?
-          </button>
-        </div>
+        
+        <div class="advisor-stage">
+          <!-- 3D Three.js Interactive Diagram Behind Advisor -->
+          <canvas id="advisor-3d-canvas"></canvas>
 
-        <div class="chat-card">
-          <div class="chat-log" id="chat-messages">
-            <div class="bubble assistant">
-              👋 Hello! I am your <strong>Academic AI Advisor</strong>. Ask me anything about prerequisite eligibility, degree rules, or course substitutions!
+          <!-- Top HUD Bar -->
+          <div class="advisor-hud-bar">
+            <div class="hud-pill">
+              <div class="hud-pulse"></div>
+              <span>🧠 Graph-RAG Active · Gemini 3.6 Flash · 24 Curriculum Nodes</span>
+            </div>
+
+            <div class="hud-controls">
+              <button class="hud-btn active" id="btn-theme-cyan" onclick="setAdvisor3DTheme('cyan')">Cyber Cyan</button>
+              <button class="hud-btn" id="btn-theme-matrix" onclick="setAdvisor3DTheme('matrix')">Emerald Matrix</button>
+              <button class="hud-btn" id="btn-theme-violet" onclick="setAdvisor3DTheme('violet')">Quantum Violet</button>
+              <button class="hud-btn" onclick="toggleAdvisorWireframe()">🕸️ Wireframe</button>
             </div>
           </div>
-          <div class="chat-input-bar">
-            <input type="text" id="chat-text" class="chat-textfield" placeholder="Ask an academic question...">
-            <button id="chat-send-btn" class="chat-submit">Ask</button>
+
+          <!-- Glassmorphic Chat Content Overlay -->
+          <div class="advisor-glass-container">
+            <div style="display: flex; gap: 8px; justify-content: center; margin-bottom: 12px; flex-wrap: wrap;">
+              <button class="hud-btn" onclick="askAdvisor('Why cannot I take CS301 Algorithms next term?')">
+                💡 Why can't I take CS301 Algorithms?
+              </button>
+              <button class="hud-btn" onclick="askAdvisor('What are the prerequisites for CS402 Machine Learning?')">
+                💡 Prerequisites for CS402 (ML)?
+              </button>
+              <button class="hud-btn" onclick="askAdvisor('What course substitutions are approved for CS350?')">
+                💡 Substitutions for CS350?
+              </button>
+              <button class="hud-btn" onclick="askAdvisor('How do I submit a Prerequisite Waiver Petition?')">
+                💡 How to request a Waiver?
+              </button>
+            </div>
+
+            <div class="chat-card">
+              <div class="chat-log" id="chat-messages">
+                <div class="bubble assistant">
+                  👋 Hello! I am your <strong>Academic AI Advisor</strong>. I use Graph-RAG to analyze curriculum dependencies, university policies, and your degree timeline. Click any citation chip to inspect the official policy source!
+                </div>
+              </div>
+              <div class="chat-input-bar">
+                <input type="text" id="chat-text" class="chat-textfield" placeholder="Ask an academic, prerequisite, or graduation policy question...">
+                <button id="chat-send-btn" class="chat-submit">Ask Advisor</button>
+              </div>
+            </div>
           </div>
         </div>
+
       </section>
 
       <!-- ================= TAB 4: CONFLICT AUDITOR ================= -->
       <section id="view-conflicts" style="display: none;">
         <div style="margin-bottom: 14px;">
-          <h2 style="font-size: 1.1rem; font-weight: 700;">Schedule Conflict Auditor</h2>
-          <div style="font-size: 0.82rem; color: var(--text-muted);">Simulate next term's registration to verify prerequisite compliance.</div>
+          <h2 style="font-size: 1.1rem; font-weight: 700;">Formal Schedule Conflict Auditor</h2>
+          <div style="font-size: 0.82rem; color: var(--text-muted);">Simulate next term's registration to verify prerequisite, corequisite, credit limit, and term offering rules.</div>
         </div>
 
         <div style="background: rgba(11, 17, 32, 0.85); backdrop-filter: blur(12px); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 22px;">
           <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 16px; margin-bottom: 16px;">
             <div>
-              <label style="font-size: 0.82rem; color: var(--text-muted); display: block; margin-bottom: 6px;">Select Proposed Courses:</label>
-              <select id="audit-course-select" multiple size="6" style="width: 100%; background: var(--bg-card); border: 1px solid var(--border); border-radius: 6px; color: white; padding: 10px;"></select>
+              <label style="font-size: 0.82rem; color: var(--text-muted); display: block; margin-bottom: 6px;">Select Proposed Courses (Hold Ctrl / Cmd to multi-select):</label>
+              <select id="audit-course-select" multiple size="7" style="width: 100%; background: var(--bg-card); border: 1px solid var(--border); border-radius: 6px; color: white; padding: 10px;"></select>
             </div>
             <div>
-              <label style="font-size: 0.82rem; color: var(--text-muted); display: block; margin-bottom: 6px;">Target Semester:</label>
+              <label style="font-size: 0.82rem; color: var(--text-muted); display: block; margin-bottom: 6px;">Target Registration Semester:</label>
               <select id="audit-sem-select" style="width: 100%; background: var(--bg-card); border: 1px solid var(--border); border-radius: 6px; color: white; padding: 10px; margin-bottom: 12px;">
-                <option value="FALL">Fall Semester</option>
-                <option value="SPRING">Spring Semester</option>
+                <option value="FALL">Fall Semester (18 cr limit)</option>
+                <option value="SPRING">Spring Semester (18 cr limit)</option>
               </select>
-              <button class="chat-submit" style="width: 100%;" onclick="runAudit()">Run Verification</button>
+              <button class="chat-submit" style="width: 100%;" onclick="runAudit()">Run Formal Verification</button>
             </div>
           </div>
 
-          <div id="audit-output" style="padding: 14px; background: var(--bg-card); border-radius: 6px; border: 1px solid var(--border); font-size: 0.86rem; color: var(--text-muted);">
-            Select courses above and click 'Run Verification' to test prerequisites.
+          <div id="audit-output" style="padding: 16px; background: var(--bg-card); border-radius: 6px; border: 1px solid var(--border); font-size: 0.88rem; color: var(--text-muted);">
+            Select proposed courses and click 'Run Formal Verification' to test against all institutional constraints.
           </div>
         </div>
+      </section>
+
+      <!-- ================= TAB 5: BOTTLENECKS & GRADUATION RISK ================= -->
+      <section id="view-bottlenecks" style="display: none;">
+        <div class="risk-meter-box">
+          <div>
+            <div style="font-size: 0.8rem; font-weight: 700; color: var(--text-dim); text-transform: uppercase;">Graduation Risk Assessment</div>
+            <h3 style="font-size: 1.4rem; color: var(--text-main); margin-top: 2px;" id="risk-summary-text">Low Delay Risk (15%)</h3>
+            <div style="font-size: 0.84rem; color: var(--text-muted); margin-top: 4px;" id="risk-projected-delay">Projected graduation: On-Time (0 delay terms)</div>
+          </div>
+          <div>
+            <div style="text-align: right; font-size: 0.8rem; color: var(--text-muted);">Risk Index</div>
+            <div class="risk-bar-bg">
+              <div class="risk-bar-fill" id="risk-bar-fill" style="width: 15%; background: var(--accent-green);"></div>
+            </div>
+          </div>
+        </div>
+
+        <div style="margin-bottom: 14px;">
+          <h2 style="font-size: 1.1rem; font-weight: 700;">Critical Path & Bottleneck Hierarchy</h2>
+          <div style="font-size: 0.82rem; color: var(--text-muted);">Courses with high out-degree blocking multiple downstream degree requirements.</div>
+        </div>
+
+        <div class="bottlenecks-grid" id="bottlenecks-container"></div>
+      </section>
+
+      <!-- ================= TAB 6: FACULTY GOVERNANCE & PETITIONS ================= -->
+      <section id="view-governance" style="display: none;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; flex-wrap: wrap; gap: 10px;">
+          <div>
+            <h2 style="font-size: 1.1rem; font-weight: 700;">Faculty & Advisor Governance Review Board</h2>
+            <div style="font-size: 0.82rem; color: var(--text-muted);">Formal constraint verification, prerequisite waiver approvals, and credit overload exceptions.</div>
+          </div>
+          <button class="btn-primary-action" onclick="openPetitionModal()">
+            <span>📝</span> Submit Exception Petition
+          </button>
+        </div>
+
+        <div class="petition-list" id="petitions-container"></div>
       </section>
 
     </main>
   </div>
 
   <!-- ==========================================================================
-       COURSE DETAIL MODAL
+       MODAL 1: COURSE DETAIL & SUBSTITUTION MODAL
        ========================================================================== -->
   <div class="modal-backdrop" id="modal-box">
     <div class="modal-box">
@@ -315,7 +403,72 @@
     </div>
   </div>
 
-  <script src="app.js?v=5.0"></script>
+  <!-- ==========================================================================
+       MODAL 2: CITATION POLICY INSPECTOR MODAL
+       ========================================================================== -->
+  <div class="modal-backdrop" id="citation-modal">
+    <div class="modal-box">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+        <h3 id="citation-modal-title" style="font-size: 1.15rem; color: var(--accent-blue);">📚 Policy Citation Inspector</h3>
+        <button style="background: transparent; border: none; color: var(--text-muted); font-size: 1.3rem; cursor: pointer;" onclick="closeCitationModal()">&times;</button>
+      </div>
+
+      <div id="citation-modal-section" style="font-size: 0.78rem; font-weight: 700; color: var(--accent-cyan); margin-bottom: 8px;">§1.1 PREREQUISITE ENFORCEMENT</div>
+      <div id="citation-modal-body" style="font-size: 0.86rem; color: var(--text-muted); line-height: 1.6; background: var(--bg-card); padding: 14px; border-radius: 6px; border: 1px solid var(--border); margin-bottom: 14px;">
+        All course prerequisites must be completed with a minimum grade of D (or C for advanced core).
+      </div>
+
+      <div style="font-size: 0.76rem; color: var(--text-dim);">
+        Authority: <span id="citation-modal-auth" style="color: var(--text-main); font-weight: 600;">Registrar & Academic Standards</span> · Version: 2026-2027
+      </div>
+    </div>
+  </div>
+
+  <!-- ==========================================================================
+       MODAL 3: SUBMIT EXCEPTION PETITION MODAL
+       ========================================================================== -->
+  <div class="modal-backdrop" id="petition-modal">
+    <div class="modal-box">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
+        <h3 style="font-size: 1.15rem; color: var(--accent-blue);">📝 Submit Faculty Exception Petition</h3>
+        <button style="background: transparent; border: none; color: var(--text-muted); font-size: 1.3rem; cursor: pointer;" onclick="closePetitionModal()">&times;</button>
+      </div>
+
+      <form onsubmit="handlePetitionSubmit(event)">
+        <div class="login-field-group" style="margin-bottom: 12px;">
+          <label class="login-label">Petition Type</label>
+          <select id="pet-type" style="width: 100%; background: var(--bg-card); border: 1px solid var(--border); border-radius: 6px; color: white; padding: 10px;">
+            <option value="PREREQUISITE_WAIVER">Prerequisite Waiver (Policy §1.2)</option>
+            <option value="CREDIT_OVERLOAD">Credit Overload to 19-21 cr (Policy §5.2)</option>
+            <option value="COURSE_SUBSTITUTION">Course Substitution Approval (Policy §2.2)</option>
+            <option value="SPECIAL_EXCEPTION">Special Academic Standing Exception</option>
+          </select>
+        </div>
+
+        <div class="login-field-group" style="margin-bottom: 12px;">
+          <label class="login-label">Target Course Code (Optional)</label>
+          <input type="text" id="pet-course" class="login-input" placeholder="e.g. CS301 or CS350">
+        </div>
+
+        <div class="login-field-group" style="margin-bottom: 12px;">
+          <label class="login-label">Target Semester</label>
+          <input type="text" id="pet-semester" class="login-input" placeholder="e.g. Fall 2026" value="Fall 2026">
+        </div>
+
+        <div class="login-field-group" style="margin-bottom: 16px;">
+          <label class="login-label">Academic Rationale & Justification</label>
+          <textarea id="pet-justification" rows="3" class="login-input" placeholder="Explain why this exception is required (e.g. prior equivalent coursework, industry experience, graduation requirement)..." required style="resize: vertical;"></textarea>
+        </div>
+
+        <button type="submit" class="btn-signin">
+          <span>Submit for Formal Faculty Verification</span>
+          <span>➔</span>
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
   <script>
     function setAuthMode(mode) {
       const tabLogin = document.getElementById("auth-tab-login");
@@ -339,15 +492,15 @@
       }
     }
 
+    const API_BASE = (window.location.protocol.startsWith("http") && window.location.port !== "8000") ? "http://localhost:8000" : "";
+
+    // 100% Pure MongoDB Atlas Login via API
     async function handleStudentLogin(e) {
       if (e) e.preventDefault();
-      const regnoInput = document.getElementById("login-regno");
-      const pwdInput = document.getElementById("login-password");
+      const regno = document.getElementById("login-regno").value.trim().toUpperCase();
+      const password = document.getElementById("login-password").value;
       const alertBox = document.getElementById("auth-alert-box");
-      const regno = regnoInput ? regnoInput.value.trim().toUpperCase() : "";
-      const password = pwdInput ? pwdInput.value : "";
 
-      // Try Backend MongoDB API First
       try {
         const res = await fetch(`${API_BASE}/api/auth/login`, {
           method: "POST",
@@ -355,6 +508,7 @@
           body: JSON.stringify({ regno: regno, password: password })
         });
         const data = await res.json();
+
         if (res.ok && data.student) {
           if (alertBox) alertBox.style.display = "none";
           state.currentStudent = data.student;
@@ -362,93 +516,39 @@
           if (typeof loadBackendData === "function") {
             await loadBackendData();
           }
-          savePermanentStudents();
           if (typeof initStudentPicker === "function") {
             initStudentPicker();
           }
-          const picker = document.getElementById("user-select");
-          if (picker) picker.value = data.student.id;
           renderDashboard();
           openDashboard('pathway');
-          return;
-        } else if (!res.ok && data.detail) {
+        } else {
           if (alertBox) {
             alertBox.className = "auth-alert error";
-            alertBox.textContent = `⚠️ ${data.detail}`;
+            alertBox.textContent = "⚠️ " + (data.detail || "Invalid registration number or password.");
             alertBox.style.display = "block";
           }
-          return;
         }
       } catch (err) {
-        console.log("Backend API offline, using permanent local storage.");
-      }
-
-      // Client-Side Permanent Fallback
-      const found = APP_DATA.students.find(s => s.id.toUpperCase() === regno);
-      if (found) {
-        // Verify password if recorded
-        if (found.password && password && found.password !== password) {
-          if (alertBox) {
-            alertBox.className = "auth-alert error";
-            alertBox.textContent = "⚠️ Incorrect password. Please enter the password you registered with.";
-            alertBox.style.display = "block";
-          }
-          return;
-        }
-
-        if (alertBox) alertBox.style.display = "none";
-        state.currentStudent = found;
-        saveActiveUser(found.id);
-        savePermanentStudents();
-        initStudentPicker();
-        const picker = document.getElementById("user-select");
-        if (picker) picker.value = found.id;
-        renderDashboard();
-        openDashboard('pathway');
-      } else {
         if (alertBox) {
           alertBox.className = "auth-alert error";
-          alertBox.textContent = `⚠️ Register Number '${regno}' not found. Please click 'Sign Up' tab to create your account.`;
+          alertBox.textContent = "⚠️ Cannot connect to MongoDB Atlas backend server. Make sure the server is running on port 8000.";
           alertBox.style.display = "block";
         }
       }
     }
 
+    // 100% Pure MongoDB Atlas Sign Up via API
     async function handleStudentSignUp(e) {
       if (e) e.preventDefault();
       const name = document.getElementById("signup-name").value.trim();
       const regno = document.getElementById("signup-regno").value.trim().toUpperCase();
       const major = document.getElementById("signup-major").value.trim();
       const grad = document.getElementById("signup-grad").value.trim();
-      const pwd = document.getElementById("signup-password").value;
+      const password = document.getElementById("signup-password").value;
       const alertBox = document.getElementById("auth-alert-box");
 
       if (!name || !regno) return;
 
-      const existing = APP_DATA.students.find(s => s.id.toUpperCase() === regno);
-      if (existing) {
-        if (alertBox) {
-          alertBox.className = "auth-alert error";
-          alertBox.textContent = `⚠️ Student '${regno}' is already registered in database. Please Sign In.`;
-          alertBox.style.display = "block";
-        }
-        return;
-      }
-
-      let newStudent = {
-        id: regno,
-        name: name,
-        password: pwd || "password123",
-        major: major || "Computer Science",
-        gpa: 3.75,
-        completed: ["CS101", "MATH101", "CS102", "MATH201", "PHYS101", "CS201", "CS250", "ENG101"],
-        planned: ["CS301", "CS302", "CS303", "CS350", "CS401", "CS402", "CS499"],
-        conflicts: [],
-        expected_grad: grad || "Spring 2027",
-        standing: "Good Standing"
-      };
-
-      // Try Backend MongoDB API
       try {
         const res = await fetch(`${API_BASE}/api/auth/signup`, {
           method: "POST",
@@ -458,27 +558,37 @@
             regno: regno,
             major: major || "Computer Science",
             expected_grad: grad || "Spring 2027",
-            password: pwd
+            password: password || "password123"
           })
         });
         const data = await res.json();
+
         if (res.ok && data.student) {
-          newStudent = data.student;
+          if (alertBox) alertBox.style.display = "none";
+          state.currentStudent = data.student;
+          saveActiveUser(data.student.id);
+          if (typeof loadBackendData === "function") {
+            await loadBackendData();
+          }
+          if (typeof initStudentPicker === "function") {
+            initStudentPicker();
+          }
+          renderDashboard();
+          openDashboard('pathway');
+        } else {
+          if (alertBox) {
+            alertBox.className = "auth-alert error";
+            alertBox.textContent = "⚠️ " + (data.detail || "Registration failed.");
+            alertBox.style.display = "block";
+          }
         }
       } catch (err) {
-        console.log("Backend offline, saving permanently to browser database.");
+        if (alertBox) {
+          alertBox.className = "auth-alert error";
+          alertBox.textContent = "⚠️ Backend offline. Please ensure the Python server is running on port 8000.";
+          alertBox.style.display = "block";
+        }
       }
-
-      APP_DATA.students.push(newStudent);
-      state.currentStudent = newStudent;
-      savePermanentStudents();
-      saveActiveUser(newStudent.id);
-      if (typeof loadBackendData === "function") {
-        await loadBackendData();
-      }
-      initStudentPicker();
-      renderDashboard();
-      openDashboard('pathway');
     }
 
     function openDashboard(tabName = 'pathway') {
@@ -490,10 +600,11 @@
     function signOut() {
       document.getElementById("dashboard-screen").style.display = "none";
       document.getElementById("landing-screen").style.display = "flex";
-      saveActiveUser("");
+      state.currentStudent = null;
       const alertBox = document.getElementById("auth-alert-box");
       if (alertBox) alertBox.style.display = "none";
     }
   </script>
 </body>
 </html>
+

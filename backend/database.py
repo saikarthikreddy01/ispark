@@ -210,6 +210,74 @@ class MongoDBManager:
         with open(self.fallback_file, "r", encoding="utf-8") as f:
             return json.load(f).get("courses", [])
 
+    # --- Petition Operations & Faculty Governance ---
+    def get_all_petitions(self) -> List[Dict]:
+        self.ensure_connected()
+        if self.is_connected and self.db is not None:
+            try:
+                return list(self.db.petitions.find({}, {"_id": 0}))
+            except Exception:
+                self.is_connected = False
+        with open(self.fallback_file, "r", encoding="utf-8") as f:
+            db_data = json.load(f)
+            return db_data.get("petitions", [])
+
+    def create_petition(self, petition_data: Dict) -> Dict:
+        self.ensure_connected()
+        import datetime
+        petition_data["created_at"] = petition_data.get("created_at") or datetime.datetime.now().strftime("%Y-%m-%d %H:%M")
+        petition_data["status"] = petition_data.get("status") or "PENDING"
+        if self.is_connected and self.db is not None:
+            try:
+                self.db.petitions.update_one(
+                    {"petition_id": petition_data["petition_id"]},
+                    {"$set": petition_data},
+                    upsert=True
+                )
+                return petition_data
+            except Exception:
+                self.is_connected = False
+        with open(self.fallback_file, "r", encoding="utf-8") as f:
+            db_data = json.load(f)
+        db_data.setdefault("petitions", [])
+        db_data["petitions"] = [p for p in db_data["petitions"] if p.get("petition_id") != petition_data["petition_id"]]
+        db_data["petitions"].append(petition_data)
+        with open(self.fallback_file, "w", encoding="utf-8") as f:
+            json.dump(db_data, f, indent=2)
+        return petition_data
+
+    def review_petition(self, petition_id: str, decision: str, reviewer: str, comments: str = "") -> Optional[Dict]:
+        self.ensure_connected()
+        import datetime
+        stamp = f"SIG-{petition_id}-{datetime.datetime.now().strftime('%Y%m%d%H%M')}"
+        update_fields = {
+            "status": decision.upper(),
+            "reviewer": reviewer,
+            "review_comments": comments,
+            "reviewed_at": datetime.datetime.now().strftime("%Y-%m-%d %H:%M"),
+            "audit_stamp": stamp
+        }
+        if self.is_connected and self.db is not None:
+            try:
+                self.db.petitions.update_one(
+                    {"petition_id": petition_id},
+                    {"$set": update_fields}
+                )
+                doc = self.db.petitions.find_one({"petition_id": petition_id}, {"_id": 0})
+                return doc
+            except Exception:
+                self.is_connected = False
+        with open(self.fallback_file, "r", encoding="utf-8") as f:
+            db_data = json.load(f)
+        petitions = db_data.get("petitions", [])
+        for p in petitions:
+            if p.get("petition_id") == petition_id:
+                p.update(update_fields)
+                with open(self.fallback_file, "w", encoding="utf-8") as f:
+                    json.dump(db_data, f, indent=2)
+                return p
+        return None
+
     # --- Chat History & Audit Logs ---
     def save_chat_log(self, student_id: str, question: str, response: str, citations: List[str]):
         self.ensure_connected()
