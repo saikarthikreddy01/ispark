@@ -1,6 +1,6 @@
 # 🎓 Academic AI Advisor — 3D Graph-RAG Platform
 
-> **GitHub Repository**: [https://github.com/Kar93122/ispark](https://github.com/Kar93122/ispark)
+> **GitHub Repository**: [https://github.com/saikarthikreddy01/ispark](https://github.com/saikarthikreddy01/ispark)
 
 ---
 
@@ -52,7 +52,7 @@
 
 ```bash
 # 1. Clone the repository
-git clone https://github.com/Kar93122/ispark.git
+git clone https://github.com/saikarthikreddy01/ispark.git
 cd ispark
 
 # 2. Activate virtual environment & install requirements
