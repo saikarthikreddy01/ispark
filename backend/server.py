@@ -129,29 +129,40 @@ def get_equivalencies():
 
 @app.post("/api/auth/login")
 def login(req: LoginRequest):
-    student = db_manager.get_student_by_id(req.regno)
-    if not student:
-        raise HTTPException(status_code=401, detail=f"Register Number '{req.regno}' not found. Please Sign Up.")
+    regno = req.regno.strip().upper()
+    student = db_manager.get_student_by_id(regno)
     
-    stored_pwd = student.get("password", "password123")
-    if req.password and req.password != stored_pwd and stored_pwd != "password123":
-        raise HTTPException(status_code=401, detail="Invalid password. Please enter the correct password.")
+    # Fallback search by ID case-insensitively
+    if not student:
+        all_students = db_manager.get_all_students()
+        for s in all_students:
+            if s.get("id", "").strip().upper() == regno:
+                student = s
+                break
+
+    if not student:
+        raise HTTPException(status_code=401, detail=f"Student ID '{regno}' not found. Please click 'Sign Up' to create your account.")
+    
+    stored_pwd = student.get("password")
+    if stored_pwd and req.password and stored_pwd not in ["password", "password123"] and req.password != stored_pwd:
+        raise HTTPException(status_code=401, detail="Incorrect password. Please verify your password.")
 
     return {
         "success": True,
-        "message": "Login successful",
+        "message": f"Welcome back, {student.get('name', regno)}!",
         "student": student
     }
 
 @app.post("/api/auth/signup")
 def signup(req: SignUpRequest):
-    existing = db_manager.get_student_by_id(req.regno)
+    regno = req.regno.strip().upper()
+    existing = db_manager.get_student_by_id(regno)
     if existing:
-        raise HTTPException(status_code=400, detail=f"Student '{req.regno}' is already registered. Please Sign In.")
+        raise HTTPException(status_code=400, detail=f"Student ID '{regno}' is already registered. Please Sign In.")
 
     new_student = {
-        "id": req.regno.upper(),
-        "name": req.name,
+        "id": regno,
+        "name": req.name.strip(),
         "password": req.password or "password123",
         "major": req.major or "Computer Science",
         "gpa": 3.75,
@@ -165,7 +176,7 @@ def signup(req: SignUpRequest):
     saved = db_manager.create_student(new_student)
     return {
         "success": True,
-        "message": "Student registered successfully in MongoDB",
+        "message": f"Student account {regno} registered successfully in MongoDB Atlas!",
         "student": saved
     }
 
