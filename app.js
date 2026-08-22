@@ -176,6 +176,10 @@ async function loadBackendData() {
       const pData = await policiesRes.json();
       state.policies = pData.policies || [];
     }
+  } catch (err) {
+    console.warn("Could not load full backend collections:", err);
+  }
+}
 
 // --- Student Auth & View Transitions ---
 function setAuthMode(mode) {
