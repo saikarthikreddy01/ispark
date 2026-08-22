@@ -192,11 +192,10 @@ window.addEventListener("DOMContentLoaded", async () => {
   initChatInput();
   initAuditorOptions();
   initThreeJSAnimations();
-  initAdvisor3D();
 });
 
 // ==========================================================================
-// 3D THREE.JS ENGINES (LANDING HERO & ADVISOR STAGE)
+// PREMIUM 3D THREE.JS LANDING HERO COSMOS ENGINE
 // ==========================================================================
 
 function initThreeJSAnimations() {
@@ -210,32 +209,131 @@ function initLanding3D() {
 
   const scene = new THREE.Scene();
   const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
-  camera.position.z = 28;
+  camera.position.z = 32;
 
   const renderer = new THREE.WebGLRenderer({ canvas: canvas, alpha: true, antialias: true });
   renderer.setSize(window.innerWidth, window.innerHeight);
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
-  const sphereGeo = new THREE.IcosahedronGeometry(8.5, 3);
-  const origPositions = sphereGeo.attributes.position.clone();
+  // --- Main 3D Diagram Group (Positioned on Left Hero Area) ---
+  const heroGroup = new THREE.Group();
+  heroGroup.position.x = window.innerWidth > 960 ? -9.5 : 0;
+  heroGroup.position.y = 0.5;
+  scene.add(heroGroup);
 
-  const diagramGroup = new THREE.Group();
-  diagramGroup.position.x = window.innerWidth > 960 ? -8.5 : 0;
-  scene.add(diagramGroup);
+  // 1. Central Morphing Geodesic Neural Lattice Core
+  const coreRadius = 8.5;
+  const coreGeo = new THREE.IcosahedronGeometry(coreRadius, 3);
+  const origPositions = coreGeo.attributes.position.clone();
 
-  const wireMat = new THREE.MeshBasicMaterial({ color: 0x38bdf8, wireframe: true, transparent: true, opacity: 0.45 });
-  const wireMesh = new THREE.Mesh(sphereGeo, wireMat);
-  diagramGroup.add(wireMesh);
+  const coreWireMat = new THREE.MeshBasicMaterial({
+    color: 0x38bdf8,
+    wireframe: true,
+    transparent: true,
+    opacity: 0.55
+  });
+  const coreMesh = new THREE.Mesh(coreGeo, coreWireMat);
+  heroGroup.add(coreMesh);
 
-  const pointMat = new THREE.PointsMaterial({ color: 0x34d399, size: 0.35, transparent: true, opacity: 0.95 });
-  const pointMesh = new THREE.Points(sphereGeo, pointMat);
-  diagramGroup.add(pointMesh);
+  // Glowing Neural Node Points at Vertices
+  const pointMat = new THREE.PointsMaterial({
+    color: 0x34d399,
+    size: 0.45,
+    transparent: true,
+    opacity: 0.95
+  });
+  const pointMesh = new THREE.Points(coreGeo, pointMat);
+  heroGroup.add(pointMesh);
 
-  const torusGeo = new THREE.TorusKnotGeometry(4.2, 1.1, 80, 16);
-  const torusMat = new THREE.MeshBasicMaterial({ color: 0x818cf8, wireframe: true, transparent: true, opacity: 0.25 });
-  const torusMesh = new THREE.Mesh(torusGeo, torusMat);
-  diagramGroup.add(torusMesh);
+  // 2. Nested Dual Quantum Rings / Torus Knots
+  const knotGeo1 = new THREE.TorusKnotGeometry(4.8, 0.9, 100, 16);
+  const knotMat1 = new THREE.MeshBasicMaterial({
+    color: 0x818cf8,
+    wireframe: true,
+    transparent: true,
+    opacity: 0.35
+  });
+  const knotMesh1 = new THREE.Mesh(knotGeo1, knotMat1);
+  heroGroup.add(knotMesh1);
 
+  const knotGeo2 = new THREE.TorusGeometry(7.2, 0.25, 16, 100);
+  const knotMat2 = new THREE.MeshBasicMaterial({
+    color: 0x22d3ee,
+    wireframe: true,
+    transparent: true,
+    opacity: 0.3
+  });
+  const ringMesh2 = new THREE.Mesh(knotGeo2, knotMat2);
+  ringMesh2.rotation.x = Math.PI / 3;
+  heroGroup.add(ringMesh2);
+
+  // 3. Five Orbiting Knowledge Cluster Satellites (Core CS, AI, Math, Systems, Capstone)
+  const satellitesGroup = new THREE.Group();
+  heroGroup.add(satellitesGroup);
+
+  const satelliteDefs = [
+    { label: "Core CS", r: 12.5, speed: 0.7, color: 0x38bdf8, size: 0.85 },
+    { label: "AI & ML", r: 14.5, speed: -0.5, color: 0x34d399, size: 0.95 },
+    { label: "Math DAG", r: 11.2, speed: 0.9, color: 0x818cf8, size: 0.75 },
+    { label: "Systems", r: 13.8, speed: -0.8, color: 0xfbbf24, size: 0.8 },
+    { label: "Capstone", r: 15.8, speed: 0.45, color: 0xf87171, size: 0.9 }
+  ];
+
+  const satelliteMeshes = [];
+  satelliteDefs.forEach((def, i) => {
+    // Satellite Sphere
+    const sGeo = new THREE.IcosahedronGeometry(def.size, 2);
+    const sMat = new THREE.MeshBasicMaterial({ color: def.color, wireframe: true, transparent: true, opacity: 0.85 });
+    const sMesh = new THREE.Mesh(sGeo, sMat);
+    sMesh.userData = def;
+
+    // Glowing core point inside satellite
+    const pGeo = new THREE.SphereGeometry(def.size * 0.4, 8, 8);
+    const pMat = new THREE.MeshBasicMaterial({ color: 0xffffff });
+    const pMesh = new THREE.Mesh(pGeo, pMat);
+    sMesh.add(pMesh);
+
+    satellitesGroup.add(sMesh);
+    satelliteMeshes.push(sMesh);
+
+    // Orbital Ring Trace
+    const orbitRingGeo = new THREE.RingGeometry(def.r - 0.04, def.r + 0.04, 80);
+    const orbitRingMat = new THREE.MeshBasicMaterial({
+      color: def.color,
+      side: THREE.DoubleSide,
+      transparent: true,
+      opacity: 0.18
+    });
+    const orbitRingMesh = new THREE.Mesh(orbitRingGeo, orbitRingMat);
+    orbitRingMesh.rotation.x = Math.PI / 2 + (i * 0.22 - 0.4);
+    orbitRingMesh.rotation.y = (i * 0.15 - 0.3);
+    heroGroup.add(orbitRingMesh);
+  });
+
+  // 4. Connecting Laser Data Beams between Core & Satellites
+  const laserLinesGeo = new THREE.BufferGeometry();
+  const laserPositions = new Float32Array(satelliteDefs.length * 6);
+  laserLinesGeo.setAttribute("position", new THREE.BufferAttribute(laserPositions, 3));
+  const laserMat = new THREE.LineBasicMaterial({ color: 0x38bdf8, transparent: true, opacity: 0.4 });
+  const laserLines = new THREE.LineSegments(laserLinesGeo, laserMat);
+  heroGroup.add(laserLines);
+
+  // 5. Ambient Floating Cosmic Particle Field (350 Particles)
+  const partCount = 350;
+  const partGeo = new THREE.BufferGeometry();
+  const partPos = new Float32Array(partCount * 3);
+
+  for (let i = 0; i < partCount * 3; i += 3) {
+    partPos[i] = (Math.random() - 0.5) * 80;
+    partPos[i + 1] = (Math.random() - 0.5) * 60;
+    partPos[i + 2] = (Math.random() - 0.5) * 45;
+  }
+  partGeo.setAttribute("position", new THREE.BufferAttribute(partPos, 3));
+  const outerCloudMat = new THREE.PointsMaterial({ color: 0x60a5fa, size: 0.28, transparent: true, opacity: 0.75 });
+  const outerCloud = new THREE.Points(partGeo, outerCloudMat);
+  scene.add(outerCloud);
+
+  // Mouse Interaction (Parallax & Depth Tilt)
   let mouseX = 0, mouseY = 0, targetX = 0, targetY = 0;
   window.addEventListener("mousemove", (e) => {
     mouseX = (e.clientX - window.innerWidth / 2) * 0.0012;
@@ -246,34 +344,59 @@ function initLanding3D() {
     camera.aspect = window.innerWidth / window.innerHeight;
     camera.updateProjectionMatrix();
     renderer.setSize(window.innerWidth, window.innerHeight);
+    heroGroup.position.x = window.innerWidth > 960 ? -9.5 : 0;
   });
 
+  // Animation Loop with Real-Time Wave Morphing & Satellite Orbits
   let clock = new THREE.Clock();
   function animate() {
     requestAnimationFrame(animate);
     const elapsedTime = clock.getElapsedTime();
 
-    targetX += (mouseX - targetX) * 0.06;
-    targetY += (mouseY - targetY) * 0.06;
+    // Smooth Cursor Inertia
+    targetX += (mouseX - targetX) * 0.05;
+    targetY += (mouseY - targetY) * 0.05;
 
-    wireMesh.rotation.y = elapsedTime * 0.15 + targetX * 1.5;
-    wireMesh.rotation.x = elapsedTime * 0.08 + targetY * 1.5;
-    pointMesh.rotation.y = wireMesh.rotation.y;
-    pointMesh.rotation.x = wireMesh.rotation.x;
+    coreMesh.rotation.y = elapsedTime * 0.12 + targetX * 1.4;
+    coreMesh.rotation.x = elapsedTime * 0.06 + targetY * 1.4;
+    pointMesh.rotation.y = coreMesh.rotation.y;
+    pointMesh.rotation.x = coreMesh.rotation.x;
 
-    torusMesh.rotation.y = -elapsedTime * 0.25 + targetX;
-    torusMesh.rotation.x = -elapsedTime * 0.15 + targetY;
+    knotMesh1.rotation.y = -elapsedTime * 0.22 + targetX;
+    knotMesh1.rotation.x = -elapsedTime * 0.12 + targetY;
+    ringMesh2.rotation.z = elapsedTime * 0.15;
 
-    const pos = sphereGeo.attributes.position;
+    outerCloud.rotation.y = -elapsedTime * 0.03;
+
+    // Organic Wave Vertex Pulsing on Icosahedron Core
+    const pos = coreGeo.attributes.position;
     for (let i = 0; i < pos.count; i++) {
       const u = origPositions.getX(i);
       const v = origPositions.getY(i);
       const w = origPositions.getZ(i);
-      const wave = Math.sin(elapsedTime * 2.5 + u * 0.5 + v * 0.5) * 0.45;
-      const factor = 1 + wave / 9;
+      const wave = Math.sin(elapsedTime * 2.4 + u * 0.45 + v * 0.45) * 0.5;
+      const factor = 1 + wave / 8.5;
       pos.setXYZ(i, u * factor, v * factor, w * factor);
     }
     pos.needsUpdate = true;
+
+    // Satellite Elliptical Orbital Motion & Laser Beams
+    const laserAttr = laserLinesGeo.attributes.position;
+    satelliteMeshes.forEach((sMesh, i) => {
+      const u = sMesh.userData;
+      const angle = elapsedTime * 0.35 * u.speed;
+      sMesh.position.x = Math.cos(angle) * u.r;
+      sMesh.position.z = Math.sin(angle) * u.r;
+      sMesh.position.y = Math.sin(angle * 2.2) * 2.8;
+      sMesh.rotation.y += 0.03;
+
+      // Update laser lines connecting center (0,0,0) to satellite position
+      const offset = i * 6;
+      laserAttr.setXYZ(offset, 0, 0, 0);
+      laserAttr.setXYZ(offset + 1, sMesh.position.x, sMesh.position.y, sMesh.position.z);
+    });
+    laserAttr.needsUpdate = true;
+
     renderer.render(scene, camera);
   }
   animate();
@@ -311,129 +434,6 @@ function initBackgroundParticles() {
     renderer.render(scene, camera);
   }
   animate();
-}
-
-// --- 3D Holographic AI Brain Behind Advisor ---
-let advisorScene, advisorCamera, advisorRenderer, advisorCoreMesh, advisorPointsMesh, advisorClusterGroup;
-let advisorColorPalettes = {
-  cyan: { core: 0x38bdf8, nodes: 0x22d3ee, glow: 0x34d399 },
-  matrix: { core: 0x34d399, nodes: 0x10b981, glow: 0x6ee7b7 },
-  violet: { core: 0x818cf8, nodes: 0xa855f7, glow: 0xc084fc }
-};
-
-function initAdvisor3D() {
-  const canvas = document.getElementById("advisor-3d-canvas");
-  if (!canvas || typeof THREE === "undefined") return;
-
-  advisorScene = new THREE.Scene();
-  const rect = canvas.parentElement.getBoundingClientRect();
-  const width = rect.width || window.innerWidth;
-  const height = rect.height || 640;
-
-  advisorCamera = new THREE.PerspectiveCamera(45, width / height, 0.1, 1000);
-  advisorCamera.position.z = 24;
-
-  advisorRenderer = new THREE.WebGLRenderer({ canvas: canvas, alpha: true, antialias: true });
-  advisorRenderer.setSize(width, height);
-  advisorRenderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-
-  // Central Holographic AI Core
-  const coreGeo = new THREE.IcosahedronGeometry(5.5, 2);
-  const coreMat = new THREE.MeshBasicMaterial({
-    color: advisorColorPalettes.cyan.core,
-    wireframe: true,
-    transparent: true,
-    opacity: 0.55
-  });
-  advisorCoreMesh = new THREE.Mesh(coreGeo, coreMat);
-  advisorScene.add(advisorCoreMesh);
-
-  const pointsMat = new THREE.PointsMaterial({
-    color: advisorColorPalettes.cyan.glow,
-    size: 0.3,
-    transparent: true,
-    opacity: 0.9
-  });
-  advisorPointsMesh = new THREE.Points(coreGeo, pointsMat);
-  advisorScene.add(advisorPointsMesh);
-
-  // Orbiting Knowledge Graph Cluster Nodes
-  advisorClusterGroup = new THREE.Group();
-  advisorScene.add(advisorClusterGroup);
-
-  const clusterNodes = [
-    { label: "Core CS", r: 10, speed: 0.8, color: 0x38bdf8 },
-    { label: "AI & ML", r: 12, speed: -0.6, color: 0x34d399 },
-    { label: "Math DAG", r: 9, speed: 1.1, color: 0x818cf8 },
-    { label: "Systems", r: 11, speed: -0.9, color: 0xfbbf24 },
-    { label: "Capstone", r: 13, speed: 0.5, color: 0xf87171 }
-  ];
-
-  clusterNodes.forEach((cn) => {
-    const nodeGeo = new THREE.SphereGeometry(0.8, 16, 16);
-    const nodeMat = new THREE.MeshBasicMaterial({ color: cn.color, wireframe: true, transparent: true, opacity: 0.8 });
-    const nodeMesh = new THREE.Mesh(nodeGeo, nodeMat);
-    nodeMesh.userData = cn;
-    advisorClusterGroup.add(nodeMesh);
-
-    // Orbit ring trace
-    const ringGeo = new THREE.RingGeometry(cn.r - 0.05, cn.r + 0.05, 64);
-    const ringMat = new THREE.MeshBasicMaterial({ color: cn.color, side: THREE.DoubleSide, transparent: true, opacity: 0.15 });
-    const ringMesh = new THREE.Mesh(ringGeo, ringMat);
-    ringMesh.rotation.x = Math.PI / 2 + (Math.random() - 0.5) * 0.4;
-    ringMesh.rotation.y = (Math.random() - 0.5) * 0.4;
-    advisorScene.add(ringMesh);
-  });
-
-  let clock = new THREE.Clock();
-  function animateAdvisor() {
-    requestAnimationFrame(animateAdvisor);
-    const time = clock.getElapsedTime();
-    const speedMult = state.advisor3D.isThinking ? 2.5 : 1.0;
-
-    advisorCoreMesh.rotation.y = time * 0.2 * speedMult;
-    advisorCoreMesh.rotation.x = time * 0.12 * speedMult;
-    advisorPointsMesh.rotation.y = advisorCoreMesh.rotation.y;
-    advisorPointsMesh.rotation.x = advisorCoreMesh.rotation.x;
-
-    // Orbiting nodes motion
-    advisorClusterGroup.children.forEach((child) => {
-      const u = child.userData;
-      const angle = time * 0.3 * u.speed * speedMult;
-      child.position.x = Math.cos(angle) * u.r;
-      child.position.z = Math.sin(angle) * u.r;
-      child.position.y = Math.sin(angle * 2) * 2;
-      child.rotation.y += 0.02;
-    });
-
-    advisorRenderer.render(advisorScene, advisorCamera);
-  }
-  animateAdvisor();
-
-  window.addEventListener("resize", () => {
-    if (!canvas.parentElement) return;
-    const w = canvas.parentElement.clientWidth;
-    const h = canvas.parentElement.clientHeight || 640;
-    advisorCamera.aspect = w / h;
-    advisorCamera.updateProjectionMatrix();
-    advisorRenderer.setSize(w, h);
-  });
-}
-
-function setAdvisor3DTheme(themeName) {
-  state.advisor3D.theme = themeName;
-  document.querySelectorAll(".hud-controls .hud-btn").forEach(b => b.classList.remove("active"));
-  const btn = document.getElementById(`btn-theme-${themeName}`);
-  if (btn) btn.classList.add("active");
-
-  const pal = advisorColorPalettes[themeName] || advisorColorPalettes.cyan;
-  if (advisorCoreMesh) advisorCoreMesh.material.color.setHex(pal.core);
-  if (advisorPointsMesh) advisorPointsMesh.material.color.setHex(pal.glow);
-}
-
-function toggleAdvisorWireframe() {
-  state.advisor3D.wireframe = !state.advisor3D.wireframe;
-  if (advisorCoreMesh) advisorCoreMesh.material.wireframe = state.advisor3D.wireframe;
 }
 
 // ==========================================================================

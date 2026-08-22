@@ -144,7 +144,7 @@
           <span>🕸️</span> Knowledge Graph
         </button>
         <button class="tab-link" id="tab-advisor" onclick="switchTab('advisor')">
-          <span>💬</span> AI Advisor (3D)
+          <span>💬</span> AI Advisor
         </button>
         <button class="tab-link" id="tab-conflicts" onclick="switchTab('conflicts')">
           <span>⚠️</span> Conflict Auditor
@@ -252,59 +252,34 @@
         <div class="graph-box" id="graph-container"></div>
       </section>
 
-      <!-- ================= TAB 3: AI ADVISOR CHAT WITH 3D NEURAL CORE BEHIND ================= -->
+      <!-- ================= TAB 3: AI ADVISOR CHAT (CLEAN & MINIMALIST) ================= -->
       <section id="view-advisor" style="display: none;">
-        
-        <div class="advisor-stage">
-          <!-- 3D Three.js Interactive Diagram Behind Advisor -->
-          <canvas id="advisor-3d-canvas"></canvas>
-
-          <!-- Top HUD Bar -->
-          <div class="advisor-hud-bar">
-            <div class="hud-pill">
-              <div class="hud-pulse"></div>
-              <span>🧠 Graph-RAG Active · Gemini 3.6 Flash · 24 Curriculum Nodes</span>
-            </div>
-
-            <div class="hud-controls">
-              <button class="hud-btn active" id="btn-theme-cyan" onclick="setAdvisor3DTheme('cyan')">Cyber Cyan</button>
-              <button class="hud-btn" id="btn-theme-matrix" onclick="setAdvisor3DTheme('matrix')">Emerald Matrix</button>
-              <button class="hud-btn" id="btn-theme-violet" onclick="setAdvisor3DTheme('violet')">Quantum Violet</button>
-              <button class="hud-btn" onclick="toggleAdvisorWireframe()">🕸️ Wireframe</button>
-            </div>
-          </div>
-
-          <!-- Glassmorphic Chat Content Overlay -->
-          <div class="advisor-glass-container">
-            <div style="display: flex; gap: 8px; justify-content: center; margin-bottom: 12px; flex-wrap: wrap;">
-              <button class="hud-btn" onclick="askAdvisor('Why cannot I take CS301 Algorithms next term?')">
-                💡 Why can't I take CS301 Algorithms?
-              </button>
-              <button class="hud-btn" onclick="askAdvisor('What are the prerequisites for CS402 Machine Learning?')">
-                💡 Prerequisites for CS402 (ML)?
-              </button>
-              <button class="hud-btn" onclick="askAdvisor('What course substitutions are approved for CS350?')">
-                💡 Substitutions for CS350?
-              </button>
-              <button class="hud-btn" onclick="askAdvisor('How do I submit a Prerequisite Waiver Petition?')">
-                💡 How to request a Waiver?
-              </button>
-            </div>
-
-            <div class="chat-card">
-              <div class="chat-log" id="chat-messages">
-                <div class="bubble assistant">
-                  👋 Hello! I am your <strong>Academic AI Advisor</strong>. I use Graph-RAG to analyze curriculum dependencies, university policies, and your degree timeline. Click any citation chip to inspect the official policy source!
-                </div>
-              </div>
-              <div class="chat-input-bar">
-                <input type="text" id="chat-text" class="chat-textfield" placeholder="Ask an academic, prerequisite, or graduation policy question...">
-                <button id="chat-send-btn" class="chat-submit">Ask Advisor</button>
-              </div>
-            </div>
-          </div>
+        <div style="display: flex; gap: 8px; justify-content: center; margin-bottom: 16px; flex-wrap: wrap;">
+          <button class="tab-link" style="background: var(--bg-card); border: 1px solid var(--border);" onclick="askAdvisor('Why cannot I take CS301 Algorithms next term?')">
+            💡 Why can't I take CS301 Algorithms?
+          </button>
+          <button class="tab-link" style="background: var(--bg-card); border: 1px solid var(--border);" onclick="askAdvisor('What are the prerequisites for CS402 Machine Learning?')">
+            💡 Prerequisites for CS402 (ML)?
+          </button>
+          <button class="tab-link" style="background: var(--bg-card); border: 1px solid var(--border);" onclick="askAdvisor('What course substitutions are approved for CS350?')">
+            💡 Substitutions for CS350?
+          </button>
+          <button class="tab-link" style="background: var(--bg-card); border: 1px solid var(--border);" onclick="askAdvisor('How do I submit a Prerequisite Waiver Petition?')">
+            💡 How to request a Waiver?
+          </button>
         </div>
 
+        <div class="chat-card">
+          <div class="chat-log" id="chat-messages">
+            <div class="bubble assistant">
+              👋 Hello! I am your <strong>Academic AI Advisor</strong>. I use Graph-RAG to analyze curriculum dependencies, university policies, and your degree timeline. Click any citation chip to inspect the official policy source!
+            </div>
+          </div>
+          <div class="chat-input-bar">
+            <input type="text" id="chat-text" class="chat-textfield" placeholder="Ask an academic, prerequisite, or graduation policy question...">
+            <button id="chat-send-btn" class="chat-submit">Ask Advisor</button>
+          </div>
+        </div>
       </section>
 
       <!-- ================= TAB 4: CONFLICT AUDITOR ================= -->
