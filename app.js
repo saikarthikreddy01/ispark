@@ -152,8 +152,61 @@ if (rememberedUserId) {
   if (remembered) state.currentStudent = remembered;
 }
 
+const API_BASE = (window.location.protocol.startsWith("http") && window.location.port !== "8000") ? "http://localhost:8000" : "";
+
 // Lifecycle
-window.addEventListener("DOMContentLoaded", () => {
+async function loadBackendData() {
+  try {
+    const [studentsResponse, coursesResponse] = await Promise.all([
+      fetch(`${API_BASE}/api/students`),
+      fetch(`${API_BASE}/api/courses`)
+    ]);
+
+    if (!studentsResponse.ok || !coursesResponse.ok) throw new Error("Backend data request failed");
+
+    const students = await studentsResponse.json();
+    const courses = await coursesResponse.json();
+    if (!Array.isArray(students) || !Array.isArray(courses)) throw new Error("Invalid backend data");
+
+    APP_DATA.students = students.map(student => {
+      let completedList = student.completed || [];
+      if ((!completedList || completedList.length === 0) && student.completed_courses) {
+        completedList = student.completed_courses.map(c => typeof c === 'string' ? c : c.course_id);
+      } else if ((!completedList || completedList.length === 0) && student.completed_course_ids) {
+        completedList = student.completed_course_ids;
+      }
+      return {
+        ...student,
+        completed: completedList || [],
+        planned: student.planned || student.planned_course_ids || [],
+        conflicts: student.conflicts || []
+      };
+    });
+
+    APP_DATA.courses = courses.map(course => {
+      const localCourse = APP_DATA.courses.find(item => item.id === course.id);
+      const prereqs = (course.prerequisite_groups || []).flatMap(group =>
+        (group.prerequisites || []).map(prerequisite => prerequisite.course_id)
+      );
+      return {
+        ...course,
+        name: course.name || course.id,
+        prereqs: course.prereqs || prereqs,
+        category: course.category || (course.credit_categories || ["Course"])[0],
+        sem: course.sem || localCourse?.sem || 1
+      };
+    });
+
+    state.currentStudent = APP_DATA.students.find(student =>
+      student.id.toUpperCase() === (getActiveUser() || "").toUpperCase()
+    ) || APP_DATA.students[0];
+  } catch (error) {
+    console.warn("MongoDB backend unavailable; using local data:", error);
+  }
+}
+
+window.addEventListener("DOMContentLoaded", async () => {
+  await loadBackendData();
   initStudentPicker();
   renderDashboard();
   initChatInput();
@@ -423,13 +476,6 @@ function renderKanban() {
   const completedSet = new Set(s.completed);
   const conflictSet = new Set(s.conflicts);
 
-  const semesters = [
-    "Semester 1 (Fall)", "Semester 2 (Spring)",
-    "Semester 3 (Fall)", "Semester 4 (Spring)",
-    "Semester 5 (Fall)", "Semester 6 (Spring)",
-    "Semester 7 (Fall)", "Semester 8 (Spring)"
-  ];
-
   for (let sem = 1; sem <= 8; sem++) {
     const col = document.createElement("div");
     col.className = "kanban-col";
@@ -467,7 +513,7 @@ function renderKanban() {
 
     col.innerHTML = `
       <div class="col-head">
-        <span>${semesters[sem - 1]}</span>
+        <span>Year ${Math.ceil(sem / 2)} - Sem ${((sem - 1) % 2) + 1}</span>
         <span class="col-credits">${credits} cr</span>
       </div>
       ${cardsHtml}

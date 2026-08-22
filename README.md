@@ -1,6 +1,5 @@
 # 🎓 Academic AI Advisor — 3D Graph-RAG Platform
 
-> **Live Netlify Production Web App**: [https://teamispark.netlify.app](https://teamispark.netlify.app)  
 > **GitHub Repository**: [https://github.com/Kar93122/ispark](https://github.com/Kar93122/ispark)
 
 ---
@@ -40,8 +39,7 @@
 
 | Layer | Technologies |
 |---|---|
-| **Production Frontend** | Pure Web (HTML5, CSS3, JavaScript ES6+, Three.js, Vis.js) |
-| **Deployment Platform** | **Netlify** (`https://teamispark.netlify.app`) |
+| **Frontend** | Pure Web (HTML5, CSS3, JavaScript ES6+, Three.js, Vis.js) |
 | **Backend & Database API** | FastAPI, Python 3.11+, PyMongo |
 | **Database** | MongoDB Atlas / Local MongoDB (`academic_advisor`) |
 | **AI / Graph-RAG** | Google Gemini, Topological Sort DAGs |
@@ -50,23 +48,20 @@
 
 ## 🚀 Running the Project
 
-### 🌐 1. Live Cloud Netlify App (No Installation Needed)
-Visit: **[https://teamispark.netlify.app](https://teamispark.netlify.app)**
-
-### 💻 2. Local Setup
+### 💻 Local Setup
 
 ```bash
 # 1. Clone the repository
 git clone https://github.com/Kar93122/ispark.git
 cd ispark
 
-# 2. Run local web server
-python -m http.server 3000
+# 2. Activate virtual environment & install requirements
+pip install -r requirements.txt
 
-# 3. (Optional) Run FastAPI MongoDB Backend
-uvicorn backend.server:app --host 0.0.0.0 --port 8000
+# 3. Run FastAPI Backend & Full-Stack Server
+python -m uvicorn backend.server:app --host 0.0.0.0 --port 8000
 ```
 
 Open:
-- Web App: `http://localhost:3000`
+- Web App: `http://localhost:8000`
 - API Docs: `http://localhost:8000/docs`

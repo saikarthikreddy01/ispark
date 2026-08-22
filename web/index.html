@@ -339,6 +339,8 @@
       }
     }
 
+    const API_BASE = (window.location.protocol.startsWith("http") && window.location.port !== "8000") ? "http://localhost:8000" : "";
+
     // 100% Pure MongoDB Atlas Login via API
     async function handleStudentLogin(e) {
       if (e) e.preventDefault();
@@ -347,7 +349,7 @@
       const alertBox = document.getElementById("auth-alert-box");
 
       try {
-        const res = await fetch("/api/auth/login", {
+        const res = await fetch(`${API_BASE}/api/auth/login`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ regno: regno, password: password })
@@ -357,7 +359,13 @@
         if (res.ok && data.student) {
           if (alertBox) alertBox.style.display = "none";
           state.currentStudent = data.student;
-          await loadStudentsFromDB();
+          saveActiveUser(data.student.id);
+          if (typeof loadBackendData === "function") {
+            await loadBackendData();
+          }
+          if (typeof initStudentPicker === "function") {
+            initStudentPicker();
+          }
           renderDashboard();
           openDashboard('pathway');
         } else {
@@ -370,7 +378,7 @@
       } catch (err) {
         if (alertBox) {
           alertBox.className = "auth-alert error";
-          alertBox.textContent = "⚠️ Cannot connect to MongoDB Atlas backend server. Make sure port 8000 is running.";
+          alertBox.textContent = "⚠️ Cannot connect to MongoDB Atlas backend server. Make sure the server is running on port 8000.";
           alertBox.style.display = "block";
         }
       }
@@ -389,7 +397,7 @@
       if (!name || !regno) return;
 
       try {
-        const res = await fetch("/api/auth/signup", {
+        const res = await fetch(`${API_BASE}/api/auth/signup`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
@@ -405,7 +413,13 @@
         if (res.ok && data.student) {
           if (alertBox) alertBox.style.display = "none";
           state.currentStudent = data.student;
-          await loadStudentsFromDB();
+          saveActiveUser(data.student.id);
+          if (typeof loadBackendData === "function") {
+            await loadBackendData();
+          }
+          if (typeof initStudentPicker === "function") {
+            initStudentPicker();
+          }
           renderDashboard();
           openDashboard('pathway');
         } else {

@@ -349,7 +349,7 @@
 
       // Try Backend MongoDB API First
       try {
-        const res = await fetch("/api/auth/login", {
+        const res = await fetch(`${API_BASE}/api/auth/login`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ regno: regno, password: password })
@@ -359,8 +359,13 @@
           if (alertBox) alertBox.style.display = "none";
           state.currentStudent = data.student;
           saveActiveUser(data.student.id);
+          if (typeof loadBackendData === "function") {
+            await loadBackendData();
+          }
           savePermanentStudents();
-          initStudentPicker();
+          if (typeof initStudentPicker === "function") {
+            initStudentPicker();
+          }
           const picker = document.getElementById("user-select");
           if (picker) picker.value = data.student.id;
           renderDashboard();
@@ -445,7 +450,7 @@
 
       // Try Backend MongoDB API
       try {
-        const res = await fetch("/api/auth/signup", {
+        const res = await fetch(`${API_BASE}/api/auth/signup`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
@@ -468,6 +473,9 @@
       state.currentStudent = newStudent;
       savePermanentStudents();
       saveActiveUser(newStudent.id);
+      if (typeof loadBackendData === "function") {
+        await loadBackendData();
+      }
       initStudentPicker();
       renderDashboard();
       openDashboard('pathway');
