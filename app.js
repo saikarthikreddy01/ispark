@@ -177,21 +177,177 @@ async function loadBackendData() {
       state.policies = pData.policies || [];
     }
 
-    state.currentStudent = APP_DATA.students.find(student =>
-      student.id.toUpperCase() === (getActiveUser() || "").toUpperCase()
-    ) || APP_DATA.students[0];
-  } catch (error) {
-    console.warn("Using offline dataset:", error);
+// --- Student Auth & View Transitions ---
+function setAuthMode(mode) {
+  const loginBtn = document.getElementById("auth-tab-login");
+  const signupBtn = document.getElementById("auth-tab-signup");
+  const loginForm = document.getElementById("form-login");
+  const signupForm = document.getElementById("form-signup");
+  const alertBox = document.getElementById("auth-alert-box");
+  if (alertBox) {
+    alertBox.style.display = "none";
+    alertBox.textContent = "";
   }
+
+  if (mode === "signup") {
+    if (loginBtn) loginBtn.classList.remove("active");
+    if (signupBtn) signupBtn.classList.add("active");
+    if (loginForm) loginForm.style.display = "none";
+    if (signupForm) signupForm.style.display = "block";
+  } else {
+    if (signupBtn) signupBtn.classList.remove("active");
+    if (loginBtn) loginBtn.classList.add("active");
+    if (signupForm) signupForm.style.display = "none";
+    if (loginForm) loginForm.style.display = "block";
+  }
+}
+
+function showAuthAlert(message, type = "error") {
+  const alertBox = document.getElementById("auth-alert-box");
+  if (!alertBox) return;
+  alertBox.className = `auth-alert ${type}`;
+  alertBox.textContent = message;
+  alertBox.style.display = "block";
+}
+
+async function handleStudentLogin(event) {
+  if (event) event.preventDefault();
+  const regnoInput = document.getElementById("login-regno");
+  const pwdInput = document.getElementById("login-password");
+  const regno = regnoInput ? regnoInput.value.trim().toUpperCase() : "";
+  const password = pwdInput ? pwdInput.value : "";
+
+  if (!regno) {
+    showAuthAlert("Please enter your Student ID / Registration Number.");
+    return;
+  }
+
+  try {
+    const res = await fetch(`${API_BASE}/api/auth/login`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ regno: regno, password: password })
+    });
+
+    if (res.ok) {
+      const data = await res.json();
+      if (data.student) {
+        state.currentStudent = data.student;
+        saveActiveUser(data.student.id);
+      }
+      showDashboard();
+      return;
+    } else {
+      const err = await res.json().catch(() => ({}));
+      // Check local fallback
+      const localFound = APP_DATA.students.find(s => s.id.toUpperCase() === regno);
+      if (localFound) {
+        state.currentStudent = localFound;
+        saveActiveUser(localFound.id);
+        showDashboard();
+        return;
+      }
+      showAuthAlert(err.detail || "Student record not found. Please Sign Up.");
+    }
+  } catch (e) {
+    // Local fallback
+    const localFound = APP_DATA.students.find(s => s.id.toUpperCase() === regno);
+    if (localFound) {
+      state.currentStudent = localFound;
+      saveActiveUser(localFound.id);
+      showDashboard();
+    } else {
+      showAuthAlert("Invalid credentials or student not registered.");
+    }
+  }
+}
+
+async function handleStudentSignUp(event) {
+  if (event) event.preventDefault();
+  const name = document.getElementById("signup-name").value.trim();
+  const regno = document.getElementById("signup-regno").value.trim().toUpperCase();
+  const major = document.getElementById("signup-major").value.trim();
+  const grad = document.getElementById("signup-grad").value.trim();
+  const password = document.getElementById("signup-password").value;
+
+  if (!name || !regno) {
+    showAuthAlert("Please fill in all required fields.");
+    return;
+  }
+
+  try {
+    const res = await fetch(`${API_BASE}/api/auth/signup`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        regno: regno,
+        name: name,
+        major: major || "Computer Science",
+        expected_grad: grad || "Spring 2027",
+        password: password || "password123"
+      })
+    });
+
+    if (res.ok) {
+      const data = await res.json();
+      if (data.student) {
+        state.currentStudent = data.student;
+        saveActiveUser(data.student.id);
+      }
+      await loadBackendData();
+      showDashboard();
+    } else {
+      const err = await res.json().catch(() => ({}));
+      showAuthAlert(err.detail || "Sign up failed.");
+    }
+  } catch (e) {
+    // Fallback: create local
+    const newStudent = {
+      id: regno,
+      name: name,
+      major: major || "Computer Science",
+      gpa: 3.75,
+      completed: ["CS101", "MATH101", "CS102", "MATH201", "PHYS101", "CS201", "CS250", "ENG101"],
+      planned: ["CS301", "CS302", "CS303", "CS350", "CS401", "CS402", "CS499"],
+      conflicts: [],
+      expected_grad: grad || "Spring 2027",
+      standing: "Good Standing"
+    };
+    APP_DATA.students.push(newStudent);
+    state.currentStudent = newStudent;
+    saveActiveUser(regno);
+    showDashboard();
+  }
+}
+
+function showDashboard() {
+  document.getElementById("landing-screen").style.display = "none";
+  document.getElementById("dashboard-screen").style.display = "block";
+  initStudentPicker();
+  renderDashboard();
+  switchTab(state.currentTab || "pathway");
+}
+
+function signOut() {
+  localStorage.removeItem(STORAGE_KEYS.ACTIVE_USER);
+  document.getElementById("dashboard-screen").style.display = "none";
+  document.getElementById("landing-screen").style.display = "flex";
+  initLanding3D();
 }
 
 window.addEventListener("DOMContentLoaded", async () => {
   await loadBackendData();
-  initStudentPicker();
-  renderDashboard();
   initChatInput();
   initAuditorOptions();
   initThreeJSAnimations();
+
+  const user = getActiveUser();
+  if (user) {
+    showDashboard();
+  } else {
+    document.getElementById("landing-screen").style.display = "flex";
+    document.getElementById("dashboard-screen").style.display = "none";
+  }
 });
 
 // ==========================================================================
@@ -209,20 +365,19 @@ function initLanding3D() {
 
   const scene = new THREE.Scene();
   const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
-  camera.position.z = 32;
+  camera.position.set(0, 0, 20);
 
   const renderer = new THREE.WebGLRenderer({ canvas: canvas, alpha: true, antialias: true });
   renderer.setSize(window.innerWidth, window.innerHeight);
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
-  // --- Main 3D Diagram Group (Positioned on Left Hero Area) ---
+  // --- Main 3D Diagram Group (Positioned in Left Hero Area) ---
   const heroGroup = new THREE.Group();
-  heroGroup.position.x = window.innerWidth > 960 ? -9.5 : 0;
-  heroGroup.position.y = 0.5;
+  heroGroup.position.set(window.innerWidth > 960 ? -6.2 : 0, 0.4, 0);
   scene.add(heroGroup);
 
   // 1. Central Morphing Geodesic Neural Lattice Core
-  const coreRadius = 8.5;
+  const coreRadius = 4.2;
   const coreGeo = new THREE.IcosahedronGeometry(coreRadius, 3);
   const origPositions = coreGeo.attributes.position.clone();
 
@@ -230,7 +385,7 @@ function initLanding3D() {
     color: 0x38bdf8,
     wireframe: true,
     transparent: true,
-    opacity: 0.55
+    opacity: 0.65
   });
   const coreMesh = new THREE.Mesh(coreGeo, coreWireMat);
   heroGroup.add(coreMesh);
@@ -238,45 +393,57 @@ function initLanding3D() {
   // Glowing Neural Node Points at Vertices
   const pointMat = new THREE.PointsMaterial({
     color: 0x34d399,
-    size: 0.45,
+    size: 0.35,
     transparent: true,
     opacity: 0.95
   });
   const pointMesh = new THREE.Points(coreGeo, pointMat);
   heroGroup.add(pointMesh);
 
-  // 2. Nested Dual Quantum Rings / Torus Knots
-  const knotGeo1 = new THREE.TorusKnotGeometry(4.8, 0.9, 100, 16);
+  // Inner Glowing Hologram Octahedron
+  const innerGeo = new THREE.OctahedronGeometry(2.4, 1);
+  const innerMat = new THREE.MeshBasicMaterial({
+    color: 0xa855f7,
+    wireframe: true,
+    transparent: true,
+    opacity: 0.55
+  });
+  const innerMesh = new THREE.Mesh(innerGeo, innerMat);
+  heroGroup.add(innerMesh);
+
+  // 2. Nested Dual Quantum Orbit Rings
+  const knotGeo1 = new THREE.TorusGeometry(3.2, 0.08, 16, 80);
   const knotMat1 = new THREE.MeshBasicMaterial({
     color: 0x818cf8,
     wireframe: true,
     transparent: true,
-    opacity: 0.35
+    opacity: 0.45
   });
   const knotMesh1 = new THREE.Mesh(knotGeo1, knotMat1);
+  knotMesh1.rotation.x = Math.PI / 4;
   heroGroup.add(knotMesh1);
 
-  const knotGeo2 = new THREE.TorusGeometry(7.2, 0.25, 16, 100);
-  const knotMat2 = new THREE.MeshBasicMaterial({
+  const ringGeo2 = new THREE.TorusGeometry(4.8, 0.06, 16, 80);
+  const ringMat2 = new THREE.MeshBasicMaterial({
     color: 0x22d3ee,
     wireframe: true,
     transparent: true,
-    opacity: 0.3
+    opacity: 0.4
   });
-  const ringMesh2 = new THREE.Mesh(knotGeo2, knotMat2);
-  ringMesh2.rotation.x = Math.PI / 3;
+  const ringMesh2 = new THREE.Mesh(ringGeo2, ringMat2);
+  ringMesh2.rotation.y = Math.PI / 3;
   heroGroup.add(ringMesh2);
 
-  // 3. Five Orbiting Knowledge Cluster Satellites (Core CS, AI, Math, Systems, Capstone)
+  // 3. Five Orbiting Departmental Knowledge Satellites
   const satellitesGroup = new THREE.Group();
   heroGroup.add(satellitesGroup);
 
   const satelliteDefs = [
-    { label: "Core CS", r: 12.5, speed: 0.7, color: 0x38bdf8, size: 0.85 },
-    { label: "AI & ML", r: 14.5, speed: -0.5, color: 0x34d399, size: 0.95 },
-    { label: "Math DAG", r: 11.2, speed: 0.9, color: 0x818cf8, size: 0.75 },
-    { label: "Systems", r: 13.8, speed: -0.8, color: 0xfbbf24, size: 0.8 },
-    { label: "Capstone", r: 15.8, speed: 0.45, color: 0xf87171, size: 0.9 }
+    { label: "Core CS", r: 6.2, speed: 0.75, color: 0x38bdf8, size: 0.55 },
+    { label: "AI & ML", r: 7.4, speed: -0.55, color: 0x34d399, size: 0.65 },
+    { label: "Math DAG", r: 5.8, speed: 0.95, color: 0x818cf8, size: 0.5 },
+    { label: "Systems", r: 7.0, speed: -0.85, color: 0xfbbf24, size: 0.52 },
+    { label: "Capstone", r: 8.2, speed: 0.45, color: 0xf87171, size: 0.6 }
   ];
 
   const satelliteMeshes = [];
@@ -288,7 +455,7 @@ function initLanding3D() {
     sMesh.userData = def;
 
     // Glowing core point inside satellite
-    const pGeo = new THREE.SphereGeometry(def.size * 0.4, 8, 8);
+    const pGeo = new THREE.SphereGeometry(def.size * 0.35, 8, 8);
     const pMat = new THREE.MeshBasicMaterial({ color: 0xffffff });
     const pMesh = new THREE.Mesh(pGeo, pMat);
     sMesh.add(pMesh);
@@ -296,17 +463,17 @@ function initLanding3D() {
     satellitesGroup.add(sMesh);
     satelliteMeshes.push(sMesh);
 
-    // Orbital Ring Trace
-    const orbitRingGeo = new THREE.RingGeometry(def.r - 0.04, def.r + 0.04, 80);
+    // Orbital Path Ring Trace
+    const orbitRingGeo = new THREE.RingGeometry(def.r - 0.03, def.r + 0.03, 64);
     const orbitRingMat = new THREE.MeshBasicMaterial({
       color: def.color,
       side: THREE.DoubleSide,
       transparent: true,
-      opacity: 0.18
+      opacity: 0.16
     });
     const orbitRingMesh = new THREE.Mesh(orbitRingGeo, orbitRingMat);
-    orbitRingMesh.rotation.x = Math.PI / 2 + (i * 0.22 - 0.4);
-    orbitRingMesh.rotation.y = (i * 0.15 - 0.3);
+    orbitRingMesh.rotation.x = Math.PI / 2 + (i * 0.25 - 0.5);
+    orbitRingMesh.rotation.y = (i * 0.18 - 0.3);
     heroGroup.add(orbitRingMesh);
   });
 
@@ -314,22 +481,22 @@ function initLanding3D() {
   const laserLinesGeo = new THREE.BufferGeometry();
   const laserPositions = new Float32Array(satelliteDefs.length * 6);
   laserLinesGeo.setAttribute("position", new THREE.BufferAttribute(laserPositions, 3));
-  const laserMat = new THREE.LineBasicMaterial({ color: 0x38bdf8, transparent: true, opacity: 0.4 });
+  const laserMat = new THREE.LineBasicMaterial({ color: 0x38bdf8, transparent: true, opacity: 0.45 });
   const laserLines = new THREE.LineSegments(laserLinesGeo, laserMat);
   heroGroup.add(laserLines);
 
-  // 5. Ambient Floating Cosmic Particle Field (350 Particles)
-  const partCount = 350;
+  // 5. Ambient Floating Cosmic Particle Field (300 Particles)
+  const partCount = 300;
   const partGeo = new THREE.BufferGeometry();
   const partPos = new Float32Array(partCount * 3);
 
   for (let i = 0; i < partCount * 3; i += 3) {
-    partPos[i] = (Math.random() - 0.5) * 80;
-    partPos[i + 1] = (Math.random() - 0.5) * 60;
-    partPos[i + 2] = (Math.random() - 0.5) * 45;
+    partPos[i] = (Math.random() - 0.5) * 60;
+    partPos[i + 1] = (Math.random() - 0.5) * 45;
+    partPos[i + 2] = (Math.random() - 0.5) * 35;
   }
   partGeo.setAttribute("position", new THREE.BufferAttribute(partPos, 3));
-  const outerCloudMat = new THREE.PointsMaterial({ color: 0x60a5fa, size: 0.28, transparent: true, opacity: 0.75 });
+  const outerCloudMat = new THREE.PointsMaterial({ color: 0x60a5fa, size: 0.25, transparent: true, opacity: 0.7 });
   const outerCloud = new THREE.Points(partGeo, outerCloudMat);
   scene.add(outerCloud);
 
@@ -344,7 +511,7 @@ function initLanding3D() {
     camera.aspect = window.innerWidth / window.innerHeight;
     camera.updateProjectionMatrix();
     renderer.setSize(window.innerWidth, window.innerHeight);
-    heroGroup.position.x = window.innerWidth > 960 ? -9.5 : 0;
+    heroGroup.position.set(window.innerWidth > 960 ? -6.2 : 0, 0.4, 0);
   });
 
   // Animation Loop with Real-Time Wave Morphing & Satellite Orbits
@@ -357,16 +524,18 @@ function initLanding3D() {
     targetX += (mouseX - targetX) * 0.05;
     targetY += (mouseY - targetY) * 0.05;
 
-    coreMesh.rotation.y = elapsedTime * 0.12 + targetX * 1.4;
-    coreMesh.rotation.x = elapsedTime * 0.06 + targetY * 1.4;
+    coreMesh.rotation.y = elapsedTime * 0.15 + targetX * 1.4;
+    coreMesh.rotation.x = elapsedTime * 0.08 + targetY * 1.4;
     pointMesh.rotation.y = coreMesh.rotation.y;
     pointMesh.rotation.x = coreMesh.rotation.x;
 
-    knotMesh1.rotation.y = -elapsedTime * 0.22 + targetX;
-    knotMesh1.rotation.x = -elapsedTime * 0.12 + targetY;
-    ringMesh2.rotation.z = elapsedTime * 0.15;
+    innerMesh.rotation.y = -elapsedTime * 0.25;
+    innerMesh.rotation.z = elapsedTime * 0.18;
 
-    outerCloud.rotation.y = -elapsedTime * 0.03;
+    knotMesh1.rotation.z = elapsedTime * 0.12;
+    ringMesh2.rotation.x = elapsedTime * 0.1;
+
+    outerCloud.rotation.y = -elapsedTime * 0.025;
 
     // Organic Wave Vertex Pulsing on Icosahedron Core
     const pos = coreGeo.attributes.position;
@@ -374,8 +543,8 @@ function initLanding3D() {
       const u = origPositions.getX(i);
       const v = origPositions.getY(i);
       const w = origPositions.getZ(i);
-      const wave = Math.sin(elapsedTime * 2.4 + u * 0.45 + v * 0.45) * 0.5;
-      const factor = 1 + wave / 8.5;
+      const wave = Math.sin(elapsedTime * 2.5 + u * 0.6 + v * 0.6) * 0.35;
+      const factor = 1 + wave / 7.5;
       pos.setXYZ(i, u * factor, v * factor, w * factor);
     }
     pos.needsUpdate = true;
@@ -384,10 +553,10 @@ function initLanding3D() {
     const laserAttr = laserLinesGeo.attributes.position;
     satelliteMeshes.forEach((sMesh, i) => {
       const u = sMesh.userData;
-      const angle = elapsedTime * 0.35 * u.speed;
+      const angle = elapsedTime * 0.38 * u.speed;
       sMesh.position.x = Math.cos(angle) * u.r;
       sMesh.position.z = Math.sin(angle) * u.r;
-      sMesh.position.y = Math.sin(angle * 2.2) * 2.8;
+      sMesh.position.y = Math.sin(angle * 2.0) * 1.8;
       sMesh.rotation.y += 0.03;
 
       // Update laser lines connecting center (0,0,0) to satellite position
