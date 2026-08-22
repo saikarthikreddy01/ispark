@@ -67,8 +67,7 @@ class MongoDBManager:
 
     def _init_file_db(self):
         self.fallback_file = DATA_DIR / "persistent_db.json"
-        if not self.fallback_file.exists():
-            self._seed_file_db()
+        self._seed_file_db()
 
     def _seed_file_db(self):
         students = self._load_json(DATA_DIR / "sample_students.json")
@@ -86,30 +85,30 @@ class MongoDBManager:
             json.dump(data, f, indent=2)
 
     def _seed_initial_data(self):
-        """Seed MongoDB collections if empty"""
+        """Seed and synchronize MongoDB collections with latest C24 dataset"""
         if not self.is_connected or self.db is None:
             return
 
         try:
             # 1. Students
-            if self.db.students.count_documents({}) == 0:
-                students = self._load_json(DATA_DIR / "sample_students.json")
-                if students:
-                    self.db.students.insert_many(students)
-                    print(f"[SEED] Seeded {len(students)} students to MongoDB.")
+            students = self._load_json(DATA_DIR / "sample_students.json")
+            if students:
+                self.db.students.delete_many({})
+                self.db.students.insert_many(students)
+                print(f"[SEED] Synced {len(students)} C24 students to MongoDB.")
 
             # 2. Courses
-            if self.db.courses.count_documents({}) == 0:
-                courses = self._load_json(DATA_DIR / "courses.json")
-                if courses:
-                    self.db.courses.insert_many(courses)
-                    print(f"[SEED] Seeded {len(courses)} courses to MongoDB.")
+            courses = self._load_json(DATA_DIR / "courses.json")
+            if courses:
+                self.db.courses.delete_many({})
+                self.db.courses.insert_many(courses)
+                print(f"[SEED] Synced {len(courses)} C24 courses to MongoDB.")
 
             # 3. Equivalencies
-            if self.db.equivalencies.count_documents({}) == 0:
-                equivs = self._load_json(DATA_DIR / "equivalencies.json")
-                if equivs:
-                    self.db.equivalencies.insert_one({"_id": "course_equivalencies", "data": equivs})
+            equivs = self._load_json(DATA_DIR / "equivalencies.json")
+            if equivs:
+                self.db.equivalencies.delete_many({})
+                self.db.equivalencies.insert_one({"_id": "course_equivalencies", "data": equivs})
         except Exception as err:
             print(f"[WARN] Error seeding MongoDB: {err}")
 

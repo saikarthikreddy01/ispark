@@ -1,25 +1,175 @@
 {
-  "program": "B.S. Computer Science",
-  "total_credits_required": 120,
+  "program": "B.Tech. Computer Science & Engineering (C24 Regulation)",
+  "institution": "Vignan's Foundation for Science, Technology & Research (VFSTR Deemed to be University)",
+  "batch": "2024-28",
+  "total_credits_required": 160,
   "minimum_gpa": 2.0,
   "minimum_major_gpa": 2.5,
   "category_requirements": {
-    "CORE": {"min_credits": 33, "description": "Core CS courses"},
-    "MATH": {"min_credits": 18, "description": "Mathematics courses"},
-    "SCIENCE": {"min_credits": 6, "description": "Natural Science courses"},
-    "LAB": {"min_credits": 2, "description": "Laboratory courses"},
-    "GENERAL_ED": {"min_credits": 21, "description": "General Education courses"},
-    "ELECTIVE": {"min_credits": 12, "description": "CS Elective courses"},
-    "CAPSTONE": {"min_credits": 3, "description": "Senior Capstone"}
+    "PROFESSIONAL_CORE": {
+      "min_credits": 48,
+      "description": "Core Computer Science & Engineering Courses"
+    },
+    "BASIC_SCIENCES": {
+      "min_credits": 23,
+      "description": "Mathematics, Physics, and Chemistry Courses"
+    },
+    "BASIC_ENGINEERING": {
+      "min_credits": 20,
+      "description": "C Programming, Python, Electronics, Graphics, IT Tools, Design Thinking"
+    },
+    "HUMANITIES": {
+      "min_credits": 15,
+      "description": "Communication Skills, Ethics, Management Science, Quantitative Aptitude"
+    },
+    "DEPARTMENT_ELECTIVE": {
+      "min_credits": 16,
+      "description": "Advanced CS Specialization Electives"
+    },
+    "OPEN_ELECTIVE": {
+      "min_credits": 9,
+      "description": "Interdisciplinary / NPTEL MOOCs Open Electives"
+    },
+    "PROJECT": {
+      "min_credits": 15,
+      "description": "Field Projects, Inter-departmental Project, and Capstone Internship"
+    },
+    "HONOURS_MINORS": {
+      "min_credits": 20,
+      "description": "Honours / Minors Track Courses (5 courses)"
+    },
+    "BINARY_GRADE": {
+      "min_credits": 6,
+      "description": "Orientation, Sports, Life Skills, Gender Sensitization, IKS, Constitution, UHV"
+    }
   },
-  "required_courses": [
-    "CS101", "CS102", "CS201", "CS202", "CS250", "CS301", "CS302",
-    "CS303", "CS304", "CS310", "CS490",
-    "MATH101", "MATH102", "MATH201", "MATH301",
-    "PHYS101", "PHYS101L",
-    "ENG101", "ENG102"
+  "semesters_structure": [
+    {
+      "semester": "I Year I Semester",
+      "semester_index": 1,
+      "total_credits": 23,
+      "contact_hours": 36,
+      "courses": [
+        "24MT101",
+        "24PY102",
+        "24EE101",
+        "24CS101",
+        "24EN101",
+        "24CY101",
+        "24CT103",
+        "24SA103",
+        "24SS101"
+      ]
+    },
+    {
+      "semester": "I Year II Semester",
+      "semester_index": 2,
+      "total_credits": 22,
+      "contact_hours": 30,
+      "courses": [
+        "24MT102",
+        "24CT101",
+        "24ME101",
+        "24CS102",
+        "24EN102",
+        "24MS101",
+        "24SA102",
+        "24SS102"
+      ]
+    },
+    {
+      "semester": "II Year I Semester",
+      "semester_index": 3,
+      "total_credits": 25,
+      "contact_hours": 35,
+      "courses": [
+        "24MT203",
+        "22TP201",
+        "22CS201",
+        "24CS204",
+        "24CS208",
+        "24CS205",
+        "24CS299",
+        "24CS801",
+        "22SA201"
+      ]
+    },
+    {
+      "semester": "II Year II Semester",
+      "semester_index": 4,
+      "total_credits": 25,
+      "contact_hours": 35,
+      "courses": [
+        "22ST202",
+        "24CS209",
+        "22CS207",
+        "24CS210",
+        "24CS207",
+        "24OE201",
+        "24CS201",
+        "24SA201",
+        "22CS951"
+      ]
+    },
+    {
+      "semester": "III Year I Semester",
+      "semester_index": 5,
+      "total_credits": 25,
+      "contact_hours": 35,
+      "courses": [
+        "22TP301",
+        "24CS301",
+        "24CS302",
+        "24CS303",
+        "24CS305",
+        "22CS804",
+        "24OE201",
+        "24EN301",
+        "22CS952"
+      ]
+    },
+    {
+      "semester": "III Year II Semester",
+      "semester_index": 6,
+      "total_credits": 25,
+      "contact_hours": 35,
+      "courses": [
+        "24TP301",
+        "24CS306",
+        "22CS401",
+        "22CS805",
+        "22CS807",
+        "24OE201",
+        "24CS307",
+        "22CS953"
+      ]
+    },
+    {
+      "semester": "IV Year I Semester",
+      "semester_index": 7,
+      "total_credits": 25,
+      "contact_hours": 35,
+      "courses": [
+        "24CS401",
+        "24CS402",
+        "24CS403",
+        "22CS813",
+        "22CS802",
+        "22CS810",
+        "22CS954"
+      ]
+    },
+    {
+      "semester": "IV Year II Semester",
+      "semester_index": 8,
+      "total_credits": 16,
+      "contact_hours": 30,
+      "courses": [
+        "22CS404",
+        "22CS956"
+      ]
+    }
   ],
-  "elective_minimum_count": 4,
-  "max_credits_per_semester": 18,
-  "min_credits_per_semester": 12
+  "max_credits_per_semester": 25,
+  "min_credits_per_semester": 16
 }

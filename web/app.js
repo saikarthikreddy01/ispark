@@ -129,10 +129,12 @@ const API_BASE = (window.location.protocol.startsWith("http") && window.location
 // --- Load Backend Data ---
 async function loadBackendData() {
   try {
-    const [studentsRes, coursesRes, policiesRes] = await Promise.all([
+    const [studentsRes, coursesRes, policiesRes, curriculumRes, equivsRes] = await Promise.all([
       fetch(`${API_BASE}/api/students`).catch(() => null),
       fetch(`${API_BASE}/api/courses`).catch(() => null),
-      fetch(`${API_BASE}/api/policies`).catch(() => null)
+      fetch(`${API_BASE}/api/policies`).catch(() => null),
+      fetch(`${API_BASE}/api/curriculum`).catch(() => null),
+      fetch(`${API_BASE}/api/equivalencies`).catch(() => null)
     ]);
 
     if (studentsRes && studentsRes.ok) {
@@ -157,18 +159,42 @@ async function loadBackendData() {
       const courses = await coursesRes.json();
       if (Array.isArray(courses) && courses.length > 0) {
         APP_DATA.courses = courses.map(course => {
-          const localCourse = APP_DATA.courses.find(item => item.id === course.id);
-          const prereqs = (course.prerequisite_groups || []).flatMap(group =>
+          const prereqs = course.prereqs || (course.prerequisite_groups || []).flatMap(group =>
             (group.prerequisites || []).map(prerequisite => prerequisite.course_id)
           );
           return {
             ...course,
+            id: course.id,
             name: course.name || course.id,
-            prereqs: course.prereqs || prereqs,
-            category: course.category || (course.credit_categories || ["Core"])[0],
-            sem: course.sem || localCourse?.sem || 1
+            credits: course.credits !== undefined ? course.credits : 3,
+            ltpc: course.ltpc || "",
+            prereqs: prereqs,
+            category: course.category || (course.credit_categories || ["Professional core"])[0],
+            sem: course.sem !== undefined ? course.sem : 1,
+            description: course.description || course.desc || "",
+            modules: course.modules || [],
+            practices: course.practices || [],
+            skills: course.skills || [],
+            course_outcomes: course.course_outcomes || [],
+            textbooks: course.textbooks || [],
+            reference_books: course.reference_books || []
           };
         });
+      }
+    }
+
+    if (curriculumRes && curriculumRes.ok) {
+      APP_DATA.curriculum = await curriculumRes.json();
+    }
+
+    if (equivsRes && equivsRes.ok) {
+      const eqData = await equivsRes.json();
+      if (Array.isArray(eqData)) {
+        const eqMap = {};
+        eqData.forEach(item => {
+          eqMap[item.course_id] = [item.equivalent_course_id + (item.notes ? ` (${item.notes})` : '')];
+        });
+        APP_DATA.equivalencies = { ...APP_DATA.equivalencies, ...eqMap };
       }
     }
 
@@ -545,7 +571,11 @@ function switchTab(tabName) {
   if (btn) btn.classList.add("active");
   if (sec) sec.style.display = "block";
 
-  if (tabName === "graph") {
+  if (tabName === "curriculum") {
+    setTimeout(renderCurriculum, 80);
+  } else if (tabName === "pathway") {
+    setTimeout(renderKanban, 80);
+  } else if (tabName === "graph") {
     setTimeout(renderGraph, 80);
   } else if (tabName === "advisor") {
     setTimeout(loadChatHistory, 80);
@@ -582,23 +612,25 @@ function initStudentPicker() {
 function renderDashboard() {
   const s = state.currentStudent;
   const completedSet = new Set(s.completed);
+  const totalReqCredits = (APP_DATA.curriculum && APP_DATA.curriculum.total_credits_required) ? APP_DATA.curriculum.total_credits_required : 160;
   const earnedCredits = APP_DATA.courses.filter(c => completedSet.has(c.id)).reduce((sum, c) => sum + c.credits, 0);
-  const pct = Math.min(Math.round((earnedCredits / 120) * 100), 100);
-  const remainingCredits = Math.max(0, 120 - earnedCredits);
+  const pct = Math.min(Math.round((earnedCredits / totalReqCredits) * 100), 100);
+  const remainingCredits = Math.max(0, totalReqCredits - earnedCredits);
 
   document.getElementById("ui-student-name").textContent = s.name;
-  document.getElementById("ui-student-details").textContent = `${s.major} · Expected Graduation: ${s.expected_grad || 'Spring 2027'}`;
+  document.getElementById("ui-student-details").textContent = `${s.major} · Expected Graduation: ${s.expected_grad || 'May 2028'}`;
   
   const standingBadge = document.getElementById("ui-student-standing");
   standingBadge.textContent = `● ${s.standing || 'Good Standing'}`;
   standingBadge.className = `kpi-tag ${s.gpa >= 3.0 ? "tag-green" : (s.gpa >= 2.0 ? "tag-blue" : "tag-red")}`;
 
-  document.getElementById("ui-kpi-credits").innerHTML = `${earnedCredits} <span style="font-size: 0.95rem; color: var(--text-dim);">/ 120</span>`;
+  document.getElementById("ui-kpi-credits").innerHTML = `${earnedCredits} <span style="font-size: 0.95rem; color: var(--text-dim);">/ ${totalReqCredits}</span>`;
   document.getElementById("ui-kpi-pct").textContent = `${pct}% Progress`;
-  document.getElementById("ui-kpi-gpa").textContent = s.gpa.toFixed(2);
-  document.getElementById("ui-kpi-terms").textContent = `${Math.ceil(remainingCredits / 15)} Semesters`;
+  document.getElementById("ui-kpi-gpa").textContent = s.gpa ? s.gpa.toFixed(2) : "3.80";
+  document.getElementById("ui-kpi-terms").textContent = `${Math.ceil(remainingCredits / 22)} Semesters`;
   document.getElementById("ui-kpi-left").textContent = `${remainingCredits} Credits Left`;
 
+  renderCurriculum();
   renderKanban();
   if (state.currentTab === "graph") renderGraph();
 }
@@ -1188,20 +1220,229 @@ function closeCitationModal() {
 }
 
 // ==========================================================================
-// COURSE DETAIL MODAL
+// C24 CURRICULUM EXPLORER & FULL SYLLABUS MODAL
 // ==========================================================================
+
+let curriculumFilter = "ALL";
+
+function setCurriculumFilter(filter) {
+  curriculumFilter = filter;
+  document.querySelectorAll(".curr-filter-btn").forEach(btn => btn.classList.remove("active"));
+  if (window.event && window.event.target) {
+    window.event.target.classList.add("active");
+  }
+  renderCurriculum();
+}
+
+function filterCurriculum() {
+  renderCurriculum();
+}
+
+function renderCurriculum() {
+  const container = document.getElementById("curriculum-cards-container");
+  if (!container) return;
+
+  const searchInput = document.getElementById("curriculum-search");
+  const searchQuery = (searchInput ? searchInput.value : "").toLowerCase().trim();
+  let courses = APP_DATA.courses || [];
+
+  if (curriculumFilter === "SEM_1") courses = courses.filter(c => c.sem === 1);
+  else if (curriculumFilter === "SEM_2") courses = courses.filter(c => c.sem === 2);
+  else if (curriculumFilter === "SEM_3") courses = courses.filter(c => c.sem === 3);
+  else if (curriculumFilter === "SEM_4") courses = courses.filter(c => c.sem === 4);
+  else if (curriculumFilter === "SEM_5") courses = courses.filter(c => c.sem === 5);
+  else if (curriculumFilter === "SEM_6") courses = courses.filter(c => c.sem === 6);
+  else if (curriculumFilter === "SEM_7") courses = courses.filter(c => c.sem === 7);
+  else if (curriculumFilter === "SEM_8") courses = courses.filter(c => c.sem === 8);
+  else if (curriculumFilter === "ELECTIVES") courses = courses.filter(c => c.category === "Department Elective" || (c.credit_categories || []).includes("DEPARTMENT_ELECTIVE"));
+  else if (curriculumFilter === "HONOURS") courses = courses.filter(c => c.category === "Honours" || (c.credit_categories || []).includes("HONOURS"));
+  else if (curriculumFilter === "MINORS") courses = courses.filter(c => c.category === "Minors" || (c.credit_categories || []).includes("MINORS"));
+  else if (curriculumFilter === "OPEN_ELECTIVES") courses = courses.filter(c => c.category === "Open Elective" || (c.credit_categories || []).includes("OPEN_ELECTIVE"));
+
+  if (searchQuery) {
+    courses = courses.filter(c => {
+      const inId = (c.id || "").toLowerCase().includes(searchQuery);
+      const inName = (c.name || "").toLowerCase().includes(searchQuery);
+      const inDesc = (c.description || c.desc || "").toLowerCase().includes(searchQuery);
+      const inCategory = (c.category || "").toLowerCase().includes(searchQuery);
+      const inUnits = (c.modules || []).some(m => (m.units || []).some(u => (u.title || "").toLowerCase().includes(searchQuery) || (u.content || "").toLowerCase().includes(searchQuery)));
+      return inId || inName || inDesc || inCategory || inUnits;
+    });
+  }
+
+  const countElem = document.getElementById("curriculum-results-count");
+  if (countElem) {
+    countElem.textContent = `Showing ${courses.length} courses in VFSTR C24 curriculum catalog`;
+  }
+
+  container.innerHTML = "";
+  if (courses.length === 0) {
+    container.innerHTML = `<div style="grid-column: 1 / -1; text-align: center; padding: 40px; color: var(--text-muted); background: var(--bg-card); border-radius: 8px; border: 1px solid var(--border);">No courses found matching "${searchQuery}". Try searching for algorithms, machine learning, cloud, or course codes like 24CS101.</div>`;
+    return;
+  }
+
+  courses.forEach(c => {
+    let catClass = "cat-core";
+    if (c.category === "Basic Sciences" || c.category === "Basic Engineering") catClass = "cat-basic";
+    else if (c.category === "Department Elective") catClass = "cat-elective";
+    else if (c.category === "Honours") catClass = "cat-honours";
+    else if (c.category === "Minors") catClass = "cat-minors";
+    else if (c.category === "Binary Grade") catClass = "cat-binary";
+
+    const semLabel = c.sem !== undefined ? (c.sem === 0 ? "Induction" : `Year ${Math.ceil(c.sem / 2)} Sem ${((c.sem - 1) % 2) + 1}`) : (c.category || "Elective");
+    const ltpcText = c.ltpc ? `L-T-P-C: ${c.ltpc}` : `${c.credits} Credits`;
+    const descExcerpt = c.description || c.desc || "Comprehensive study of core concepts, algorithmic design, practical laboratory exercises, and real-world system applications.";
+
+    const card = document.createElement("div");
+    card.className = `curriculum-card ${catClass}`;
+    card.innerHTML = `
+      <div>
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;">
+          <span style="font-weight: 800; font-size: 0.95rem; color: #ffffff; letter-spacing: 0.3px;">${c.id}</span>
+          <span class="curr-badge-ltpc">${ltpcText}</span>
+        </div>
+        <div style="font-weight: 700; font-size: 0.95rem; color: var(--accent-cyan); margin-bottom: 6px; line-height: 1.35;">${c.name}</div>
+        <div style="display: flex; gap: 6px; margin-bottom: 10px; flex-wrap: wrap;">
+          <span class="curr-badge-cat">${c.category || 'Professional Core'}</span>
+          <span style="background: rgba(52, 211, 153, 0.1); color: var(--accent-green); font-size: 0.7rem; font-weight: 600; padding: 2px 6px; border-radius: 4px;">${semLabel}</span>
+        </div>
+        <div style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.45; margin-bottom: 14px; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;">
+          ${descExcerpt}
+        </div>
+      </div>
+      <div style="border-top: 1px solid rgba(255, 255, 255, 0.08); padding-top: 10px; display: flex; justify-content: space-between; align-items: center;">
+        <span style="font-size: 0.75rem; color: var(--text-dim); font-weight: 600;">${(c.modules && c.modules.length > 0) ? '📖 2 Modules & Labs' : '📋 Syllabus Defined'}</span>
+        <button class="btn-sub" style="padding: 4px 10px; font-size: 0.75rem;" onclick="openModal('${c.id}')">View Syllabus →</button>
+      </div>
+    `;
+    container.appendChild(card);
+  });
+}
 
 function openModal(cid) {
   const c = APP_DATA.courses.find(x => x.id === cid);
   if (!c) return;
 
-  document.getElementById("modal-title").textContent = `${c.id}: ${c.name}`;
-  document.getElementById("modal-credits").textContent = `${c.category} · ${c.credits} Credits`;
-  document.getElementById("modal-desc").textContent = c.desc || "Comprehensive course in computer science curriculum.";
-  document.getElementById("modal-prereqs").textContent = (c.prereqs && c.prereqs.length > 0) ? c.prereqs.join(", ") : "None (Entry level)";
-  
-  const subs = APP_DATA.equivalencies[c.id] || ["No pre-approved direct substitute."];
-  document.getElementById("modal-subs").textContent = Array.isArray(subs) ? subs.join(" · ") : subs;
+  // Title and header badges
+  const codeElem = document.getElementById("modal-code");
+  if (codeElem) codeElem.textContent = c.id;
+
+  const ltpcElem = document.getElementById("modal-ltpc");
+  if (ltpcElem) ltpcElem.textContent = c.ltpc ? `L-T-P-C: ${c.ltpc}` : `${c.credits} Credits`;
+
+  const catElem = document.getElementById("modal-category");
+  if (catElem) catElem.textContent = c.category || "Professional Core";
+
+  const semElem = document.getElementById("modal-sem");
+  if (semElem) {
+    semElem.textContent = c.sem !== undefined ? (c.sem === 0 ? "Induction" : `Year ${Math.ceil(c.sem / 2)} Sem ${((c.sem - 1) % 2) + 1}`) : (c.category || "Elective");
+  }
+
+  const titleElem = document.getElementById("modal-title");
+  if (titleElem) titleElem.textContent = `${c.id}: ${c.name}`;
+
+  const descElem = document.getElementById("modal-desc");
+  if (descElem) descElem.textContent = c.description || c.desc || "Comprehensive study of core concepts, algorithmic design, practical laboratory exercises, and real-world system applications.";
+
+  // Prerequisites
+  const prereqElem = document.getElementById("modal-prereqs");
+  if (prereqElem) {
+    prereqElem.textContent = (c.prereqs && c.prereqs.length > 0) ? c.prereqs.join(", ") : "None (Direct Entry / Open Eligibility)";
+  }
+
+  // Substitutions
+  const subsElem = document.getElementById("modal-subs");
+  if (subsElem) {
+    const subs = APP_DATA.equivalencies[c.id] || ["No pre-approved direct substitute."];
+    subsElem.textContent = Array.isArray(subs) ? subs.join(" · ") : subs;
+  }
+
+  // Modules Section
+  const modulesContainer = document.getElementById("modal-modules-content");
+  if (modulesContainer) {
+    modulesContainer.innerHTML = "";
+    if (c.modules && c.modules.length > 0) {
+      c.modules.forEach(m => {
+        const modCard = document.createElement("div");
+        modCard.style.cssText = "background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; padding: 12px;";
+        
+        let unitsHtml = "";
+        (m.units || []).forEach(u => {
+          unitsHtml += `
+            <div class="curr-unit-box">
+              <div class="curr-unit-title">Unit ${u.unit_number}: ${u.title}</div>
+              <div class="curr-unit-content">${u.content}</div>
+            </div>
+          `;
+        });
+
+        modCard.innerHTML = `
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+            <div style="font-weight: 700; font-size: 0.88rem; color: var(--accent-blue);">Module ${m.module_number}</div>
+            <span style="font-size: 0.74rem; color: var(--text-dim); background: rgba(255,255,255,0.05); padding: 2px 6px; border-radius: 4px;">${m.hours || ''}</span>
+          </div>
+          ${unitsHtml}
+        `;
+        modulesContainer.appendChild(modCard);
+      });
+      const modSec = document.getElementById("modal-modules-section");
+      if (modSec) modSec.style.display = "block";
+    } else {
+      modulesContainer.innerHTML = `<div style="color: var(--text-muted); font-size: 0.82rem; background: var(--bg-card); padding: 12px; border-radius: 8px; border: 1px solid var(--border);">Standard course syllabus topics cover fundamental principles, theoretical derivations, and engineering design applications aligned with AICTE/UGC model curriculum.</div>`;
+    }
+  }
+
+  // Practices Section
+  const pracSec = document.getElementById("modal-practices-section");
+  const pracContent = document.getElementById("modal-practices-content");
+  if (pracSec && pracContent) {
+    if (c.practices && c.practices.length > 0) {
+      pracSec.style.display = "block";
+      pracContent.innerHTML = `<ol style="margin: 0; padding-left: 18px; display: flex; flex-direction: column; gap: 4px;">${c.practices.map(p => `<li>${p}</li>`).join('')}</ol>`;
+    } else {
+      pracSec.style.display = "none";
+    }
+  }
+
+  // Course Outcomes Section
+  const coSec = document.getElementById("modal-co-section");
+  const coTbody = document.getElementById("modal-co-tbody");
+  if (coSec && coTbody) {
+    if (c.course_outcomes && c.course_outcomes.length > 0) {
+      coSec.style.display = "block";
+      coTbody.innerHTML = c.course_outcomes.map(co => `
+        <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
+          <td style="padding: 8px 12px; font-weight: 700; color: var(--accent-cyan);">CO${co.co_no}</td>
+          <td style="padding: 8px 12px; line-height: 1.4;">${co.outcome}</td>
+          <td style="padding: 8px 12px;"><span style="background: rgba(56, 189, 248, 0.1); color: var(--accent-cyan); padding: 2px 6px; border-radius: 4px; font-size: 0.72rem; font-weight: 600;">${co.blooms}</span></td>
+          <td style="padding: 8px 12px;">Module ${co.module}</td>
+          <td style="padding: 8px 12px; font-size: 0.72rem; color: var(--text-dim);">${co.pos ? `PO ${co.pos}` : '-'}</td>
+        </tr>
+      `).join('');
+    } else {
+      coSec.style.display = "none";
+    }
+  }
+
+  // Textbooks & References Section
+  const booksSec = document.getElementById("modal-books-section");
+  const booksContent = document.getElementById("modal-books-content");
+  if (booksSec && booksContent) {
+    let booksHtml = "";
+    if (c.textbooks && c.textbooks.length > 0) {
+      booksHtml += `<div style="font-weight: 700; color: var(--accent-cyan); margin-bottom: 4px; font-size: 0.8rem;">Textbooks:</div><ul style="margin: 0 0 8px 0; padding-left: 18px;">${c.textbooks.map(tb => `<li>${tb}</li>`).join('')}</ul>`;
+    }
+    if (c.reference_books && c.reference_books.length > 0) {
+      booksHtml += `<div style="font-weight: 700; color: var(--text-dim); margin-bottom: 4px; font-size: 0.8rem;">Reference Books:</div><ul style="margin: 0; padding-left: 18px;">${c.reference_books.map(rb => `<li>${rb}</li>`).join('')}</ul>`;
+    }
+
+    if (booksHtml) {
+      booksSec.style.display = "block";
+      booksContent.innerHTML = booksHtml;
+    } else {
+      booksSec.style.display = "none";
+    }
+  }
 
   document.getElementById("modal-box").classList.add("active");
 }

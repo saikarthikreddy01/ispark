@@ -135,7 +135,10 @@
 
       <!-- Navigation Tabs -->
       <nav class="topbar-tabs">
-        <button class="tab-link active" id="tab-pathway" onclick="switchTab('pathway')">
+        <button class="tab-link active" id="tab-curriculum" onclick="switchTab('curriculum')">
+          <span>📚</span> C24 Curriculum
+        </button>
+        <button class="tab-link" id="tab-pathway" onclick="switchTab('pathway')">
           <span>🗺️</span> Pathway
         </button>
         <button class="tab-link" id="tab-graph" onclick="switchTab('graph')">
@@ -198,8 +201,51 @@
         </div>
       </div>
 
+      <!-- ================= TAB: C24 CURRICULUM & SYLLABUS EXPLORER ================= -->
+      <section id="view-curriculum">
+        <div class="curriculum-header" style="background: linear-gradient(135deg, rgba(30, 41, 59, 0.8), rgba(15, 23, 42, 0.95)); border: 1px solid var(--border); border-radius: 12px; padding: 20px; margin-bottom: 20px;">
+          <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 15px;">
+            <div>
+              <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 6px; flex-wrap: wrap;">
+                <span style="background: var(--accent-blue); color: white; font-size: 0.72rem; font-weight: 700; padding: 3px 8px; border-radius: 4px; text-transform: uppercase; letter-spacing: 0.5px;">C24 Regulation</span>
+                <span style="background: rgba(52, 211, 153, 0.15); color: var(--accent-green); border: 1px solid rgba(52, 211, 153, 0.3); font-size: 0.72rem; font-weight: 700; padding: 3px 8px; border-radius: 4px;">Batch 2024-28 (w.e.f)</span>
+                <span style="background: rgba(245, 158, 11, 0.15); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.3); font-size: 0.72rem; font-weight: 700; padding: 3px 8px; border-radius: 4px;">160 Credits Required</span>
+                <span style="background: rgba(168, 85, 247, 0.15); color: #c084fc; border: 1px solid rgba(168, 85, 247, 0.3); font-size: 0.72rem; font-weight: 700; padding: 3px 8px; border-radius: 4px;">M.P.C Stream</span>
+              </div>
+              <h2 style="font-size: 1.35rem; font-weight: 800; color: #fff; margin: 0 0 4px 0;">B.Tech Computer Science & Engineering Curriculum</h2>
+              <div style="font-size: 0.85rem; color: var(--text-muted);">Vignan's Foundation for Science, Technology & Research (VFSTR Deemed to be University) · Department of CSE</div>
+            </div>
+            <div style="display: flex; gap: 8px;">
+              <input type="text" id="curriculum-search" placeholder="🔍 Search course, code, module topic..." oninput="filterCurriculum()" style="background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; padding: 8px 14px; color: white; font-size: 0.85rem; width: 280px;">
+            </div>
+          </div>
+
+          <!-- Curriculum Category / Semester Filters -->
+          <div style="display: flex; gap: 8px; margin-top: 16px; flex-wrap: wrap;" id="curriculum-filter-bar">
+            <button class="curr-filter-btn active" onclick="setCurriculumFilter('ALL')">All Catalog</button>
+            <button class="curr-filter-btn" onclick="setCurriculumFilter('SEM_1')">I-I (23 Cr)</button>
+            <button class="curr-filter-btn" onclick="setCurriculumFilter('SEM_2')">I-II (22 Cr)</button>
+            <button class="curr-filter-btn" onclick="setCurriculumFilter('SEM_3')">II-I (25 Cr)</button>
+            <button class="curr-filter-btn" onclick="setCurriculumFilter('SEM_4')">II-II (25 Cr)</button>
+            <button class="curr-filter-btn" onclick="setCurriculumFilter('SEM_5')">III-I (25 Cr)</button>
+            <button class="curr-filter-btn" onclick="setCurriculumFilter('SEM_6')">III-II (25 Cr)</button>
+            <button class="curr-filter-btn" onclick="setCurriculumFilter('SEM_7')">IV-I (25 Cr)</button>
+            <button class="curr-filter-btn" onclick="setCurriculumFilter('SEM_8')">IV-II (16 Cr)</button>
+            <button class="curr-filter-btn" onclick="setCurriculumFilter('ELECTIVES')">Dept Electives (PE)</button>
+            <button class="curr-filter-btn" onclick="setCurriculumFilter('HONOURS')">Honours Track (HN)</button>
+            <button class="curr-filter-btn" onclick="setCurriculumFilter('MINORS')">Minors Track (MN)</button>
+            <button class="curr-filter-btn" onclick="setCurriculumFilter('OPEN_ELECTIVES')">Open Electives (OE)</button>
+          </div>
+        </div>
+
+        <div id="curriculum-results-count" style="font-size: 0.82rem; color: var(--text-muted); margin-bottom: 12px;">Showing all courses in C24 curriculum</div>
+
+        <!-- Course Catalog Grid -->
+        <div class="curriculum-grid" id="curriculum-cards-container" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 16px; margin-bottom: 24px;"></div>
+      </section>
+
       <!-- ================= TAB 1: PATHWAY ROADMAP (KANBAN) ================= -->
-      <section id="view-pathway">
+      <section id="view-pathway" style="display: none;">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; flex-wrap: wrap; gap: 10px;">
           <div>
             <h2 style="font-size: 1.1rem; font-weight: 700;">Topological Degree Pathway</h2>
@@ -374,26 +420,77 @@
   </div>
 
   <!-- ==========================================================================
-       MODAL 1: COURSE DETAIL & SUBSTITUTION MODAL
+       MODAL 1: C24 COURSE DETAIL & FULL SYLLABUS MODAL
        ========================================================================== -->
   <div class="modal-backdrop" id="modal-box">
-    <div class="modal-box">
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-        <h3 id="modal-title" style="font-size: 1.15rem; color: var(--accent-blue);">CS301: Algorithms</h3>
-        <button style="background: transparent; border: none; color: var(--text-muted); font-size: 1.3rem; cursor: pointer;" onclick="closeModal()">&times;</button>
+    <div class="modal-box" style="max-width: 850px; width: 90%; max-height: 88vh; overflow-y: auto; padding: 24px;">
+      <!-- Header -->
+      <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; border-bottom: 1px solid var(--border); padding-bottom: 12px;">
+        <div>
+          <div style="display: flex; gap: 8px; align-items: center; margin-bottom: 6px; flex-wrap: wrap;">
+            <span id="modal-code" style="background: var(--accent-blue); color: white; font-weight: 700; font-size: 0.8rem; padding: 2px 8px; border-radius: 4px;">24CS101</span>
+            <span id="modal-ltpc" style="background: rgba(56, 189, 248, 0.15); color: var(--accent-cyan); font-weight: 600; font-size: 0.76rem; padding: 2px 8px; border-radius: 4px; border: 1px solid rgba(56, 189, 248, 0.3);">L-T-P-C: 2-0-4-4</span>
+            <span id="modal-category" style="background: rgba(168, 85, 247, 0.15); color: #c084fc; font-weight: 600; font-size: 0.76rem; padding: 2px 8px; border-radius: 4px;">Basic Engineering</span>
+            <span id="modal-sem" style="background: rgba(52, 211, 153, 0.15); color: var(--accent-green); font-weight: 600; font-size: 0.76rem; padding: 2px 8px; border-radius: 4px;">I Year I Sem</span>
+          </div>
+          <h3 id="modal-title" style="font-size: 1.3rem; color: #fff; margin: 0; font-weight: 800;">Programming in C</h3>
+        </div>
+        <button style="background: rgba(255,255,255,0.05); border: 1px solid var(--border); color: var(--text-muted); font-size: 1.3rem; cursor: pointer; border-radius: 6px; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;" onclick="closeModal()">&times;</button>
       </div>
 
-      <div id="modal-credits" style="font-size: 0.8rem; color: var(--text-dim); margin-bottom: 10px;">Core · 3 Credits</div>
-      <p id="modal-desc" style="font-size: 0.86rem; color: var(--text-muted); line-height: 1.5; margin-bottom: 14px;"></p>
-
-      <div style="background: var(--bg-card); padding: 10px; border-radius: 6px; margin-bottom: 10px; font-size: 0.84rem;">
-        <span style="color: var(--text-dim); font-weight: 600;">Prerequisites:</span>
-        <span id="modal-prereqs" style="color: var(--text-main); font-weight: 600; margin-left: 4px;">CS201, MATH201</span>
+      <!-- Description -->
+      <div style="margin-bottom: 16px;">
+        <div style="font-size: 0.8rem; text-transform: uppercase; font-weight: 700; color: var(--accent-blue); letter-spacing: 0.5px; margin-bottom: 4px;">Course Description & Objectives</div>
+        <p id="modal-desc" style="font-size: 0.86rem; color: var(--text-muted); line-height: 1.6; margin: 0; background: var(--bg-card); padding: 12px; border-radius: 8px; border: 1px solid var(--border);"></p>
       </div>
 
-      <div style="background: rgba(52, 211, 153, 0.1); border: 1px solid rgba(52, 211, 153, 0.25); padding: 10px; border-radius: 6px; font-size: 0.84rem;">
-        <span style="color: var(--accent-green); font-weight: 600;">Approved Substitutions:</span>
-        <div id="modal-subs" style="color: var(--text-main); margin-top: 2px;">CS305 (Applied Algorithm Design)</div>
+      <!-- Prerequisites & Substitutions Grid -->
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px;">
+        <div style="background: var(--bg-card); padding: 12px; border-radius: 8px; border: 1px solid var(--border);">
+          <div style="font-size: 0.75rem; text-transform: uppercase; font-weight: 700; color: var(--accent-cyan); margin-bottom: 4px;">📌 Prerequisites & Eligibility</div>
+          <div id="modal-prereqs" style="font-size: 0.84rem; color: var(--text-main); font-weight: 600;">None (Direct entry)</div>
+        </div>
+        <div style="background: rgba(52, 211, 153, 0.06); padding: 12px; border-radius: 8px; border: 1px solid rgba(52, 211, 153, 0.2);">
+          <div style="font-size: 0.75rem; text-transform: uppercase; font-weight: 700; color: var(--accent-green); margin-bottom: 4px;">🔄 Approved Substitutions (§2.1)</div>
+          <div id="modal-subs" style="font-size: 0.84rem; color: var(--text-main); font-weight: 600;">No direct substitute</div>
+        </div>
+      </div>
+
+      <!-- Syllabus Modules (Module 1 & Module 2) -->
+      <div id="modal-modules-section" style="margin-bottom: 16px;">
+        <div style="font-size: 0.8rem; text-transform: uppercase; font-weight: 700; color: var(--accent-blue); letter-spacing: 0.5px; margin-bottom: 8px;">📖 Syllabus Structure (Modules & Units)</div>
+        <div id="modal-modules-content" style="display: flex; flex-direction: column; gap: 10px;"></div>
+      </div>
+
+      <!-- Practices / Lab Experiments -->
+      <div id="modal-practices-section" style="margin-bottom: 16px; display: none;">
+        <div style="font-size: 0.8rem; text-transform: uppercase; font-weight: 700; color: #fbbf24; letter-spacing: 0.5px; margin-bottom: 8px;">🔬 Laboratory Practices & Problem Solving</div>
+        <div id="modal-practices-content" style="background: var(--bg-card); padding: 12px; border-radius: 8px; border: 1px solid var(--border); font-size: 0.82rem; color: var(--text-muted); line-height: 1.6;"></div>
+      </div>
+
+      <!-- Course Outcomes (Bloom's Taxonomy) Table -->
+      <div id="modal-co-section" style="margin-bottom: 16px; display: none;">
+        <div style="font-size: 0.8rem; text-transform: uppercase; font-weight: 700; color: var(--accent-green); letter-spacing: 0.5px; margin-bottom: 8px;">🎯 Course Outcomes (COs) & Bloom's Mapping</div>
+        <div style="overflow-x: auto; border: 1px solid var(--border); border-radius: 8px;">
+          <table style="width: 100%; border-collapse: collapse; font-size: 0.8rem; text-align: left;">
+            <thead style="background: rgba(30, 41, 59, 0.8); color: var(--accent-blue);">
+              <tr>
+                <th style="padding: 8px 12px; border-bottom: 1px solid var(--border);">CO #</th>
+                <th style="padding: 8px 12px; border-bottom: 1px solid var(--border);">Course Outcome Description</th>
+                <th style="padding: 8px 12px; border-bottom: 1px solid var(--border);">Bloom's Level</th>
+                <th style="padding: 8px 12px; border-bottom: 1px solid var(--border);">Module</th>
+                <th style="padding: 8px 12px; border-bottom: 1px solid var(--border);">Mapped POs</th>
+              </tr>
+            </thead>
+            <tbody id="modal-co-tbody" style="color: var(--text-muted);"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Textbooks & Reference Books -->
+      <div id="modal-books-section" style="margin-bottom: 10px; display: none;">
+        <div style="font-size: 0.8rem; text-transform: uppercase; font-weight: 700; color: #c084fc; letter-spacing: 0.5px; margin-bottom: 8px;">📚 Prescribed Textbooks & References</div>
+        <div id="modal-books-content" style="background: var(--bg-card); padding: 12px; border-radius: 8px; border: 1px solid var(--border); font-size: 0.82rem; color: var(--text-muted); line-height: 1.6;"></div>
       </div>
     </div>
   </div>

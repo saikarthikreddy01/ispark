@@ -121,6 +121,51 @@ def get_student(student_id: str):
 def get_courses():
     return db_manager.get_all_courses()
 
+@app.get("/api/courses/{course_id}")
+def get_course_detail(course_id: str):
+    courses = db_manager.get_all_courses()
+    for c in courses:
+        if c.get("id", "").upper() == course_id.upper():
+            return c
+    raise HTTPException(status_code=404, detail=f"Course '{course_id}' not found in C24 catalog")
+
+@app.get("/api/curriculum")
+def get_curriculum_structure():
+    degree_req = load_json_file("degree_requirements.json")
+    courses = db_manager.get_all_courses()
+    course_map = {c["id"]: c for c in courses}
+
+    # Structure by semester
+    structured_semesters = []
+    for sem in degree_req.get("semesters_structure", []):
+        sem_courses = [course_map.get(cid, {"id": cid, "name": cid}) for cid in sem.get("courses", [])]
+        structured_semesters.append({
+            "semester": sem.get("semester"),
+            "semester_index": sem.get("semester_index"),
+            "total_credits": sem.get("total_credits"),
+            "contact_hours": sem.get("contact_hours"),
+            "courses": sem_courses
+        })
+
+    # Group Electives, Honours, Minors, Open Electives
+    dept_electives = [c for c in courses if c.get("category") == "Department Elective"]
+    honours_courses = [c for c in courses if c.get("category") == "Honours"]
+    minor_courses = [c for c in courses if c.get("category") == "Minors"]
+    open_electives = [c for c in courses if c.get("category") == "Open Elective"]
+
+    return {
+        "program": degree_req.get("program", "B.Tech. Computer Science & Engineering (C24 Regulation)"),
+        "institution": degree_req.get("institution", "VFSTR Deemed to be University"),
+        "batch": degree_req.get("batch", "2024-28"),
+        "total_credits_required": degree_req.get("total_credits_required", 160),
+        "category_requirements": degree_req.get("category_requirements", {}),
+        "semesters": structured_semesters,
+        "department_electives": dept_electives,
+        "honours_courses": honours_courses,
+        "minor_courses": minor_courses,
+        "open_electives": open_electives
+    }
+
 @app.get("/api/equivalencies")
 def get_equivalencies():
     return load_json_file("equivalencies.json")
@@ -229,8 +274,9 @@ def advisor_chat(req: ChatRequest):
             from google import genai
             client = genai.Client(api_key=api_key)
             prompt = (
-                "You are an expert Academic AI Advisor specializing in degree sequencing, prerequisite validation, and university policies.\n"
-                "Ground your answers using official institutional standards. Include specific course codes and formal section citations like [Course Catalog §4.2] or [Academic Policy §2.1].\n\n"
+                "You are an expert Academic AI Advisor for Vignan's Foundation for Science, Technology & Research (VFSTR Deemed to be University).\n"
+                "You specialize in the B.Tech Computer Science & Engineering (C24 Regulation, Batch 2024-28) curriculum, prerequisite validation, syllabi, course outcomes, and university policies.\n"
+                "Ground your answers using official institutional standards. Include specific course codes (e.g., 24CS101, 22TP201, 24CS204, 24CS209, 24CS306, 22CS401, 22CS804, 22CS951) and formal section citations like [VFSTR C24 Regulation §1.1] or [B.Tech CSE Catalog 2024-28].\n\n"
                 f"--- OFFICIAL UNIVERSITY POLICY TEXT ---\n{policy_doc[:4000]}\n\n"
                 f"--- STUDENT PROFILE ---\n{student_ctx}\n\n"
                 f"--- STUDENT QUESTION ---\n{req.question}\n\n"
@@ -244,72 +290,91 @@ def advisor_chat(req: ChatRequest):
                 reply = response.text
             
             # Extract citations from reply or add defaults
-            citations = ["[Course Catalog 2026, §4.2]", "[Academic Regulation §1.1]"]
+            citations = ["[VFSTR C24 Regulation §1.1]", "[B.Tech CSE Course Catalog 2024-28]"]
             if "§1.2" in reply or "waiver" in req.question.lower() or "petition" in req.question.lower():
                 citations.append("[Policy §1.2: Prerequisite Waivers]")
-            if "§1.3" in reply or "grade" in req.question.lower():
-                citations.append("[Policy §1.3: Minimum Grade Thresholds]")
+            if "§1.3" in reply or "grade" in req.question.lower() or "evaluation" in req.question.lower():
+                citations.append("[Policy §1.3: Continuous Evaluation & Thresholds]")
             if "§2.1" in reply or "substitut" in req.question.lower() or "equivalent" in req.question.lower():
                 citations.append("[Policy §2.1: Course Equivalencies]")
-            if "§5.2" in reply or "overload" in req.question.lower() or "credit" in req.question.lower():
-                citations.append("[Policy §5.2: Credit Overload Limits]")
-            if "§6.1" in reply or "graduat" in req.question.lower():
-                citations.append("[Policy §6.1: Degree Audit Clearance]")
+            if "honour" in req.question.lower() or "minor" in req.question.lower():
+                citations.append("[VFSTR Regulation: Honours & Minors Track]")
+            if "graduat" in req.question.lower() or "credit" in req.question.lower():
+                citations.append("[Policy §2.0: 160 Total Credit Graduation Requirement]")
         except Exception as e:
             print(f"[WARN] Gemini API error ({e}), using Graph-RAG deterministic fallback.")
 
-    # High-precision Graph-RAG Rule-based Fallback
+    # High-precision Graph-RAG Rule-based Fallback for C24
     if not reply:
         q = req.question.lower()
-        if "cs301" in q or "algorithm" in q:
+        if "24cs209" in q or "daa" in q or "algorithm" in q:
             reply = (
-                "⚠️ **Prerequisite Policy on CS301 (Algorithms)**:\n\n"
-                "Under **Course Catalog §4.2** & **Policy §1.3 (Minimum Grade Requirements)**, enrolling in **CS301** requires:\n"
-                "1. Passing **CS201 (Data Structures)** with a grade of **C or higher**.\n"
-                "2. Completing **MATH201 (Discrete Mathematics)** with a minimum passing grade.\n\n"
-                "**Bottleneck Impact**: CS301 is a critical milestone blocking **CS401 (Software Engineering)** and **CS402 (Machine Learning)**. "
-                "Since CS301 is typically a Fall-only offering, you should prioritize satisfying CS201 to prevent graduation delays."
+                "⚠️ **Prerequisite Policy on 24CS209 (Design and Analysis of Algorithms)**:\n\n"
+                "Under **VFSTR C24 Curriculum §1.1 (Prerequisite Enforcement)**, enrolling in **24CS209** requires:\n"
+                "1. Passing **22TP201 (Data Structures)** with a passing grade.\n"
+                "2. Completing **24MT203 (Discrete Mathematical Structures)**.\n\n"
+                "**Bottleneck Impact**: 24CS209 is a critical milestone blocking **24CS306 (Machine Learning)** and **22CS951 (Advanced Graph Algorithms)**. "
+                "Ensure Data Structures and Discrete Math are cleared to maintain normal 4-year graduation trajectory."
             )
-            citations = ["[Course Catalog 2026, §4.2]", "[Policy §1.1: Prerequisite Enforcement]", "[Policy §1.3: Grade Requirements]"]
-        elif "cs402" in q or "machine learning" in q or "ml" in q:
+            citations = ["[VFSTR C24 Curriculum §1.1]", "[B.Tech CSE Catalog 2024-28, II-II]", "[Policy §1.3: Grade Requirements]"]
+        elif "24cs306" in q or "machine learning" in q or "ml" in q:
             reply = (
-                "📘 **Prerequisites for CS402 (Machine Learning)**:\n\n"
-                "According to **Course Catalog Electives §7.1**, **CS402** requires:\n"
-                "- **CS301 (Algorithms)** [Prerequisite]\n"
-                "- **MATH202 (Linear Algebra)** [Corequisite/Prerequisite]\n\n"
-                "Your transcript confirms MATH202 is satisfied. Once you clear CS301, you are eligible to register immediately."
+                "📘 **Prerequisites for 24CS306 (Machine Learning)**:\n\n"
+                "According to the **VFSTR C24 Syllabus (III Year II Semester)**, **24CS306 (2-2-2, 4 Credits)** requires:\n"
+                "- **22ST202 (Probability and Statistics)**\n"
+                "- **24CS102 (Problem Solving through Python)**\n"
+                "- **24MT101 (Linear Algebra and ODE)**\n\n"
+                "Once satisfied, you are eligible to explore advanced electives like **22CS804 (Deep Learning)** and **22CS809 (Text Mining)**."
             )
-            citations = ["[Course Catalog 2026, Electives §7.1]", "[Degree Requirements §6.0]"]
+            citations = ["[B.Tech CSE Catalog 2024-28, III-II]", "[Policy §1.1: Prerequisite Enforcement]"]
+        elif "22cs804" in q or "deep learning" in q:
+            reply = (
+                "🧠 **Curriculum Details for 22CS804 (Deep Learning)**:\n\n"
+                "Under **VFSTR C24 Department Electives (3-0-2, 4 Credits)**, **22CS804** covers:\n"
+                "- **Module 1**: Perceptron convergence, Shallow vs Deep networks, Optimizers (Adam, RMSProp, Adagrad), Regularization (Dropout, Batch Norm), and CNNs (AlexNet, VGGNet, ResNet).\n"
+                "- **Module 2**: Deep Unsupervised Learning (Autoencoders, Denoising, Contractive) and RNNs, LSTMs, GRUs for Text & Vision.\n\n"
+                "Prerequisites: **24CS306 (Machine Learning)** & **24CS102 (Python)**."
+            )
+            citations = ["[B.Tech CSE Department Electives, p.131]", "[VFSTR C24 Syllabus]"]
         elif "waiver" in q or "petition" in q or "exception" in q:
             reply = (
                 "📝 **Formal Faculty Exception & Waiver Policy (§1.2)**:\n\n"
-                "If you face an unavoidable scheduling conflict or hold equivalent industry experience, you may submit a **Prerequisite Waiver Petition**:\n"
+                "If you face an unavoidable scheduling conflict or hold certified equivalent competencies, you may submit a **Prerequisite Waiver Petition**:\n"
                 "1. Submit via the **Faculty Governance** tab with written justification.\n"
-                "2. Requires instructor recommendation and Department Chair co-signature.\n"
-                "3. Petitions undergo automated formal constraint verification before final approval."
+                "2. Requires instructor recommendation and HoD (CSE) approval.\n"
+                "3. Petitions undergo automated formal constraint verification before final sign-off."
             )
-            citations = ["[Policy §1.2: Prerequisite Waivers]", "[Policy §2.2: Substitution by Petition]"]
+            citations = ["[Policy §1.2: Prerequisite Waivers]", "[VFSTR Academic Governance Regulations]"]
+        elif "honour" in q or "minor" in q:
+            reply = (
+                "🌟 **Honours & Minors Degree Program (VFSTR C24 Regulation)**:\n\n"
+                "Students with CGPA ≥ 7.5 can enroll in an Honours or Minor track for an additional **20 Credits** (5 courses × 4 credits):\n"
+                "- **Honours Tracks**: Advanced Graph Algorithms (22CS951), Biometrics (22CS952), Parallel & Distributed Computing (22CS953), IoT (22CS954), Wireless Sensor Networks (22CS955), and Capstone Project (22CS956).\n"
+                "- **Minor Tracks**: Python (22CS901), Java OOP (22CS902), DBMS (22CS903), Web Tech (22CS904), Mobile App Dev (22CS905), DAA (22CS906), OS (22CS907), Networks (22CS908), Capstone (22CS909)."
+            )
+            citations = ["[VFSTR C24 Honours & Minors Regulation]", "[B.Tech CSE Structure, p.5]"]
         elif "substitut" in q or "alternative" in q:
             reply = (
                 "🔄 **Approved Course Substitution Standards (§2.1)**:\n\n"
-                "The Department approves the following direct equivalencies:\n"
-                "- **CS301 (Algorithms)** ➔ **CS305 (Applied Algorithm Design)**\n"
-                "- **CS350 (Web App Architecture)** ➔ **CS351 (Mobile App Development)**\n"
-                "- **MATH202 (Linear Algebra)** ➔ **MATH203 (Calculus III)** (with Chair approval)\n\n"
+                "The Department of CSE approves the following direct equivalencies:\n"
+                "- **24CS402 (Parallel & Distributed Computing)** ➔ **22CS953 (Honours P&DC)**\n"
+                "- **24CS204 (OOP Java)** ➔ **22CS902 (Java OOP Minor)**\n"
+                "- **24CS403 (Privacy & Intrusion Detection)** ➔ **22CS815 (IDPS Elective)**\n"
+                "- **24CS207 (Full Stack MERN)** ➔ **22CS904 (Web Technologies)**\n\n"
                 "Approved substitutions satisfy degree requirements without extending graduation timeline."
             )
-            citations = ["[Policy §2.1: Equivalent Courses]", "[Degree Audit Standard §8.3]"]
+            citations = ["[Policy §2.1: Equivalent Courses]", "[VFSTR C24 Equivalence Standards]"]
         else:
-            completed_cnt = len(student.get('completed', [])) if student else 8
-            gpa = student.get('gpa', 3.65) if student else 3.65
+            completed_cnt = len(student.get('completed', [])) if student else 18
+            gpa = student.get('gpa', 3.82) if student else 3.82
             reply = (
-                "🟢 **Academic Progress Summary & Degree Trajectory**:\n\n"
-                f"- **Completed Requirements**: {completed_cnt} courses completed ({completed_cnt * 3.5:.0f} credits earned).\n"
-                f"- **Cumulative GPA**: {gpa:.2f} ({student.get('standing', 'Good Standing') if student else 'Good Standing'}).\n"
-                f"- **Graduation Target**: {student.get('expected_grad', 'Spring 2027') if student else 'Spring 2027'}.\n\n"
-                "You are currently progressing on schedule. Review your **Topological Pathway** and **Knowledge Graph** to verify upcoming terms."
+                "🟢 **VFSTR C24 Academic Progress Summary & Degree Trajectory**:\n\n"
+                f"- **Completed Courses**: {completed_cnt} courses completed in B.Tech CSE (C24 Regulation).\n"
+                f"- **Cumulative GPA / SGPA**: {gpa:.2f} ({student.get('standing', 'Good Standing') if student else 'Good Standing'}).\n"
+                f"- **Total Degree Target**: 160 Credits (Graduation Target: {student.get('expected_grad', 'May 2028') if student else 'May 2028'}).\n\n"
+                "You are progressing on track. Explore the **C24 Curriculum Explorer**, **Topological Pathway**, and **Knowledge Graph** to inspect upcoming semester courses and syllabi."
             )
-            citations = ["[Degree Audit Standard §8.3]", "[Policy §4.1: Good Standing]"]
+            citations = ["[VFSTR C24 Degree Standards]", "[Policy §2.0: 160 Credit Graduation Requirement]"]
 
     # Log conversation to MongoDB
     db_manager.save_chat_log(req.student_id, req.question, reply, citations)
@@ -583,7 +648,7 @@ def analyze_bottlenecks_and_risk(student_id: str):
                 "is_completed": is_passed,
                 "term_offering": c.get("offered_semesters", ["FALL", "SPRING"]),
                 "risk_factor": "CRITICAL" if len(dependents) >= 4 else "HIGH",
-                "suggested_substitutes": load_json_file("equivalencies.json")
+                "suggested_substitutes": [eq.get("equivalent_course_id") for eq in load_json_file("equivalencies.json") if eq.get("course_id") == cid]
             })
 
     # Sort bottlenecks by blocked count descending

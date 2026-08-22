@@ -24,7 +24,7 @@ COPY . .
 EXPOSE 8080
 
 # Health check
-HEALTHCHECK CMD curl --fail http://localhost:8080/_stcore/health || exit 1
+HEALTHCHECK CMD curl --fail http://localhost:8080/api/courses || exit 1
 
-# Run Streamlit
-ENTRYPOINT ["streamlit", "run", "app/app.py", "--server.port=8080", "--server.address=0.0.0.0", "--server.enableCORS=false", "--server.enableXsrfProtection=false", "--server.headless=true"]
+# Run FastAPI with Uvicorn
+ENTRYPOINT ["python", "-m", "uvicorn", "backend.server:app", "--host", "0.0.0.0", "--port", "8080"]

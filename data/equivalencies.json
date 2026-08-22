@@ -1,7 +1,32 @@
 [
-  {"course_id": "CS350", "equivalent_course_id": "CS351", "notes": "Both satisfy web/mobile development elective requirement"},
-  {"course_id": "CS401", "equivalent_course_id": "CS450", "notes": "Either satisfies the AI elective requirement"},
-  {"course_id": "MATH203", "equivalent_course_id": "MATH202", "notes": "Calculus III can substitute for Linear Algebra with department approval"},
-  {"course_id": "CS370", "equivalent_course_id": "CS402", "notes": "Data Science can substitute for ML with advisor approval"},
-  {"course_id": "CS405", "equivalent_course_id": "CS404", "notes": "Cloud Computing and Distributed Systems are interchangeable electives"}
+  {
+    "course_id": "24CS402",
+    "equivalent_course_id": "22CS953",
+    "notes": "Parallel & Distributed Computing (Core) equivalent to Honours version 22CS953"
+  },
+  {
+    "course_id": "24CS204",
+    "equivalent_course_id": "22CS902",
+    "notes": "OOP through Java (Core) equivalent to Minor track 22CS902"
+  },
+  {
+    "course_id": "22TP201",
+    "equivalent_course_id": "22CS801",
+    "notes": "Data Structures satisfies prerequisite bridge for Advanced Data Structures"
+  },
+  {
+    "course_id": "24CS102",
+    "equivalent_course_id": "22CS901",
+    "notes": "Problem Solving through Python equivalent to 22CS901"
+  },
+  {
+    "course_id": "24CS403",
+    "equivalent_course_id": "22CS815",
+    "notes": "Privacy & Intrusion Detection equivalent to IDPS 22CS815"
+  },
+  {
+    "course_id": "24CS207",
+    "equivalent_course_id": "22CS904",
+    "notes": "Full Stack Development (MERN) satisfies Web Technologies 22CS904"
+  }
 ]
