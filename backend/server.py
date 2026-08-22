@@ -169,6 +169,21 @@ def signup(req: SignUpRequest):
         "student": saved
     }
 
+@app.get("/api/gemini/status")
+def get_gemini_status():
+    api_key = os.getenv("GEMINI_API_KEY", "")
+    masked = f"{api_key[:8]}...{api_key[-6:]}" if len(api_key) > 14 else "Not configured"
+    return {
+        "status": "connected" if api_key else "disconnected",
+        "model": "gemini-3.6-flash",
+        "name": "Gemini API Key",
+        "project_name": "projects/882038538915",
+        "project_number": "882038538915",
+        "api_key_masked": masked,
+        "mode": "real_time_graph_rag",
+        "live_interaction": True
+    }
+
 # --- 3. GRAPH-RAG ADVISING WITH CITATIONS ---
 
 @app.post("/api/chat")
