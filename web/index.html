@@ -315,7 +315,7 @@
     </div>
   </div>
 
-  <script src="app.js?v=6.0"></script>
+    <script src="app.js"></script>
   <script>
     function setAuthMode(mode) {
       const tabLogin = document.getElementById("auth-tab-login");
@@ -339,123 +339,55 @@
       }
     }
 
+    // 100% Pure MongoDB Atlas Login via API
     async function handleStudentLogin(e) {
       if (e) e.preventDefault();
-      const regnoInput = document.getElementById("login-regno");
-      const pwdInput = document.getElementById("login-password");
+      const regno = document.getElementById("login-regno").value.trim().toUpperCase();
+      const password = document.getElementById("login-password").value;
       const alertBox = document.getElementById("auth-alert-box");
-      const regno = regnoInput ? regnoInput.value.trim().toUpperCase() : "";
-      const password = pwdInput ? pwdInput.value : "";
 
-      // Try Backend MongoDB API First
       try {
         const res = await fetch("/api/auth/login", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ regno: regno, password: password })
         });
-        const contentType = res.headers.get("content-type") || "";
-        if (contentType.includes("application/json")) {
-          const data = await res.json();
-          if (res.ok && data.student) {
-            if (alertBox) alertBox.style.display = "none";
-            state.currentStudent = data.student;
-            saveActiveUser(data.student.id);
-            savePermanentStudents();
-            initStudentPicker();
-            const picker = document.getElementById("user-select");
-            if (picker) picker.value = data.student.id;
-            renderDashboard();
-            openDashboard('pathway');
-            return;
-          } else if (!res.ok && data.detail) {
-            if (alertBox) {
-              alertBox.className = "auth-alert error";
-              alertBox.textContent = `⚠️ ${data.detail}`;
-              alertBox.style.display = "block";
-            }
-            return;
-          }
+        const data = await res.json();
+
+        if (res.ok && data.student) {
+          if (alertBox) alertBox.style.display = "none";
+          state.currentStudent = data.student;
+          await loadStudentsFromDB();
+          renderDashboard();
+          openDashboard('pathway');
         } else {
-          // Server returned HTML (e.g. Netlify), fall through to localStorage
-          console.log("Backend returned non-JSON (Netlify static host), using permanent local storage.");
-        }
-      } catch (err) {
-        console.log("Backend API offline, using permanent local storage.");
-      }
-
-      // Re-load permanent students from localStorage to ensure we have latest data
-      loadPermanentStudents();
-
-      // Client-Side Permanent Fallback (localStorage)
-      const found = APP_DATA.students.find(s => s.id.toUpperCase() === regno);
-      if (found) {
-        // Verify password if recorded
-        if (found.password && password && found.password !== password) {
           if (alertBox) {
             alertBox.className = "auth-alert error";
-            alertBox.textContent = "⚠️ Incorrect password. Please enter the password you registered with.";
+            alertBox.textContent = "⚠️ " + (data.detail || "Invalid registration number or password.");
             alertBox.style.display = "block";
           }
-          return;
         }
-
-        if (alertBox) alertBox.style.display = "none";
-        state.currentStudent = found;
-        saveActiveUser(found.id);
-        savePermanentStudents();
-        initStudentPicker();
-        const picker = document.getElementById("user-select");
-        if (picker) picker.value = found.id;
-        renderDashboard();
-        openDashboard('pathway');
-      } else {
+      } catch (err) {
         if (alertBox) {
           alertBox.className = "auth-alert error";
-          alertBox.textContent = `⚠️ Register Number '${regno}' not found. Please click 'Sign Up' tab to create your account.`;
+          alertBox.textContent = "⚠️ Cannot connect to MongoDB Atlas backend server. Make sure port 8000 is running.";
           alertBox.style.display = "block";
         }
       }
     }
 
+    // 100% Pure MongoDB Atlas Sign Up via API
     async function handleStudentSignUp(e) {
       if (e) e.preventDefault();
       const name = document.getElementById("signup-name").value.trim();
       const regno = document.getElementById("signup-regno").value.trim().toUpperCase();
       const major = document.getElementById("signup-major").value.trim();
       const grad = document.getElementById("signup-grad").value.trim();
-      const pwd = document.getElementById("signup-password").value;
+      const password = document.getElementById("signup-password").value;
       const alertBox = document.getElementById("auth-alert-box");
 
       if (!name || !regno) return;
 
-      // Re-load from localStorage to check for duplicates across sessions
-      loadPermanentStudents();
-
-      const existing = APP_DATA.students.find(s => s.id.toUpperCase() === regno);
-      if (existing) {
-        if (alertBox) {
-          alertBox.className = "auth-alert error";
-          alertBox.textContent = `⚠️ Student '${regno}' is already registered in database. Please Sign In.`;
-          alertBox.style.display = "block";
-        }
-        return;
-      }
-
-      let newStudent = {
-        id: regno,
-        name: name,
-        password: pwd || "password123",
-        major: major || "Computer Science",
-        gpa: 3.75,
-        completed: ["CS101", "MATH101", "CS102", "MATH201", "PHYS101", "CS201", "CS250", "ENG101"],
-        planned: ["CS301", "CS302", "CS303", "CS350", "CS401", "CS402", "CS499"],
-        conflicts: [],
-        expected_grad: grad || "Spring 2027",
-        standing: "Good Standing"
-      };
-
-      // Try Backend MongoDB API
       try {
         const res = await fetch("/api/auth/signup", {
           method: "POST",
@@ -465,38 +397,31 @@
             regno: regno,
             major: major || "Computer Science",
             expected_grad: grad || "Spring 2027",
-            password: pwd
+            password: password || "password123"
           })
         });
-        const contentType = res.headers.get("content-type") || "";
-        if (contentType.includes("application/json")) {
-          const data = await res.json();
-          if (res.ok && data.student) {
-            newStudent = data.student;
-            // Ensure password is preserved
-            if (!newStudent.password) newStudent.password = pwd || "password123";
-          }
+        const data = await res.json();
+
+        if (res.ok && data.student) {
+          if (alertBox) alertBox.style.display = "none";
+          state.currentStudent = data.student;
+          await loadStudentsFromDB();
+          renderDashboard();
+          openDashboard('pathway');
         } else {
-          console.log("Backend returned non-JSON (Netlify static host), saving to permanent local storage.");
+          if (alertBox) {
+            alertBox.className = "auth-alert error";
+            alertBox.textContent = "⚠️ " + (data.detail || "Registration failed.");
+            alertBox.style.display = "block";
+          }
         }
       } catch (err) {
-        console.log("Backend offline, saving permanently to browser database.");
+        if (alertBox) {
+          alertBox.className = "auth-alert error";
+          alertBox.textContent = "⚠️ Backend offline. Please ensure the Python server is running on port 8000.";
+          alertBox.style.display = "block";
+        }
       }
-
-      APP_DATA.students.push(newStudent);
-      state.currentStudent = newStudent;
-      savePermanentStudents();
-      saveActiveUser(newStudent.id);
-      initStudentPicker();
-
-      if (alertBox) {
-        alertBox.className = "auth-alert success";
-        alertBox.textContent = `✅ Account '${regno}' created successfully! You are now logged in.`;
-        alertBox.style.display = "block";
-      }
-
-      renderDashboard();
-      openDashboard('pathway');
     }
 
     function openDashboard(tabName = 'pathway') {
@@ -508,10 +433,11 @@
     function signOut() {
       document.getElementById("dashboard-screen").style.display = "none";
       document.getElementById("landing-screen").style.display = "flex";
-      saveActiveUser("");
+      state.currentStudent = null;
       const alertBox = document.getElementById("auth-alert-box");
       if (alertBox) alertBox.style.display = "none";
     }
   </script>
 </body>
 </html>
+
