@@ -341,17 +341,12 @@ window.addEventListener("DOMContentLoaded", async () => {
   initAuditorOptions();
   initThreeJSAnimations();
 
-  const user = getActiveUser();
-  if (user) {
-    showDashboard();
-  } else {
-    document.getElementById("landing-screen").style.display = "flex";
-    document.getElementById("dashboard-screen").style.display = "none";
-  }
+  document.getElementById("landing-screen").style.display = "flex";
+  document.getElementById("dashboard-screen").style.display = "none";
 });
 
 // ==========================================================================
-// PREMIUM 3D THREE.JS LANDING HERO COSMOS ENGINE
+// 3D THREE.JS ANIMATION ENGINE (Matches User Screenshot)
 // ==========================================================================
 
 function initThreeJSAnimations() {
@@ -365,143 +360,78 @@ function initLanding3D() {
 
   const scene = new THREE.Scene();
   const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
-  camera.position.set(0, 0, 20);
+  camera.position.z = 28;
 
   const renderer = new THREE.WebGLRenderer({ canvas: canvas, alpha: true, antialias: true });
   renderer.setSize(window.innerWidth, window.innerHeight);
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
-  // --- Main 3D Diagram Group (Positioned in Left Hero Area) ---
-  const heroGroup = new THREE.Group();
-  heroGroup.position.set(window.innerWidth > 960 ? -6.2 : 0, 0.4, 0);
-  scene.add(heroGroup);
+  // --- 1. Morphing 3D Neural Sphere Geometry ---
+  const sphereGeo = new THREE.IcosahedronGeometry(8.5, 3);
+  const origPositions = sphereGeo.attributes.position.clone();
 
-  // 1. Central Morphing Geodesic Neural Lattice Core
-  const coreRadius = 4.2;
-  const coreGeo = new THREE.IcosahedronGeometry(coreRadius, 3);
-  const origPositions = coreGeo.attributes.position.clone();
+  // Create Diagram Group to offset to left side behind typography
+  const diagramGroup = new THREE.Group();
+  diagramGroup.position.x = window.innerWidth > 960 ? -8.5 : 0;
+  diagramGroup.position.y = 0;
+  scene.add(diagramGroup);
 
-  const coreWireMat = new THREE.MeshBasicMaterial({
+  // Outer Glowing Wireframe Sphere (Cyan)
+  const wireMat = new THREE.MeshBasicMaterial({
     color: 0x38bdf8,
     wireframe: true,
     transparent: true,
-    opacity: 0.65
+    opacity: 0.45
   });
-  const coreMesh = new THREE.Mesh(coreGeo, coreWireMat);
-  heroGroup.add(coreMesh);
+  const wireMesh = new THREE.Mesh(sphereGeo, wireMat);
+  diagramGroup.add(wireMesh);
 
-  // Glowing Neural Node Points at Vertices
+  // Glowing Vertex Particles (Emerald Cyan)
   const pointMat = new THREE.PointsMaterial({
     color: 0x34d399,
     size: 0.35,
     transparent: true,
     opacity: 0.95
   });
-  const pointMesh = new THREE.Points(coreGeo, pointMat);
-  heroGroup.add(pointMesh);
+  const pointMesh = new THREE.Points(sphereGeo, pointMat);
+  diagramGroup.add(pointMesh);
 
-  // Inner Glowing Hologram Octahedron
-  const innerGeo = new THREE.OctahedronGeometry(2.4, 1);
-  const innerMat = new THREE.MeshBasicMaterial({
-    color: 0xa855f7,
-    wireframe: true,
-    transparent: true,
-    opacity: 0.55
-  });
-  const innerMesh = new THREE.Mesh(innerGeo, innerMat);
-  heroGroup.add(innerMesh);
-
-  // 2. Nested Dual Quantum Orbit Rings
-  const knotGeo1 = new THREE.TorusGeometry(3.2, 0.08, 16, 80);
-  const knotMat1 = new THREE.MeshBasicMaterial({
+  // --- 2. Inner Glowing Core Torus Knot (Lavender Purple) ---
+  const torusGeo = new THREE.TorusKnotGeometry(4.2, 1.1, 80, 16);
+  const torusMat = new THREE.MeshBasicMaterial({
     color: 0x818cf8,
     wireframe: true,
     transparent: true,
-    opacity: 0.45
+    opacity: 0.28
   });
-  const knotMesh1 = new THREE.Mesh(knotGeo1, knotMat1);
-  knotMesh1.rotation.x = Math.PI / 4;
-  heroGroup.add(knotMesh1);
+  const torusMesh = new THREE.Mesh(torusGeo, torusMat);
+  diagramGroup.add(torusMesh);
 
-  const ringGeo2 = new THREE.TorusGeometry(4.8, 0.06, 16, 80);
-  const ringMat2 = new THREE.MeshBasicMaterial({
-    color: 0x22d3ee,
-    wireframe: true,
-    transparent: true,
-    opacity: 0.4
-  });
-  const ringMesh2 = new THREE.Mesh(ringGeo2, ringMat2);
-  ringMesh2.rotation.y = Math.PI / 3;
-  heroGroup.add(ringMesh2);
-
-  // 3. Five Orbiting Departmental Knowledge Satellites
-  const satellitesGroup = new THREE.Group();
-  heroGroup.add(satellitesGroup);
-
-  const satelliteDefs = [
-    { label: "Core CS", r: 6.2, speed: 0.75, color: 0x38bdf8, size: 0.55 },
-    { label: "AI & ML", r: 7.4, speed: -0.55, color: 0x34d399, size: 0.65 },
-    { label: "Math DAG", r: 5.8, speed: 0.95, color: 0x818cf8, size: 0.5 },
-    { label: "Systems", r: 7.0, speed: -0.85, color: 0xfbbf24, size: 0.52 },
-    { label: "Capstone", r: 8.2, speed: 0.45, color: 0xf87171, size: 0.6 }
-  ];
-
-  const satelliteMeshes = [];
-  satelliteDefs.forEach((def, i) => {
-    // Satellite Sphere
-    const sGeo = new THREE.IcosahedronGeometry(def.size, 2);
-    const sMat = new THREE.MeshBasicMaterial({ color: def.color, wireframe: true, transparent: true, opacity: 0.85 });
-    const sMesh = new THREE.Mesh(sGeo, sMat);
-    sMesh.userData = def;
-
-    // Glowing core point inside satellite
-    const pGeo = new THREE.SphereGeometry(def.size * 0.35, 8, 8);
-    const pMat = new THREE.MeshBasicMaterial({ color: 0xffffff });
-    const pMesh = new THREE.Mesh(pGeo, pMat);
-    sMesh.add(pMesh);
-
-    satellitesGroup.add(sMesh);
-    satelliteMeshes.push(sMesh);
-
-    // Orbital Path Ring Trace
-    const orbitRingGeo = new THREE.RingGeometry(def.r - 0.03, def.r + 0.03, 64);
-    const orbitRingMat = new THREE.MeshBasicMaterial({
-      color: def.color,
-      side: THREE.DoubleSide,
-      transparent: true,
-      opacity: 0.16
-    });
-    const orbitRingMesh = new THREE.Mesh(orbitRingGeo, orbitRingMat);
-    orbitRingMesh.rotation.x = Math.PI / 2 + (i * 0.25 - 0.5);
-    orbitRingMesh.rotation.y = (i * 0.18 - 0.3);
-    heroGroup.add(orbitRingMesh);
-  });
-
-  // 4. Connecting Laser Data Beams between Core & Satellites
-  const laserLinesGeo = new THREE.BufferGeometry();
-  const laserPositions = new Float32Array(satelliteDefs.length * 6);
-  laserLinesGeo.setAttribute("position", new THREE.BufferAttribute(laserPositions, 3));
-  const laserMat = new THREE.LineBasicMaterial({ color: 0x38bdf8, transparent: true, opacity: 0.45 });
-  const laserLines = new THREE.LineSegments(laserLinesGeo, laserMat);
-  heroGroup.add(laserLines);
-
-  // 5. Ambient Floating Cosmic Particle Field (300 Particles)
-  const partCount = 300;
+  // --- 3. Ambient Floating Particle Constellation ---
+  const partCount = 180;
   const partGeo = new THREE.BufferGeometry();
   const partPos = new Float32Array(partCount * 3);
 
   for (let i = 0; i < partCount * 3; i += 3) {
-    partPos[i] = (Math.random() - 0.5) * 60;
-    partPos[i + 1] = (Math.random() - 0.5) * 45;
-    partPos[i + 2] = (Math.random() - 0.5) * 35;
+    partPos[i] = (Math.random() - 0.5) * 70;
+    partPos[i + 1] = (Math.random() - 0.5) * 50;
+    partPos[i + 2] = (Math.random() - 0.5) * 40;
   }
   partGeo.setAttribute("position", new THREE.BufferAttribute(partPos, 3));
-  const outerCloudMat = new THREE.PointsMaterial({ color: 0x60a5fa, size: 0.25, transparent: true, opacity: 0.7 });
-  const outerCloud = new THREE.Points(partGeo, outerCloudMat);
+  
+  const outerMat = new THREE.PointsMaterial({
+    color: 0x60a5fa,
+    size: 0.25,
+    transparent: true,
+    opacity: 0.7
+  });
+  const outerCloud = new THREE.Points(partGeo, outerMat);
   scene.add(outerCloud);
 
-  // Mouse Interaction (Parallax & Depth Tilt)
-  let mouseX = 0, mouseY = 0, targetX = 0, targetY = 0;
+  // Mouse Interaction (Parallax & Tilt)
+  let mouseX = 0, mouseY = 0;
+  let targetX = 0, targetY = 0;
+
   window.addEventListener("mousemove", (e) => {
     mouseX = (e.clientX - window.innerWidth / 2) * 0.0012;
     mouseY = (e.clientY - window.innerHeight / 2) * 0.0012;
@@ -511,60 +441,43 @@ function initLanding3D() {
     camera.aspect = window.innerWidth / window.innerHeight;
     camera.updateProjectionMatrix();
     renderer.setSize(window.innerWidth, window.innerHeight);
-    heroGroup.position.set(window.innerWidth > 960 ? -6.2 : 0, 0.4, 0);
+    diagramGroup.position.x = window.innerWidth > 960 ? -8.5 : 0;
   });
 
-  // Animation Loop with Real-Time Wave Morphing & Satellite Orbits
+  // Animation Loop with Real-Time Vertex Wave Morphing
   let clock = new THREE.Clock();
+
   function animate() {
     requestAnimationFrame(animate);
     const elapsedTime = clock.getElapsedTime();
 
-    // Smooth Cursor Inertia
-    targetX += (mouseX - targetX) * 0.05;
-    targetY += (mouseY - targetY) * 0.05;
+    // Smooth Cursor Physics
+    targetX += (mouseX - targetX) * 0.06;
+    targetY += (mouseY - targetY) * 0.06;
 
-    coreMesh.rotation.y = elapsedTime * 0.15 + targetX * 1.4;
-    coreMesh.rotation.x = elapsedTime * 0.08 + targetY * 1.4;
-    pointMesh.rotation.y = coreMesh.rotation.y;
-    pointMesh.rotation.x = coreMesh.rotation.x;
+    wireMesh.rotation.y = elapsedTime * 0.15 + targetX * 1.5;
+    wireMesh.rotation.x = elapsedTime * 0.08 + targetY * 1.5;
+    pointMesh.rotation.y = wireMesh.rotation.y;
+    pointMesh.rotation.x = wireMesh.rotation.x;
 
-    innerMesh.rotation.y = -elapsedTime * 0.25;
-    innerMesh.rotation.z = elapsedTime * 0.18;
+    torusMesh.rotation.y = -elapsedTime * 0.25 + targetX;
+    torusMesh.rotation.x = -elapsedTime * 0.15 + targetY;
 
-    knotMesh1.rotation.z = elapsedTime * 0.12;
-    ringMesh2.rotation.x = elapsedTime * 0.1;
+    outerCloud.rotation.y = -elapsedTime * 0.03;
 
-    outerCloud.rotation.y = -elapsedTime * 0.025;
-
-    // Organic Wave Vertex Pulsing on Icosahedron Core
-    const pos = coreGeo.attributes.position;
+    // Organic Wave Vertex Pulsing
+    const pos = sphereGeo.attributes.position;
     for (let i = 0; i < pos.count; i++) {
       const u = origPositions.getX(i);
       const v = origPositions.getY(i);
       const w = origPositions.getZ(i);
-      const wave = Math.sin(elapsedTime * 2.5 + u * 0.6 + v * 0.6) * 0.35;
-      const factor = 1 + wave / 7.5;
+
+      const wave = Math.sin(elapsedTime * 2.5 + u * 0.5 + v * 0.5) * 0.45;
+      const factor = 1 + wave / 9;
+
       pos.setXYZ(i, u * factor, v * factor, w * factor);
     }
     pos.needsUpdate = true;
-
-    // Satellite Elliptical Orbital Motion & Laser Beams
-    const laserAttr = laserLinesGeo.attributes.position;
-    satelliteMeshes.forEach((sMesh, i) => {
-      const u = sMesh.userData;
-      const angle = elapsedTime * 0.38 * u.speed;
-      sMesh.position.x = Math.cos(angle) * u.r;
-      sMesh.position.z = Math.sin(angle) * u.r;
-      sMesh.position.y = Math.sin(angle * 2.0) * 1.8;
-      sMesh.rotation.y += 0.03;
-
-      // Update laser lines connecting center (0,0,0) to satellite position
-      const offset = i * 6;
-      laserAttr.setXYZ(offset, 0, 0, 0);
-      laserAttr.setXYZ(offset + 1, sMesh.position.x, sMesh.position.y, sMesh.position.z);
-    });
-    laserAttr.needsUpdate = true;
 
     renderer.render(scene, camera);
   }
