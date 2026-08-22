@@ -335,6 +335,13 @@ function signOut() {
   initLanding3D();
 }
 
+window.showDashboard = showDashboard;
+window.openDashboard = showDashboard;
+window.signOut = signOut;
+window.handleStudentLogin = handleStudentLogin;
+window.handleStudentSignUp = handleStudentSignUp;
+window.setAuthMode = setAuthMode;
+
 window.addEventListener("DOMContentLoaded", async () => {
   await loadBackendData();
   initChatInput();
