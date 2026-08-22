@@ -203,33 +203,30 @@ def advisor_chat(req: ChatRequest):
             prompt = (
                 "You are an expert Academic AI Advisor specializing in degree sequencing, prerequisite validation, and university policies.\n"
                 "Ground your answers using official institutional standards. Include specific course codes and formal section citations like [Course Catalog §4.2] or [Academic Policy §2.1].\n\n"
-                f"--- OFFICIAL UNIVERSITY POLICY TEXT ---\n{policy_doc[:3500]}\n\n"
+                f"--- OFFICIAL UNIVERSITY POLICY TEXT ---\n{policy_doc[:4000]}\n\n"
                 f"--- STUDENT PROFILE ---\n{student_ctx}\n\n"
                 f"--- STUDENT QUESTION ---\n{req.question}\n\n"
-                "Provide a clear, structured, encouraging, and policy-grounded academic advising response with exact section citations:"
+                "Provide a personalized, insightful, well-structured academic advising response answering the student's question directly with exact policy citations and actionable next steps:"
             )
-            # Try fast model
-            try:
-                response = client.models.generate_content(
-                    model="gemini-2.5-flash",
-                    contents=prompt
-                )
-                reply = response.text
-            except Exception:
-                response = client.models.generate_content(
-                    model="gemini-1.5-flash",
-                    contents=prompt
-                )
+            response = client.models.generate_content(
+                model="gemini-3.6-flash",
+                contents=prompt
+            )
+            if response and response.text:
                 reply = response.text
             
             # Extract citations from reply or add defaults
             citations = ["[Course Catalog 2026, §4.2]", "[Academic Regulation §1.1]"]
-            if "§1.2" in reply or "waiver" in req.question.lower():
+            if "§1.2" in reply or "waiver" in req.question.lower() or "petition" in req.question.lower():
                 citations.append("[Policy §1.2: Prerequisite Waivers]")
-            if "§2.1" in reply or "substitut" in req.question.lower():
+            if "§1.3" in reply or "grade" in req.question.lower():
+                citations.append("[Policy §1.3: Minimum Grade Thresholds]")
+            if "§2.1" in reply or "substitut" in req.question.lower() or "equivalent" in req.question.lower():
                 citations.append("[Policy §2.1: Course Equivalencies]")
             if "§5.2" in reply or "overload" in req.question.lower() or "credit" in req.question.lower():
                 citations.append("[Policy §5.2: Credit Overload Limits]")
+            if "§6.1" in reply or "graduat" in req.question.lower():
+                citations.append("[Policy §6.1: Degree Audit Clearance]")
         except Exception as e:
             print(f"[WARN] Gemini API error ({e}), using Graph-RAG deterministic fallback.")
 
