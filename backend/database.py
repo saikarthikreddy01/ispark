@@ -19,6 +19,7 @@ DATA_DIR = Path(__file__).resolve().parent.parent / "data"
 
 class MongoDBManager:
     def __init__(self):
+        self.fallback_file = DATA_DIR / "persistent_db.json"
         self.client = None
         self.db = None
         self.is_connected = False
@@ -198,6 +199,57 @@ class MongoDBManager:
             json.dump(db_data, f, indent=2)
         return self._normalize_student(student_data)
 
+    def update_student(self, student_id: str, update_data: Dict) -> Optional[Dict]:
+        self.ensure_connected()
+        student_id = student_id.upper()
+        if "id" in update_data:
+            update_data["id"] = update_data["id"].upper()
+        if self.is_connected and self.db is not None:
+            try:
+                self.db.students.update_one(
+                    {"$or": [
+                        {"id": {"$regex": f"^{student_id}$", "$options": "i"}},
+                        {"student_id": {"$regex": f"^{student_id}$", "$options": "i"}}
+                    ]},
+                    {"$set": update_data}
+                )
+                return self.get_student_by_id(student_id)
+            except Exception:
+                self.is_connected = False
+        with open(self.fallback_file, "r", encoding="utf-8") as f:
+            db_data = json.load(f)
+        for s in db_data.get("students", []):
+            if s.get("id", "").upper() == student_id or s.get("student_id", "").upper() == student_id:
+                s.update(update_data)
+                with open(self.fallback_file, "w", encoding="utf-8") as f:
+                    json.dump(db_data, f, indent=2)
+                return self._normalize_student(s)
+        return None
+
+    def delete_student(self, student_id: str) -> bool:
+        self.ensure_connected()
+        student_id = student_id.upper()
+        if self.is_connected and self.db is not None:
+            try:
+                res = self.db.students.delete_one({
+                    "$or": [
+                        {"id": {"$regex": f"^{student_id}$", "$options": "i"}},
+                        {"student_id": {"$regex": f"^{student_id}$", "$options": "i"}}
+                    ]
+                })
+                return res.deleted_count > 0
+            except Exception:
+                self.is_connected = False
+        with open(self.fallback_file, "r", encoding="utf-8") as f:
+            db_data = json.load(f)
+        initial_count = len(db_data.get("students", []))
+        db_data["students"] = [s for s in db_data.get("students", []) if s.get("id", "").upper() != student_id and s.get("student_id", "").upper() != student_id]
+        if len(db_data["students"]) < initial_count:
+            with open(self.fallback_file, "w", encoding="utf-8") as f:
+                json.dump(db_data, f, indent=2)
+            return True
+        return False
+
     # --- Course Operations ---
     def get_all_courses(self) -> List[Dict]:
         self.ensure_connected()
@@ -208,6 +260,184 @@ class MongoDBManager:
                 self.is_connected = False
         with open(self.fallback_file, "r", encoding="utf-8") as f:
             return json.load(f).get("courses", [])
+
+    def get_course_by_id(self, course_id: str) -> Optional[Dict]:
+        self.ensure_connected()
+        course_id = course_id.upper()
+        if self.is_connected and self.db is not None:
+            try:
+                return self.db.courses.find_one({"id": {"$regex": f"^{course_id}$", "$options": "i"}}, {"_id": 0})
+            except Exception:
+                self.is_connected = False
+        courses = self.get_all_courses()
+        for c in courses:
+            if c.get("id", "").upper() == course_id:
+                return c
+        return None
+
+    def create_course(self, course_data: Dict) -> Dict:
+        self.ensure_connected()
+        course_data["id"] = course_data.get("id", "").upper()
+        if self.is_connected and self.db is not None:
+            try:
+                self.db.courses.update_one(
+                    {"id": course_data["id"]},
+                    {"$set": course_data},
+                    upsert=True
+                )
+                return course_data
+            except Exception:
+                self.is_connected = False
+        with open(self.fallback_file, "r", encoding="utf-8") as f:
+            db_data = json.load(f)
+        db_data.setdefault("courses", [])
+        db_data["courses"] = [c for c in db_data["courses"] if c.get("id", "").upper() != course_data["id"]]
+        db_data["courses"].append(course_data)
+        with open(self.fallback_file, "w", encoding="utf-8") as f:
+            json.dump(db_data, f, indent=2)
+        return course_data
+
+    def update_course(self, course_id: str, update_data: Dict) -> Optional[Dict]:
+        self.ensure_connected()
+        course_id = course_id.upper()
+        if "id" in update_data:
+            update_data["id"] = update_data["id"].upper()
+        if self.is_connected and self.db is not None:
+            try:
+                self.db.courses.update_one(
+                    {"id": {"$regex": f"^{course_id}$", "$options": "i"}},
+                    {"$set": update_data}
+                )
+                return self.get_course_by_id(course_id)
+            except Exception:
+                self.is_connected = False
+        with open(self.fallback_file, "r", encoding="utf-8") as f:
+            db_data = json.load(f)
+        for c in db_data.get("courses", []):
+            if c.get("id", "").upper() == course_id:
+                c.update(update_data)
+                with open(self.fallback_file, "w", encoding="utf-8") as f:
+                    json.dump(db_data, f, indent=2)
+                return c
+        return None
+
+    def delete_course(self, course_id: str) -> bool:
+        self.ensure_connected()
+        course_id = course_id.upper()
+        if self.is_connected and self.db is not None:
+            try:
+                res = self.db.courses.delete_one({"id": {"$regex": f"^{course_id}$", "$options": "i"}})
+                return res.deleted_count > 0
+            except Exception:
+                self.is_connected = False
+        with open(self.fallback_file, "r", encoding="utf-8") as f:
+            db_data = json.load(f)
+        initial = len(db_data.get("courses", []))
+        db_data["courses"] = [c for c in db_data.get("courses", []) if c.get("id", "").upper() != course_id]
+        if len(db_data["courses"]) < initial:
+            with open(self.fallback_file, "w", encoding="utf-8") as f:
+                json.dump(db_data, f, indent=2)
+            return True
+        return False
+
+    # --- Course Equivalency Operations ---
+    def get_equivalencies(self) -> List[Dict]:
+        self.ensure_connected()
+        if self.is_connected and self.db is not None:
+            try:
+                doc = self.db.equivalencies.find_one({"_id": "course_equivalencies"})
+                if doc and "data" in doc:
+                    return doc["data"]
+            except Exception:
+                self.is_connected = False
+        with open(self.fallback_file, "r", encoding="utf-8") as f:
+            return json.load(f).get("equivalencies", [])
+
+    def create_equivalency(self, equiv_data: Dict) -> Dict:
+        self.ensure_connected()
+        equiv_data["course_id"] = equiv_data.get("course_id", "").upper()
+        equiv_data["equivalent_course_id"] = equiv_data.get("equivalent_course_id", "").upper()
+        equivs = self.get_equivalencies()
+        equivs = [eq for eq in equivs if not (eq.get("course_id") == equiv_data["course_id"] and eq.get("equivalent_course_id") == equiv_data["equivalent_course_id"])]
+        equivs.append(equiv_data)
+        if self.is_connected and self.db is not None:
+            try:
+                self.db.equivalencies.update_one(
+                    {"_id": "course_equivalencies"},
+                    {"$set": {"data": equivs}},
+                    upsert=True
+                )
+                return equiv_data
+            except Exception:
+                self.is_connected = False
+        if self.fallback_file and self.fallback_file.exists():
+            with open(self.fallback_file, "r", encoding="utf-8") as f:
+                db_data = json.load(f)
+            db_data["equivalencies"] = equivs
+            with open(self.fallback_file, "w", encoding="utf-8") as f:
+                json.dump(db_data, f, indent=2)
+        return equiv_data
+
+    def delete_equivalency(self, course_id: str, equiv_course_id: str) -> bool:
+        self.ensure_connected()
+        course_id = course_id.upper()
+        equiv_course_id = equiv_course_id.upper()
+        equivs = self.get_equivalencies()
+        new_equivs = [eq for eq in equivs if not (eq.get("course_id") == course_id and eq.get("equivalent_course_id") == equiv_course_id)]
+        if len(new_equivs) == len(equivs):
+            return False
+        if self.is_connected and self.db is not None:
+            try:
+                self.db.equivalencies.update_one(
+                    {"_id": "course_equivalencies"},
+                    {"$set": {"data": new_equivs}},
+                    upsert=True
+                )
+                return True
+            except Exception:
+                self.is_connected = False
+        if self.fallback_file and self.fallback_file.exists():
+            with open(self.fallback_file, "r", encoding="utf-8") as f:
+                db_data = json.load(f)
+            db_data["equivalencies"] = new_equivs
+            with open(self.fallback_file, "w", encoding="utf-8") as f:
+                json.dump(db_data, f, indent=2)
+        return True
+
+    # --- Department Dean & Admin Aggregated Analytics ---
+    def get_admin_stats(self) -> Dict:
+        self.ensure_connected()
+        students = self.get_all_students()
+        courses = self.get_all_courses()
+        petitions = self.get_all_petitions()
+        
+        total_students = len(students)
+        total_courses = len(courses)
+        pending_petitions = len([p for p in petitions if p.get("status", "PENDING").upper() == "PENDING"])
+        approved_petitions = len([p for p in petitions if p.get("status").upper() == "APPROVED"])
+        
+        at_risk_students = 0
+        gpas = []
+        for s in students:
+            gpa = s.get("gpa", 3.0)
+            gpas.append(gpa)
+            if gpa < 2.5 or s.get("standing") == "Probation" or len(s.get("conflicts", [])) > 0:
+                at_risk_students += 1
+                
+        avg_gpa = round(sum(gpas) / len(gpas), 2) if gpas else 3.5
+
+        return {
+            "total_students": total_students,
+            "total_courses": total_courses,
+            "pending_petitions": pending_petitions,
+            "approved_petitions": approved_petitions,
+            "total_petitions": len(petitions),
+            "at_risk_students": at_risk_students,
+            "average_gpa": avg_gpa,
+            "institution": "VFSTR (Deemed to be University)",
+            "department": "Computer Science & Engineering",
+            "regulation": "C24 Regulation (160 Credits)"
+        }
 
     # --- Petition Operations & Faculty Governance ---
     def get_all_petitions(self) -> List[Dict]:

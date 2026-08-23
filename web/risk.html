@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Graduation Risk | Academic Advisor</title>
+  <link rel="stylesheet" href="portal.css">
+</head>
+<body data-page="risk">
+
+  <!-- Top Application Navigation Header -->
+  <header class="appbar">
+    <nav class="nav">
+      <!-- Shared navigation items injected at runtime -->
+    </nav>
+    <div class="userbar">
+      <!-- Active user controls and authorization state -->
+    </div>
+  </header>
+
+  <!-- Central Interface Layout -->
+  <main class="page">
+    <div class="page-head">
+      <div>
+        <span class="eyebrow">06 &middot; Critical path</span>
+        <h1>Graduation risk</h1>
+        <p>See what may delay graduation and which prerequisite bottlenecks deserve attention first.</p>
+      </div>
+    </div>
+
+    <!-- Dynamic Risk Alerts and Summary Indicators -->
+    <div data-summary></div>
+
+    <!-- Active Analytics Visualization Workspace -->
+    <section class="panel" data-output>
+      <div class="empty">Calculating risk&hellip;</div>
+    </section>
+  </main>
+
+  <!-- Global Context Status Alerts -->
+  <div id="toast"></div>
+
+  <!-- Operational Lifecycle Configurations -->
+  <script src="portal.js"></script>
+  <script src="feature.js"></script>
+</body>
+</html>

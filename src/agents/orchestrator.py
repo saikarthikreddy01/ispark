@@ -65,16 +65,16 @@ class AcademicAdvisor:
 
     def classify_query(self, query: str) -> str:
         q = query.lower()
-        if any(k in q for k in ["prereq", "require", "eligible", "can i take", "enroll"]):
-            return "prerequisite"
+        if any(k in q for k in ["substitute", "instead of", "equivalent", "alternative"]):
+            return "substitution"
         elif any(k in q for k in ["pathway", "plan", "roadmap", "schedule", "semesters"]):
             return "pathway"
-        elif any(k in q for k in ["risk", "graduate", "ontime", "delay", "standing", "probation"]):
+        elif any(k in q for k in ["risk", "delay", "standing", "probation"]):
             return "risk"
-        elif any(k in q for k in ["substitute", "instead of", "equivalent", "alternative"]):
-            return "substitution"
-        elif any(k in q for k in ["policy", "waiver", "transfer", "repeat", "gpa", "credit limit"]):
+        elif any(k in q for k in ["policy", "waiver", "transfer", "repeat", "credit limit"]):
             return "policy"
+        elif any(k in q for k in ["prereq", "require", "eligible", "can i take", "enroll"]):
+            return "prerequisite"
         return "general"
 
     def chat_sync(self, message: str, student=None) -> dict:

@@ -153,19 +153,41 @@
 
 ## 📡 REST API Reference
 
+### 🎓 Student & Curriculum Endpoints
 | Method | Endpoint | Description |
 |---|---|---|
-| GET | /api/courses | Returns all 82 C24 courses with full syllabus details |
-| GET | /api/courses/{course_id} | Returns single course syllabus (modules, labs, COs, books) |
-| GET | /api/curriculum | Returns 8-semester sequence, electives, honours, minors, requirements |
-| GET | /api/equivalencies | Returns approved course equivalency mappings |
-| POST | /api/auth/login | Student login authentication |
-| POST | /api/auth/signup | New student registration and transcript creation |
-| GET | /api/students/{id} | Fetches student profile, transcript, and GPA |
-| POST | /api/pathway/generate | Generates optimal topological 8-semester graduation pathway |
-| POST | /api/audit/verify | Formal constraint verification (prerequisites, overload, term offerings) |
-| GET | /api/bottlenecks/{id} | Calculates critical blocking courses & Graduation Risk Index |
-| POST | /api/chat | Citation-grounded Graph-RAG AI advising assistant |
+| `GET` | `/api/courses` | Returns all 82 C24 courses with full syllabus details |
+| `GET` | `/api/courses/{course_id}` | Returns single course syllabus (modules, labs, COs, books) |
+| `GET` | `/api/curriculum` | Returns 8-semester sequence, electives, honours, minors, requirements |
+| `GET` | `/api/equivalencies` | Returns approved course equivalency mappings |
+| `POST` | `/api/auth/login` | Student login authentication |
+| `POST` | `/api/auth/signup` | New student registration and transcript creation |
+| `GET` | `/api/students/{id}` | Fetches student profile, transcript, and GPA |
+| `POST` | `/api/pathway/generate` | Generates optimal topological 8-semester graduation pathway |
+| `POST` | `/api/audit/verify` | Formal constraint verification (prerequisites, overload, term offerings) |
+| `GET` | `/api/bottlenecks/{id}` | Calculates critical blocking courses & Graduation Risk Index |
+| `POST` | `/api/chat` | Citation-grounded Graph-RAG AI advising assistant |
+| `POST` | `/api/petitions/submit` | Submit prerequisite waiver or credit overload petition |
+
+### 👑 Faculty & Admin Governance Endpoints
+| Method | Endpoint | Description |
+|---|---|---|
+| `POST` | `/api/admin/login` | Admin & Faculty authentication (`admin` / `admin123`) |
+| `GET` | `/api/admin/stats` | Dean's overview KPIs (total students, courses, at-risk, avg GPA) |
+| `GET` | `/api/admin/students` | List all students with search & filter |
+| `POST` | `/api/admin/students` | Register new student profile into database |
+| `PUT` | `/api/admin/students/{id}` | Update student GPA, standing, and transcript |
+| `DELETE` | `/api/admin/students/{id}` | Delete student record |
+| `GET` | `/api/admin/courses` | List all courses in catalog |
+| `POST` | `/api/admin/courses` | Add new course or elective to catalog |
+| `PUT` | `/api/admin/courses/{id}` | Edit course syllabus, L-T-P-C, and prerequisites |
+| `DELETE` | `/api/admin/courses/{id}` | Remove course from catalog |
+| `GET` | `/api/admin/petitions` | List all student exception & waiver requests |
+| `POST` | `/api/petitions/{id}/review` | Issue official Dean decision with digital signature stamp |
+| `GET` | `/api/admin/equivalencies` | List all approved course substitution rules |
+| `POST` | `/api/admin/equivalencies` | Create new course substitution rule |
+| `DELETE` | `/api/admin/equivalencies/{c_id}/{sub_id}` | Remove course substitution rule |
+| `GET` | `/api/admin/bottlenecks` | Department-wide bottleneck impact & student delay ranking |
 
 ---
 

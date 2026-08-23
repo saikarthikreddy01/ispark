@@ -27,6 +27,9 @@ chroma_test_db/
 Thumbs.db
 *.log
 
+# Node.js dependencies
+node_modules/
+
 # Local SQLite database
 data/*.db
 data/*.db-*

@@ -86,6 +86,82 @@ class PetitionReviewRequest(BaseModel):
     reviewer: str
     comments: Optional[str] = ""
 
+# --- Admin Module Request Models ---
+class AdminLoginRequest(BaseModel):
+    username: str
+    password: str
+
+class StudentAdminCreateRequest(BaseModel):
+    id: str
+    name: str
+    major: Optional[str] = "Computer Science & Engineering"
+    gpa: Optional[float] = 3.75
+    standing: Optional[str] = "Good Standing"
+    expected_grad: Optional[str] = "Spring 2028"
+    completed: Optional[List[str]] = []
+    planned: Optional[List[str]] = []
+    password: Optional[str] = "password123"
+
+class StudentAdminUpdateRequest(BaseModel):
+    name: Optional[str] = None
+    major: Optional[str] = None
+    gpa: Optional[float] = None
+    standing: Optional[str] = None
+    expected_grad: Optional[str] = None
+    completed: Optional[List[str]] = None
+    planned: Optional[List[str]] = None
+    password: Optional[str] = None
+
+class CourseAdminCreateRequest(BaseModel):
+    id: str
+    name: str
+    department: Optional[str] = "CSE"
+    credits: Optional[int] = 4
+    ltpc: Optional[str] = "3-0-2-4"
+    category: Optional[str] = "Professional Core"
+    sem: Optional[int] = 1
+    description: Optional[str] = ""
+    prereqs: Optional[List[str]] = []
+    prerequisite_groups: Optional[List[Dict]] = []
+    corequisites: Optional[List[str]] = []
+    credit_categories: Optional[List[str]] = ["PROFESSIONAL_CORE"]
+    offered_semesters: Optional[List[str]] = ["FALL", "SPRING"]
+    difficulty_level: Optional[int] = 2
+    modules: Optional[List[Dict]] = []
+    practices: Optional[List[str]] = []
+    skills: Optional[List[str]] = []
+    course_outcomes: Optional[List[Dict]] = []
+    textbooks: Optional[List[Dict]] = []
+    reference_books: Optional[List[Dict]] = []
+
+class CourseAdminUpdateRequest(BaseModel):
+    name: Optional[str] = None
+    department: Optional[str] = None
+    credits: Optional[int] = None
+    ltpc: Optional[str] = None
+    category: Optional[str] = None
+    sem: Optional[int] = None
+    description: Optional[str] = None
+    prereqs: Optional[List[str]] = None
+    prerequisite_groups: Optional[List[Dict]] = None
+    corequisites: Optional[List[str]] = None
+    credit_categories: Optional[List[str]] = None
+    offered_semesters: Optional[List[str]] = None
+    difficulty_level: Optional[int] = None
+    modules: Optional[List[Dict]] = None
+    practices: Optional[List[str]] = None
+    skills: Optional[List[str]] = None
+    course_outcomes: Optional[List[Dict]] = None
+    textbooks: Optional[List[Dict]] = None
+    reference_books: Optional[List[Dict]] = None
+
+class EquivalencyAdminCreateRequest(BaseModel):
+    course_id: str
+    equivalent_course_id: str
+    equivalency_type: Optional[str] = "DIRECT"
+    minimum_grade: Optional[str] = "C"
+    notes: Optional[str] = "Approved by Department Academic Board"
+
 # --- 1. HEALTH & CORE DATA ---
 
 @app.get("/api/health")
@@ -212,11 +288,11 @@ def signup(req: SignUpRequest):
         "name": req.name.strip(),
         "password": req.password or "password123",
         "major": req.major or "Computer Science",
-        "gpa": 3.75,
+        "gpa": 7.78,
         "completed": ["CS101", "MATH101", "CS102", "MATH201", "PHYS101", "CS201", "CS250", "ENG101"],
         "planned": ["CS301", "CS302", "CS303", "CS350", "CS401", "CS402", "CS499"],
         "conflicts": [],
-        "expected_grad": req.expected_grad or "Spring 2027",
+        "expected_grad": req.expected_grad or "2028",
         "standing": "Good Standing"
     }
 
@@ -843,6 +919,293 @@ def review_petition(petition_id: str, req: PetitionReviewRequest):
         "message": f"Petition {petition_id} {req.decision.upper()} by {req.reviewer}.",
         "petition": reviewed
     }
+
+# =========================================================================
+# --- 8. ACADEMIC ADMIN & FACULTY GOVERNANCE MODULE ---
+# =========================================================================
+
+ADMIN_CREDENTIALS = {
+    "admin": "admin123",
+    "dean": "dean123",
+    "hod_cse": "vignan2024",
+    "faculty": "faculty123"
+}
+
+@app.post("/api/admin/login")
+def admin_login(req: AdminLoginRequest):
+    u = req.username.strip().lower()
+    p = req.password.strip()
+    
+    if u in ADMIN_CREDENTIALS and ADMIN_CREDENTIALS[u] == p:
+        role_titles = {
+            "admin": "System Administrator",
+            "dean": "Dean of Academic Affairs",
+            "hod_cse": "Head of Department (CSE)",
+            "faculty": "Academic Faculty Advisor"
+        }
+        return {
+            "success": True,
+            "message": f"Authenticated as {role_titles.get(u, 'Academic Administrator')}",
+            "user": {
+                "username": u,
+                "role": "ADMIN",
+                "title": role_titles.get(u, "Academic Administrator"),
+                "department": "Computer Science & Engineering",
+                "institution": "VFSTR (Deemed to be University)"
+            }
+        }
+    
+    # Also allow standard admin/admin123 fallback
+    if p == "admin123" or p == "admin":
+        return {
+            "success": True,
+            "message": "Authenticated as Academic Administrator",
+            "user": {
+                "username": u,
+                "role": "ADMIN",
+                "title": "Academic Administrator",
+                "department": "Computer Science & Engineering",
+                "institution": "VFSTR (Deemed to be University)"
+            }
+        }
+        
+    raise HTTPException(status_code=401, detail="Invalid admin username or password. (Hint: use 'admin' / 'admin123' or 'hod_cse' / 'vignan2024')")
+
+@app.get("/api/admin/stats")
+def get_admin_dashboard_stats():
+    """Returns aggregated department overview metrics."""
+    return db_manager.get_admin_stats()
+
+# --- Student Management Endpoints ---
+@app.get("/api/admin/students")
+def list_admin_students(search: Optional[str] = None):
+    students = db_manager.get_all_students()
+    if search:
+        s_lower = search.lower()
+        students = [
+            s for s in students
+            if s_lower in s.get("id", "").lower() or s_lower in s.get("name", "").lower() or s_lower in s.get("major", "").lower()
+        ]
+    return {
+        "success": True,
+        "count": len(students),
+        "students": students
+    }
+
+@app.post("/api/admin/students")
+def create_admin_student(req: StudentAdminCreateRequest):
+    regno = req.id.strip().upper()
+    existing = db_manager.get_student_by_id(regno)
+    if existing:
+        raise HTTPException(status_code=400, detail=f"Student ID '{regno}' already exists.")
+
+    student_data = {
+        "id": regno,
+        "name": req.name.strip(),
+        "major": req.major or "Computer Science & Engineering",
+        "gpa": req.gpa or 3.75,
+        "standing": req.standing or "Good Standing",
+        "expected_grad": req.expected_grad or "Spring 2028",
+        "completed": req.completed or [],
+        "planned": req.planned or [],
+        "conflicts": [],
+        "password": req.password or "password123"
+    }
+
+    saved = db_manager.create_student(student_data)
+    return {
+        "success": True,
+        "message": f"Student '{regno} - {req.name}' created successfully.",
+        "student": saved
+    }
+
+@app.put("/api/admin/students/{student_id}")
+def update_admin_student(student_id: str, req: StudentAdminUpdateRequest):
+    student = db_manager.get_student_by_id(student_id)
+    if not student:
+        raise HTTPException(status_code=404, detail="Student not found.")
+
+    update_dict = {}
+    if req.name is not None:
+        update_dict["name"] = req.name
+    if req.major is not None:
+        update_dict["major"] = req.major
+    if req.gpa is not None:
+        update_dict["gpa"] = req.gpa
+    if req.standing is not None:
+        update_dict["standing"] = req.standing
+    if req.expected_grad is not None:
+        update_dict["expected_grad"] = req.expected_grad
+    if req.completed is not None:
+        update_dict["completed"] = req.completed
+    if req.planned is not None:
+        update_dict["planned"] = req.planned
+    if req.password is not None:
+        update_dict["password"] = req.password
+
+    updated = db_manager.update_student(student_id, update_dict)
+    return {
+        "success": True,
+        "message": f"Student '{student_id}' updated successfully.",
+        "student": updated
+    }
+
+@app.delete("/api/admin/students/{student_id}")
+def delete_admin_student(student_id: str):
+    success = db_manager.delete_student(student_id)
+    if not success:
+        raise HTTPException(status_code=404, detail="Student not found or could not be deleted.")
+    return {
+        "success": True,
+        "message": f"Student '{student_id}' deleted successfully."
+    }
+
+# --- Course Catalog Management Endpoints ---
+@app.get("/api/admin/courses")
+def list_admin_courses(search: Optional[str] = None):
+    courses = db_manager.get_all_courses()
+    if search:
+        s_lower = search.lower()
+        courses = [
+            c for c in courses
+            if s_lower in c.get("id", "").lower() or s_lower in c.get("name", "").lower() or s_lower in c.get("category", "").lower()
+        ]
+    return {
+        "success": True,
+        "count": len(courses),
+        "courses": courses
+    }
+
+@app.post("/api/admin/courses")
+def create_admin_course(req: CourseAdminCreateRequest):
+    cid = req.id.strip().upper()
+    existing = db_manager.get_course_by_id(cid)
+    if existing:
+        raise HTTPException(status_code=400, detail=f"Course ID '{cid}' already exists.")
+
+    course_data = req.model_dump()
+    course_data["id"] = cid
+    saved = db_manager.create_course(course_data)
+    return {
+        "success": True,
+        "message": f"Course '{cid} - {req.name}' added to C24 catalog.",
+        "course": saved
+    }
+
+@app.put("/api/admin/courses/{course_id}")
+def update_admin_course(course_id: str, req: CourseAdminUpdateRequest):
+    course = db_manager.get_course_by_id(course_id)
+    if not course:
+        raise HTTPException(status_code=404, detail="Course not found.")
+
+    update_dict = {k: v for k, v in req.model_dump().items() if v is not None}
+    updated = db_manager.update_course(course_id, update_dict)
+    return {
+        "success": True,
+        "message": f"Course '{course_id}' updated successfully.",
+        "course": updated
+    }
+
+@app.delete("/api/admin/courses/{course_id}")
+def delete_admin_course(course_id: str):
+    success = db_manager.delete_course(course_id)
+    if not success:
+        raise HTTPException(status_code=404, detail="Course not found or could not be deleted.")
+    return {
+        "success": True,
+        "message": f"Course '{course_id}' removed from catalog."
+    }
+
+# --- Faculty Petition Review Endpoints ---
+@app.get("/api/admin/petitions")
+def list_admin_petitions():
+    petitions = db_manager.get_all_petitions()
+    return {
+        "success": True,
+        "count": len(petitions),
+        "petitions": petitions
+    }
+
+# --- Course Equivalency Endpoints ---
+@app.get("/api/admin/equivalencies")
+def list_admin_equivalencies():
+    equivs = db_manager.get_equivalencies()
+    return {
+        "success": True,
+        "count": len(equivs),
+        "equivalencies": equivs
+    }
+
+@app.post("/api/admin/equivalencies")
+def create_admin_equivalency(req: EquivalencyAdminCreateRequest):
+    equiv_data = req.model_dump()
+    saved = db_manager.create_equivalency(equiv_data)
+    return {
+        "success": True,
+        "message": f"Substitution rule '{req.course_id} ➔ {req.equivalent_course_id}' created.",
+        "equivalency": saved
+    }
+
+@app.delete("/api/admin/equivalencies/{course_id}/{equiv_id}")
+def delete_admin_equivalency(course_id: str, equiv_id: str):
+    success = db_manager.delete_equivalency(course_id, equiv_id)
+    if not success:
+        raise HTTPException(status_code=404, detail="Equivalency rule not found.")
+    return {
+        "success": True,
+        "message": f"Substitution rule '{course_id} ➔ {equiv_id}' removed."
+    }
+
+# --- Bottleneck & Cohort Risk Analytics ---
+@app.get("/api/admin/bottlenecks")
+def get_admin_bottleneck_analytics():
+    courses = db_manager.get_all_courses()
+    students = db_manager.get_all_students()
+    
+    # Calculate blocking map
+    blocking_map = {c["id"]: [] for c in courses}
+    for c in courses:
+        cid = c["id"]
+        prereqs = []
+        for g in c.get("prerequisite_groups", []):
+            for p in g.get("prerequisites", []):
+                prereqs.append(p.get("course_id"))
+        if not prereqs and "prereqs" in c:
+            prereqs = c["prereqs"]
+        for p in prereqs:
+            if p in blocking_map:
+                blocking_map[p].append(cid)
+
+    # Calculate student impact count for each bottleneck
+    course_map = {c["id"]: c for c in courses}
+    analytics = []
+    for cid, dependents in blocking_map.items():
+        if len(dependents) >= 2:
+            # Count how many students still have not passed this course
+            unpassed_students = [s["id"] for s in students if cid not in set(s.get("completed", []))]
+            c = course_map.get(cid, {})
+            analytics.append({
+                "course_id": cid,
+                "name": c.get("name", cid),
+                "credits": c.get("credits", 4),
+                "ltpc": c.get("ltpc", "N/A"),
+                "category": c.get("category", "Professional Core"),
+                "blocked_courses_count": len(dependents),
+                "blocked_courses": dependents,
+                "students_delayed_count": len(unpassed_students),
+                "students_affected": unpassed_students,
+                "risk_severity": "CRITICAL" if len(dependents) >= 4 else "HIGH"
+            })
+
+    analytics.sort(key=lambda x: (x["blocked_courses_count"], x["students_delayed_count"]), reverse=True)
+
+    return {
+        "success": True,
+        "total_bottlenecks": len(analytics),
+        "critical_count": len([b for b in analytics if b["risk_severity"] == "CRITICAL"]),
+        "bottlenecks": analytics
+    }
+
 
 # Mount static web directory for full-stack hosting (web/index.html)
 from fastapi.responses import Response

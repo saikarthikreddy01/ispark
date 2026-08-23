@@ -1,7 +1,7 @@
 """Course-related Pydantic models for the Academic Advising system."""
 
 from enum import Enum
-from pydantic import BaseModel, Field, ConfigDict
+from pydantic import BaseModel, Field, ConfigDict, computed_field
 from typing import Optional, List, Dict, Any
 
 
@@ -81,6 +81,17 @@ class Course(BaseModel):
     reference_books: Optional[List[str]] = None
     
     model_config = ConfigDict(extra="allow")
+
+    @computed_field
+    @property
+    def prerequisites(self) -> list[str]:
+        """Convenience property extracting list of prerequisite course IDs."""
+        res = []
+        for group in self.prerequisite_groups:
+            for p in group.prerequisites:
+                if p.course_id not in res:
+                    res.append(p.course_id)
+        return res
 
 
 class CourseEquivalency(BaseModel):

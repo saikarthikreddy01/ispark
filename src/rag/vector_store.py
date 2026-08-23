@@ -49,7 +49,11 @@ class AcademicVectorStore:
             for doc in self.documents
         ]
 
-    def search(self, query: str, n_results: int = 5, filter_metadata: Optional[dict] = None) -> list[dict]:
+    def count(self) -> int:
+        return len(self.documents)
+
+    def search(self, query: str, n_results: int = 5, filter_metadata: Optional[dict] = None, top_k: Optional[int] = None) -> list[dict]:
+        limit = top_k if top_k is not None else n_results
         if not self.documents:
             return []
             
@@ -83,10 +87,10 @@ class AcademicVectorStore:
             
         # Sort descending by similarity
         scores.sort(key=lambda x: x[0], reverse=True)
-        top_k = scores[:n_results]
+        top_results = scores[:limit]
         
         results = []
-        for sim, idx, doc in top_k:
+        for sim, idx, doc in top_results:
             results.append({
                 "content": doc.content,
                 "metadata": doc.metadata,

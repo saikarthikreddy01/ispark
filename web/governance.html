@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Faculty Review | Academic Advisor</title>
+  <link rel="stylesheet" href="portal.css">
+</head>
+<body data-page="governance">
+
+  <!-- Top Application Navigation Header -->
+  <header class="appbar">
+    <nav class="nav">
+      <!-- Dynamic contextual navigation system links go here -->
+    </nav>
+    <div class="userbar">
+      
+    </div>
+  </header>
+
+  <!-- Central Layout Container -->
+  <main class="page">
+    <div class="page-head">
+      <div>
+        <span class="eyebrow">08 &middot; Exceptional cases</span>
+        <h1>Faculty approval</h1>
+        <p>Submit formal exception cases and track automated verification before faculty review.</p>
+      </div>
+    </div>
+
+    <!-- Exception Petition Submission Form -->
+    <form class="panel stack" data-form>
+      <label>
+        Request type
+        <select name="petition_type">
+          <option value="PREREQUISITE_WAIVER">Prerequisite waiver</option>
+          <option value="CREDIT_OVERLOAD">Credit overload</option>
+          <option value="COURSE_SUBSTITUTION">Course substitution</option>
+        </select>
+      </label>
+
+      <label>
+        Course code
+        <input name="course_id" placeholder="Optional">
+      </label>
+
+      <label>
+        Target semester
+        <input name="target_semester" value="Fall 2026">
+      </label>
+
+      <label>
+        Requested credits
+        <input name="requested_credits" type="number" value="0">
+      </label>
+
+      <label>
+        Justification
+        <textarea name="justification" required placeholder="Explain the exceptional case and supporting evidence."></textarea>
+      </label>
+
+      <button class="btn btn-primary" type="submit">Submit for faculty review</button>
+    </form>
+
+    <!-- Historical Petitions & Approval Status List -->
+    <section class="panel" data-output>
+      <div class="empty">Loading your petitions&hellip;</div>
+    </section>
+  </main>
+
+  <!-- Global Action Feedback Notifications -->
+  <div id="toast"></div>
+
+  <!-- Operational Lifecycle Scripts -->
+  <script src="portal.js"></script>
+  <script src="feature.js"></script>
+</body>
+</html>

@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Conflict Audit | Academic Advisor</title>
+  <link rel="stylesheet" href="portal.css">
+</head>
+<body data-page="conflicts">
+
+  <!-- Top Application Navigation Header -->
+  <header class="appbar">
+    <nav class="nav">
+      <!-- Contextual platform routing injected dynamically -->
+    </nav>
+    <div class="userbar">
+      <!-- Active user profile session parameters -->
+    </div>
+  </header>
+
+  <!-- Central Interface Layout -->
+  <main class="page">
+    <div class="page-head">
+      <div>
+        <span class="eyebrow">05 &middot; Registration check</span>
+        <h1>Conflict auditor</h1>
+        <p>Verify prerequisites, corequisites, term offerings, and credit limits before registration.</p>
+      </div>
+    </div>
+
+    <!-- Multi-select Rule Checking Workspace -->
+    <form class="panel stack" data-form>
+      <label>
+        Proposed courses
+        <select data-course-options multiple size="8"></select>
+      </label>
+
+      <label>
+        Registration semester
+        <select data-semester>
+          <option>FALL</option>
+          <option>SPRING</option>
+        </select>
+      </label>
+
+      <button class="btn btn-primary" type="submit">Run formal verification</button>
+    </form>
+
+    <!-- Formal Verification Error & Flag Feed -->
+    <section class="panel" data-output>
+      <div class="empty">Select courses to begin.</div>
+    </section>
+  </main>
+
+  <!-- Global Action Notification Channel -->
+  <div id="toast"></div>
+
+  <!-- Operational Engine Injections -->
+  <script src="portal.js"></script>
+  <script src="feature.js"></script>
+</body>
+</html>

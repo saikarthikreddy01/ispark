@@ -21,18 +21,34 @@ class ScheduleAnalyzer:
         """
         Analyzes the feasibility of graduation for a student.
         """
-        completed = student.completed_course_ids if hasattr(student, 'completed_course_ids') else set(c.course_id for c in student.completed_courses)
+        completed_grades = self._extract_grades(student)
+        completed_ids = set(completed_grades.keys())
         
-        # Determine remaining requirements (mocked for simplicity)
+        # Determine remaining requirements
         reqs = self.kg.degree_requirements.get('required_courses', [])
-        remaining_courses = [r for r in reqs if r not in completed]
+        remaining_courses = [r for r in reqs if r not in completed_ids]
+        
+        # Category tracking (Degree Audit)
+        category_reqs = self.kg.degree_requirements.get('categories', {})
+        earned_categories = {}
+        for c_id in completed_ids:
+            c = self.kg.get_course(c_id)
+            if c:
+                for cat in c.credit_categories:
+                    earned_categories[cat.value] = earned_categories.get(cat.value, 0) + c.credits
+                    
+        category_deficits = {}
+        for cat, req_creds in category_reqs.items():
+            earned = earned_categories.get(cat, 0)
+            if earned < req_creds:
+                category_deficits[cat] = req_creds - earned
         
         bottlenecks = [b for b, count in get_bottleneck_courses(self.kg) if b in remaining_courses]
         critical_path = self.identify_critical_path(remaining_courses)
         semesters_remaining = len(critical_path) # Absolute minimum semesters
         
         total_req = self.kg.degree_requirements.get('total_credits', 120)
-        total_earned = sum(self.kg.get_course_credits(c) for c in completed)
+        total_earned = sum(self.kg.get_course_credits(c) for c in completed_ids)
         remaining_credits = max(0, total_req - total_earned)
         
         # Simple heuristic risk score
@@ -44,17 +60,32 @@ class ScheduleAnalyzer:
             "remaining_credits": remaining_credits,
             "semesters_remaining": semesters_remaining,
             "bottleneck_courses": bottlenecks,
+            "category_deficits": category_deficits,
             "risk_factors": [f"Missing {len(remaining_courses)} required courses"],
             "risk_score": risk_score
         }
+        
+    def _extract_grades(self, student: StudentProfile) -> dict[str, str]:
+        """Extracts a mapping of course_id to grade from a student profile."""
+        grades = {}
+        for c in student.completed_courses:
+            if hasattr(c, 'course_id') and hasattr(c, 'grade'):
+                grades[c.course_id] = c.grade
+            elif isinstance(c, dict) and 'course_id' in c and 'grade' in c:
+                grades[c['course_id']] = c['grade']
+            elif isinstance(c, str):
+                grades[c] = "A" # Mock passing grade for simple string IDs
+        return grades
     
-    def suggest_semester_load(self, student: StudentProfile, target_graduation: str = None) -> list[SemesterPlan]:
+    def suggest_semester_load(self, student: StudentProfile, target_graduation: str = None, max_difficulty_score: int = 14) -> list[SemesterPlan]:
         """
         Generates a balanced set of semester plans for remaining courses.
+        Includes a max_difficulty_score to prevent burnout.
         """
-        completed = student.completed_course_ids if hasattr(student, 'completed_course_ids') else set(c.course_id for c in student.completed_courses)
+        completed_grades = self._extract_grades(student)
+        completed_ids = set(completed_grades.keys())
         reqs = self.kg.degree_requirements.get('required_courses', [])
-        remaining_courses = [r for r in reqs if r not in completed]
+        remaining_courses = [r for r in reqs if r not in completed_ids]
         
         ordered_remaining = topological_sort_prerequisites(self.kg, remaining_courses)
         
@@ -67,12 +98,13 @@ class ScheduleAnalyzer:
             if sem == Semester.SPRING: return Semester.SUMMER, year
             return Semester.FALL, year
             
-        current_completed = set(completed)
+        current_grades = dict(completed_grades)
         idx = 0
         
         while idx < len(ordered_remaining):
             plan_courses = []
             credits = 0
+            semester_difficulty = 0
             
             # Simple greedy packing
             temp_idx = idx
@@ -80,13 +112,15 @@ class ScheduleAnalyzer:
                 course_id = ordered_remaining[temp_idx]
                 c = self.kg.get_course(course_id)
                 
-                # Check prereqs against current_completed
-                satisfied, _ = self.prereq_checker.check_prerequisites(course_id, current_completed)
+                # Check prereqs against current_grades
+                satisfied, _ = self.prereq_checker.check_prerequisites(course_id, current_grades)
                 
                 if satisfied and self.check_course_availability(course_id, current_semester_val):
-                    if credits + c.credits <= student.max_credits_per_semester:
+                    # Check both credits limit and difficulty score limit
+                    if (credits + c.credits <= student.max_credits_per_semester) and (semester_difficulty + c.difficulty_level <= max_difficulty_score):
                         plan_courses.append(course_id)
                         credits += c.credits
+                        semester_difficulty += c.difficulty_level
                         ordered_remaining.pop(temp_idx)
                     else:
                         temp_idx += 1
@@ -100,7 +134,9 @@ class ScheduleAnalyzer:
                 total_credits=credits
             ))
             
-            current_completed.update(plan_courses)
+            # Simulate earning an 'A' in the planned courses for future semesters
+            for c_id in plan_courses:
+                current_grades[c_id] = "A"
             current_semester_val, current_year = next_semester(current_semester_val, current_year)
             
             if not plan_courses:

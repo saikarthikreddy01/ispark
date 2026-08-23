@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Graph-RAG Retrieval | Academic Advisor</title>
+  <link rel="stylesheet" href="portal.css">
+</head>
+<body data-page="retrieval">
+
+  <!-- Top Application Navigation Header -->
+  <header class="appbar">
+    <nav class="nav">
+      <!-- Contextual navigation links populate dynamically -->
+    </nav>
+    <div class="userbar">
+      <!-- Session user information panel -->
+    </div>
+  </header>
+
+  <!-- Central Context Shell -->
+  <main class="page">
+    <div class="page-head">
+      <div>
+        <span class="eyebrow">03 &middot; Grounded knowledge</span>
+        <h1>Graph-RAG retrieval</h1>
+        <p>Read the academic policy and course knowledge used to ground advising decisions.</p>
+      </div>
+    </div>
+
+    <!-- Retrieved Policies and Source Material Viewport -->
+    <section data-output>
+      <div class="empty">Loading policy index&hellip;</div>
+    </section>
+  </main>
+
+  <!-- Global Action Feedback Channel -->
+  <div id="toast"></div>
+
+  <!-- Framework Engine and Feature Script Injections -->
+  <script src="portal.js"></script>
+  <script src="feature.js"></script>
+</body>
+</html>

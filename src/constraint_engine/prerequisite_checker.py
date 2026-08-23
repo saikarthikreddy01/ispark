@@ -6,11 +6,16 @@ class PrerequisiteChecker:
     def __init__(self, kg: AcademicKnowledgeGraph):
         self.kg = kg
     
-    def check_prerequisites(self, course_id: str, completed: set[str]) -> tuple[bool, list[str]]:
+    def check_prerequisites(self, course_id: str, completed_grades: dict[str, str], concurrent_courses: set[str] = None) -> tuple[bool, list[str]]:
         """
-        Checks if prerequisites for a course are satisfied.
+        Checks if prerequisites for a course are satisfied based on grades.
+        completed_grades: dict mapping course_id to earned letter grade.
+        concurrent_courses: set of course IDs taken in the same semester.
         Returns (is_satisfied, list_of_missing_course_ids).
         """
+        if concurrent_courses is None:
+            concurrent_courses = set()
+            
         course = self.kg.get_course(course_id)
         if not course:
             return True, []
@@ -28,24 +33,41 @@ class PrerequisiteChecker:
             if group.logic_type == PrerequisiteType.OR:
                 # Need at least one satisfied
                 for prereq in group.prerequisites:
-                    if prereq.course_id in completed:
+                    p_id = prereq.course_id
+                    has_passing_grade = p_id in completed_grades and self._grade_meets_min(completed_grades[p_id], prereq.min_grade)
+                    can_take_concurrently = prereq.can_be_concurrent and p_id in concurrent_courses
+                    
+                    if has_passing_grade or can_take_concurrently:
                         group_satisfied = True
                         break
                     else:
-                        missing_in_group.append(prereq.course_id)
+                        missing_in_group.append(p_id)
             else: # AND
                 # Need all satisfied
                 group_satisfied = True
                 for prereq in group.prerequisites:
-                    if prereq.course_id not in completed:
+                    p_id = prereq.course_id
+                    has_passing_grade = p_id in completed_grades and self._grade_meets_min(completed_grades[p_id], prereq.min_grade)
+                    can_take_concurrently = prereq.can_be_concurrent and p_id in concurrent_courses
+                    
+                    if not (has_passing_grade or can_take_concurrently):
                         group_satisfied = False
-                        missing_in_group.append(prereq.course_id)
+                        missing_in_group.append(p_id)
                         
             if not group_satisfied:
                 all_groups_satisfied = False
                 missing_overall.extend(missing_in_group)
                 
         return all_groups_satisfied, list(set(missing_overall))
+        
+    def _grade_meets_min(self, earned_grade: str, min_grade: str) -> bool:
+        """Helper to compare letter grades."""
+        from src.models.student import GRADE_POINTS
+        earned_pt = GRADE_POINTS.get(earned_grade, 0.0)
+        min_pt = GRADE_POINTS.get(min_grade, 0.0)
+        if earned_pt is None or min_pt is None:
+            return False
+        return earned_pt >= min_pt
     
     def check_corequisites(self, course_id: str, semester_courses: set[str], completed: set[str]) -> tuple[bool, list[str]]:
         """
@@ -62,9 +84,10 @@ class PrerequisiteChecker:
                 
         return len(missing_coreqs) == 0, missing_coreqs
     
-    def validate_semester_plan(self, planned_courses: list[str], completed: set[str], semester: Semester) -> list[Conflict]:
+    def validate_semester_plan(self, planned_courses: list[str], completed_grades: dict[str, str], semester: Semester) -> list[Conflict]:
         """
         Validates all courses in a proposed semester plan.
+        completed_grades: dict mapping course_id to earned letter grade.
         """
         conflicts = []
         planned_set = set(planned_courses)
@@ -75,7 +98,7 @@ class PrerequisiteChecker:
                 continue
                 
             # 4. Already completed?
-            if course_id in completed:
+            if course_id in completed_grades and self._grade_meets_min(completed_grades[course_id], "D"):
                 conflicts.append(Conflict(
                     type=ConflictType.ALREADY_COMPLETED,
                     course_id=course_id,
@@ -93,30 +116,18 @@ class PrerequisiteChecker:
                 ))
                 
             # 1. Prerequisites met?
-            prereqs_met, missing_prereqs = self.check_prerequisites(course_id, completed)
+            prereqs_met, missing_prereqs = self.check_prerequisites(course_id, completed_grades, concurrent_courses=planned_set)
             if not prereqs_met:
-                # Check if any can be taken concurrently and are in planned_set
-                still_missing = []
-                for p_id in missing_prereqs:
-                    can_concurrent = False
-                    for group in course.prerequisite_groups:
-                        for p in group.prerequisites:
-                            if p.course_id == p_id and p.can_be_concurrent:
-                                can_concurrent = True
-                    
-                    if not (can_concurrent and p_id in planned_set):
-                        still_missing.append(p_id)
-                        
-                if still_missing:
-                    conflicts.append(Conflict(
-                        type=ConflictType.PREREQUISITE_MISSING,
-                        course_id=course_id,
-                        description=f"Missing prerequisites for {course_id}: {', '.join(still_missing)}",
-                        severity="error"
-                    ))
+                conflicts.append(Conflict(
+                    type=ConflictType.PREREQUISITE_MISSING,
+                    course_id=course_id,
+                    description=f"Missing prerequisites for {course_id}: {', '.join(missing_prereqs)}",
+                    severity="error"
+                ))
                     
             # 2. Corequisites met?
-            coreqs_met, missing_coreqs = self.check_corequisites(course_id, planned_set, completed)
+            completed_set = set(completed_grades.keys())
+            coreqs_met, missing_coreqs = self.check_corequisites(course_id, planned_set, completed_set)
             if not coreqs_met:
                 conflicts.append(Conflict(
                     type=ConflictType.COREQUISITE_MISSING,

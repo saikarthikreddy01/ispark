@@ -91,6 +91,12 @@ class GraphRAGRetriever:
             if hasattr(student, 'major'):
                 context_lines.append(f"  - Major: {student.major}")
             if hasattr(student, 'completed_courses'):
-                context_lines.append(f"  - Completed Credits: {sum(c.credits for c in student.completed_courses)}")
+                completed_credits = 0
+                for c in student.completed_courses:
+                    if hasattr(c, 'credits'):
+                        completed_credits += getattr(c, 'credits', 0)
+                    elif isinstance(c, str) and c in self.kg.courses:
+                        completed_credits += self.kg.courses[c].credits
+                context_lines.append(f"  - Completed Credits: {completed_credits}")
             
         return "\n".join(context_lines), citations
