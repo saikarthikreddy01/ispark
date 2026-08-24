@@ -33,3 +33,4 @@ node_modules/
 # Local SQLite database
 data/*.db
 data/*.db-*
+data/persistent_db.json
