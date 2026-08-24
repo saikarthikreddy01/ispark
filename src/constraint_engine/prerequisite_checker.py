@@ -6,15 +6,19 @@ class PrerequisiteChecker:
     def __init__(self, kg: AcademicKnowledgeGraph):
         self.kg = kg
     
-    def check_prerequisites(self, course_id: str, completed_grades: dict[str, str], concurrent_courses: set[str] = None) -> tuple[bool, list[str]]:
+    def check_prerequisites(self, course_id: str, completed_grades: dict[str, str] | set[str], concurrent_courses: set[str] = None) -> tuple[bool, list[str]]:
         """
         Checks if prerequisites for a course are satisfied based on grades.
-        completed_grades: dict mapping course_id to earned letter grade.
+        completed_grades: dict mapping course_id to earned letter grade, or a
+        set of course IDs that are assumed to have passing grades.
         concurrent_courses: set of course IDs taken in the same semester.
         Returns (is_satisfied, list_of_missing_course_ids).
         """
         if concurrent_courses is None:
             concurrent_courses = set()
+
+        if isinstance(completed_grades, set):
+            completed_grades = {course_id: "A" for course_id in completed_grades}
             
         course = self.kg.get_course(course_id)
         if not course:
