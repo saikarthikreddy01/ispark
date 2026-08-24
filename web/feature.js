@@ -84,7 +84,7 @@ async function graph(student) {
   if (networkEl) {
     const nodes = new vis.DataSet(courses.map(course => ({
       id: course.id,
-      label: course.id,
+      label: `${course.id}\n${course.name || 'Course'}`,
       title: `${course.id}: ${course.name || 'Course'}\n${course.credits || 0} credits`,
       value: 12 + (counts[course.id] || 0) * 3,
       color: counts[course.id] > 2 ? { background: '#e9c382', border: '#b26d18' } : { background: '#8bd8c7', border: '#187c70' },
@@ -96,7 +96,7 @@ async function graph(student) {
     new vis.Network(networkEl, { nodes, edges }, {
       physics: { stabilization: { iterations: 180 }, barnesHut: { gravitationalConstant: -4200, springLength: 145, springConstant: .03 } },
       interaction: { hover: true, navigationButtons: true, keyboard: true },
-      nodes: { shape: 'dot', borderWidth: 2, scaling: { min: 14, max: 34 } },
+      nodes: { shape: 'box', borderWidth: 2, margin: 10, widthConstraint: { maximum: 150 }, scaling: { min: 14, max: 34 } },
       edges: { width: 1.5, selectionWidth: 3 }
     });
   }
