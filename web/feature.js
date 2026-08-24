@@ -132,16 +132,32 @@ async function retrieval() {
 
 async function advisor(student) {
   const form = document.querySelector('[data-form]');
+  const out = document.querySelector('[data-output]');
   if (form) {
     form.onsubmit = async event => {
       event.preventDefault();
-      const question = new FormData(event.target).get('question');
+      const input = form.elements.question;
+      const question = input.value.trim();
+      if (!question) return;
       const studentId = student?.id || '241FA04077';
-      const result = await api('/api/chat', { method:'POST', body:JSON.stringify({ student_id:studentId, question }) });
-      const citations = Array.isArray(result.citations) ? result.citations : [];
-      const out = document.querySelector('[data-output]');
-      if (out) {
-        out.innerHTML = `<article class="panel"><h3>Advisor response</h3><p>${esc(result.reply || '').replace(/\n/g, '<br>')}</p><div class="data-list"><strong>Sources used</strong>${citations.map(citation => `<span class="badge">${esc(citation)}</span>`).join('')}</div></article>`;
+      out.insertAdjacentHTML('beforeend', `<article class="chat-message user"><strong>You</strong><p>${esc(question)}</p></article><article class="chat-message assistant chat-loading"><strong>Academic Advisor</strong><p>Checking your curriculum and policy sources...</p></article>`);
+      out.scrollTop = out.scrollHeight;
+      input.value = '';
+      input.disabled = true;
+      form.querySelector('button').disabled = true;
+      try {
+        const result = await api('/api/chat', { method:'POST', body:JSON.stringify({ student_id:studentId, question }) });
+        const citations = Array.isArray(result.citations) ? result.citations : [];
+        const loading = out.querySelector('.chat-loading:last-child');
+        if (loading) loading.outerHTML = `<article class="chat-message assistant"><strong>Academic Advisor</strong><p>${esc(result.reply || 'I could not generate an answer. Please try again.').replace(/\n/g, '<br>')}</p>${citations.length ? `<div class="chat-citations"><span>Sources</span>${citations.map(citation => `<span class="badge">${esc(citation)}</span>`).join('')}</div>` : ''}</article>`;
+      } catch (error) {
+        const loading = out.querySelector('.chat-loading:last-child');
+        if (loading) loading.outerHTML = `<article class="chat-message assistant"><strong>Academic Advisor</strong><p>${esc(error.message)}</p></article>`;
+      } finally {
+        input.disabled = false;
+        form.querySelector('button').disabled = false;
+        input.focus();
+        out.scrollTop = out.scrollHeight;
       }
     };
   }
