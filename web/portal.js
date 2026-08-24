@@ -20,6 +20,10 @@ async function currentStudent() {
   try { return await api(`/api/student/${encodeURIComponent(savedId)}`); } catch { return null; }
 }
 
+function isFacultySession() {
+  return localStorage.getItem('academic_advisor_faculty_session') === 'active';
+}
+
 function signOut() {
   localStorage.removeItem('academic_advisor_permanent_active_user_v3');
   localStorage.removeItem('academic_advisor_faculty_session');
@@ -35,24 +39,27 @@ function toast(message) {
   }
 }
 
-function nav(active) {
+function nav(active, faculty) {
   const items = [
     ['home.html','Home','home'], ['curriculum.html','Curriculum','curriculum'], ['graph.html','Knowledge graph','graph'], ['retrieval.html','Graph-RAG','retrieval'], ['advisor.html','Advisor','advisor'],
     ['pathway.html','Degree pathway','pathway'], ['conflicts.html','Conflict audit','conflicts'], ['risk.html','Risk','risk'],
     ['substitutions.html','Substitutions','substitutions'], ['governance.html','Faculty review','governance']
   ];
-  return items.map(([href,label,key]) => `<a class="${key === active ? 'active' : ''}" href="${href}">${label}</a>`).join('');
+  const visibleItems = faculty ? items.filter(([, , key]) => key === 'governance') : items;
+  return visibleItems.map(([href,label,key]) => `<a class="${key === active ? 'active' : ''}" href="${href}">${label}</a>`).join('');
 }
 
 async function initShell(active) {
   const student = await currentStudent();
   if (!student) { location.href = 'index.html'; return null; }
+  const faculty = isFacultySession();
+  if (faculty && active !== 'governance') { location.href = 'governance.html'; return null; }
   const appbar = document.querySelector('.appbar');
   if (appbar) {
-    appbar.insertAdjacentHTML('afterbegin', `<a class="brand" href="home.html"><span class="brand-mark">AA</span><span>Academic Advisor</span></a>`);
+    appbar.insertAdjacentHTML('afterbegin', `<a class="brand" href="${faculty ? 'governance.html' : 'home.html'}"><span class="brand-mark">AA</span><span>Academic Advisor</span></a>`);
   }
   const navNode = document.querySelector('.nav');
-  if (navNode) navNode.innerHTML = nav(active);
+  if (navNode) navNode.innerHTML = nav(active, faculty);
   const userbar = document.querySelector('.userbar');
   if (userbar) {
     userbar.innerHTML = `<span class="user-chip">${esc(student.name)} · ${esc(student.id || 'Faculty')}</span><button class="btn" type="button" onclick="signOut()">Sign out</button>`;
