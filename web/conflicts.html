@@ -30,16 +30,16 @@
 
     <!-- Multi-select Rule Checking Workspace -->
     <form class="panel stack" data-form>
-      <label>
-        Proposed courses
-        <select data-course-options multiple size="8"></select>
-      </label>
+      <div class="form-group">
+        <label>Proposed courses</label>
+        <div data-course-accordion class="course-accordion">Loading curriculum...</div>
+      </div>
 
       <label>
         Registration semester
         <select data-semester>
-          <option>FALL</option>
-          <option>SPRING</option>
+          <option value="SEM 1">Sem 1</option>
+          <option value="SEM 2">Sem 2</option>
         </select>
       </label>
 

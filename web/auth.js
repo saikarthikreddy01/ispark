@@ -120,8 +120,8 @@
                 input.type = showing ? 'password' : 'text';
                 btn.setAttribute('aria-pressed', String(!showing));
                 btn.setAttribute('aria-label', showing ? 'Show password' : 'Hide password');
-                btn.querySelector('.eye-open').hidden = !showing ? false : true;
-                btn.querySelector('.eye-closed').hidden = !showing ? true : false;
+                btn.querySelector('.eye-open').hidden = !showing;
+                btn.querySelector('.eye-closed').hidden = showing;
             });
         });
 
@@ -209,14 +209,14 @@
 
     function applyCopy() {
         var c = currentCopy();
-        el('visual-eyebrow').textContent = c.visualEyebrow;
-        el('visual-heading').textContent = c.visualHeading;
-        el('visual-text').textContent = c.visualText;
-        el('form-eyebrow').textContent = c.eyebrow;
-        el('form-title').textContent = c.title;
-        el('form-copy').textContent = c.copy;
-        el('submit-label').textContent = c.submit;
-        el('login-foot').textContent = c.foot;
+        if (el('visual-eyebrow')) el('visual-eyebrow').textContent = c.visualEyebrow;
+        if (el('visual-heading')) el('visual-heading').textContent = c.visualHeading;
+        if (el('visual-text')) el('visual-text').textContent = c.visualText;
+        if (el('form-eyebrow')) el('form-eyebrow').textContent = c.eyebrow;
+        if (el('form-title')) el('form-title').textContent = c.title;
+        if (el('form-copy')) el('form-copy').textContent = c.copy;
+        if (el('submit-label')) el('submit-label').textContent = c.submit;
+        if (el('login-foot')) el('login-foot').textContent = c.foot;
 
         var switchWrap = el('auth-switch');
         if (state.role === 'faculty') {

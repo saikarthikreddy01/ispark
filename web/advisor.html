@@ -30,16 +30,41 @@
 
     <section class="panel chat-panel" aria-label="Academic advisor chat">
       <div class="chat-head">
-        <div><span class="eyebrow">Grounded assistant</span><h2>Talk through your next move</h2></div>
-        <span class="badge good">C24 aware</span>
+        <div>
+          <span class="eyebrow">⚡ Autonomous Agentic AI Advisor</span>
+          <h2>Intelligent Academic Reasoning & Action Engine</h2>
+        </div>
+        <span class="badge good">Multi-Agent Active</span>
       </div>
+
+      <div class="agent-capability-bar">
+        <span class="agent-tool-tag">🛡️ Constraint Engine</span>
+        <span class="agent-tool-tag">🗺️ Pathway Sorter</span>
+        <span class="agent-tool-tag">🚨 Risk & Bottleneck Evaluator</span>
+        <span class="agent-tool-tag">🔄 Substitutions Engine</span>
+        <span class="agent-tool-tag">📜 Policy Graph-RAG</span>
+      </div>
+
       <div class="chat-feed" data-output aria-live="polite">
-        <article class="chat-message assistant"><strong>Academic Advisor</strong><p>Ask me about prerequisites, course planning, graduation risk, or university policy.</p></article>
+        <article class="chat-message assistant">
+          <strong>Academic AI Advisor</strong>
+          <p>Hello! I am your <strong>Autonomous Academic AI Advisor</strong>. I don't just answer questions—I can run conflict audits, construct degree pathways, analyze graduation bottlenecks, and find course substitutions for you in real-time.</p>
+        </article>
       </div>
+
+      <div class="agent-quick-actions" data-quick-actions>
+        <span class="quick-title">Quick Actions:</span>
+        <button type="button" class="quick-chip" data-prompt="Audit 24CS209 and 24CS306 for Sem 1">⚡ Audit 24CS209 & 24CS306</button>
+        <button type="button" class="quick-chip" data-prompt="Generate my optimal 4-year degree pathway">🗺️ Generate Degree Pathway</button>
+        <button type="button" class="quick-chip" data-prompt="What courses are blocking my graduation?">🚨 Check My Bottlenecks</button>
+        <button type="button" class="quick-chip" data-prompt="Find approved substitutions for 24CS402">🔄 Substitutions for 24CS402</button>
+        <button type="button" class="quick-chip" data-prompt="What is the prerequisite waiver policy (§1.2)?">📜 Prerequisite Waiver Rules</button>
+      </div>
+
       <form class="chat-composer" data-form>
-        <label class="sr-only" for="advisor-question">Your question</label>
-        <textarea id="advisor-question" name="question" rows="2" required placeholder="Can I take Algorithms next semester?"></textarea>
-        <button class="btn btn-primary" type="submit">Send <span aria-hidden="true">&rarr;</span></button>
+        <label class="sr-only" for="advisor-question">Your question or command</label>
+        <textarea id="advisor-question" name="question" rows="2" required placeholder="Ask a question or command (e.g., 'Audit 24CS209 for Sem 1' or 'Generate my pathway')..."></textarea>
+        <button class="btn btn-primary" type="submit">Execute Action <span aria-hidden="true">&rarr;</span></button>
       </form>
     </section>
   </main>

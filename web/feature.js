@@ -130,9 +130,36 @@ async function retrieval() {
   }
 }
 
+function formatAgentMarkdown(text) {
+  let formatted = esc(text || '');
+  // Bold
+  formatted = formatted.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+  // Italic
+  formatted = formatted.replace(/\*(.*?)\*/g, '<em>$1</em>');
+  // Code tags
+  formatted = formatted.replace(/`([^`]+)`/g, '<code class="code">$1</code>');
+  // Line breaks
+  formatted = formatted.replace(/\n/g, '<br>');
+  return formatted;
+}
+
 async function advisor(student) {
   const form = document.querySelector('[data-form]');
   const out = document.querySelector('[data-output]');
+  const quickChips = document.querySelectorAll('[data-quick-actions] .quick-chip');
+
+  if (quickChips.length && form) {
+    quickChips.forEach(chip => {
+      chip.onclick = () => {
+        const prompt = chip.getAttribute('data-prompt');
+        if (prompt && form.elements.question) {
+          form.elements.question.value = prompt;
+          form.dispatchEvent(new Event('submit'));
+        }
+      };
+    });
+  }
+
   if (form) {
     form.onsubmit = async event => {
       event.preventDefault();
@@ -140,7 +167,7 @@ async function advisor(student) {
       const question = input.value.trim();
       if (!question) return;
       const studentId = student?.id || '241FA04077';
-      out.insertAdjacentHTML('beforeend', `<article class="chat-message user"><strong>You</strong><p>${esc(question)}</p></article><article class="chat-message assistant chat-loading"><strong>Academic Advisor</strong><p>Checking your curriculum and policy sources...</p></article>`);
+      out.insertAdjacentHTML('beforeend', `<article class="chat-message user"><strong>You</strong><p>${esc(question)}</p></article><article class="chat-message assistant chat-loading"><strong>Autonomous AI Advisor</strong><p>⚡ Agent is reasoning and executing tools...</p></article>`);
       out.scrollTop = out.scrollHeight;
       input.value = '';
       input.disabled = true;
@@ -148,11 +175,14 @@ async function advisor(student) {
       try {
         const result = await api('/api/chat', { method:'POST', body:JSON.stringify({ student_id:studentId, question }) });
         const citations = Array.isArray(result.citations) ? result.citations : [];
+        const toolBadge = result.tool_executed ? `<span class="badge good" style="font-size:11px;margin-bottom:8px;display:inline-block;">⚡ Tool: ${esc(result.tool_executed)}</span>` : '';
         const loading = out.querySelector('.chat-loading:last-child');
-        if (loading) loading.outerHTML = `<article class="chat-message assistant"><strong>Academic Advisor</strong><p>${esc(result.reply || 'I could not generate an answer. Please try again.').replace(/\n/g, '<br>')}</p>${citations.length ? `<div class="chat-citations"><span>Sources</span>${citations.map(citation => `<span class="badge">${esc(citation)}</span>`).join('')}</div>` : ''}</article>`;
+        if (loading) {
+          loading.outerHTML = `<article class="chat-message assistant"><strong>Academic AI Advisor</strong>${toolBadge}<div class="agent-reply-content">${formatAgentMarkdown(result.reply || 'I could not generate an answer. Please try again.')}</div>${citations.length ? `<div class="chat-citations"><span>Sources</span>${citations.map(citation => `<span class="badge">${esc(citation)}</span>`).join('')}</div>` : ''}</article>`;
+        }
       } catch (error) {
         const loading = out.querySelector('.chat-loading:last-child');
-        if (loading) loading.outerHTML = `<article class="chat-message assistant"><strong>Academic Advisor</strong><p>${esc(error.message)}</p></article>`;
+        if (loading) loading.outerHTML = `<article class="chat-message assistant"><strong>Academic AI Advisor</strong><p>${esc(error.message)}</p></article>`;
       } finally {
         input.disabled = false;
         form.querySelector('button').disabled = false;
@@ -175,19 +205,71 @@ async function pathway(student) {
 
 async function conflicts(student) {
   const courses = await api('/api/courses');
-  const courseOptions = document.querySelector('[data-course-options]');
-  if (courseOptions) {
-    courseOptions.innerHTML = courses.map(course => `<option value="${esc(course.id)}">${esc(course.id)} · ${esc(course.name)}</option>`).join('');
+  const courseAccordion = document.querySelector('[data-course-accordion]');
+  
+  if (courseAccordion) {
+    const sems = {};
+    courses.forEach(course => {
+      const s = course.sem || 0;
+      if (!sems[s]) sems[s] = [];
+      sems[s].push(course);
+    });
+    
+    let html = '';
+    const years = [
+      { name: "First Year", sems: [1, 2] },
+      { name: "Second Year", sems: [3, 4] },
+      { name: "Third Year", sems: [5, 6] },
+      { name: "Fourth Year", sems: [7, 8] }
+    ];
+    
+    years.forEach(year => {
+      let yearHtml = '';
+      year.sems.forEach(s => {
+        if (sems[s] && sems[s].length > 0) {
+          const semCourses = sems[s].map(c => `
+            <label class="accordion-item">
+              <input type="checkbox" name="courses" value="${esc(c.id)}">
+              <span class="code">${esc(c.id)}</span> ${esc(c.name)}
+            </label>
+          `).join('');
+          yearHtml += `
+            <details class="accordion-sem">
+              <summary>Semester ${s}</summary>
+              <div class="accordion-content">
+                ${semCourses}
+              </div>
+            </details>
+          `;
+        }
+      });
+      if (yearHtml) {
+        html += `
+          <details class="accordion-year">
+            <summary>${year.name}</summary>
+            <div class="accordion-content">
+              ${yearHtml}
+            </div>
+          </details>
+        `;
+      }
+    });
+    
+    courseAccordion.innerHTML = html || '<div class="empty">No courses found.</div>';
   }
+
   const form = document.querySelector('[data-form]');
   if (form) {
     form.onsubmit = async event => {
       event.preventDefault();
-      const ids = [...(document.querySelector('[data-course-options]')?.selectedOptions || [])].map(option => option.value);
+      const ids = [...document.querySelectorAll('[data-course-accordion] input:checked')].map(cb => cb.value);
       const studentId = student?.id || '241FA04077';
-      const semester = document.querySelector('[data-semester]')?.value || 'FALL';
-      const result = await api('/api/audit/verify', { method:'POST', body:JSON.stringify({ student_id:studentId, selected_courses:ids, semester }) });
+      const semester = document.querySelector('[data-semester]')?.value || 'SEM 1';
+      
       const out = document.querySelector('[data-output]');
+      if (out) out.innerHTML = `<div class="empty">Running formal verification...</div>`;
+      
+      const result = await api('/api/audit/verify', { method:'POST', body:JSON.stringify({ student_id:studentId, selected_courses:ids, semester }) });
       if (out) {
         out.innerHTML = `<div class="notice ${result.is_valid ? 'good' : ''}">${esc(result.summary)} · ${esc(result.total_credits)} credits</div><div class="data-list">${[...(result.issues || []), ...(result.warnings || [])].map(esc).map(item => `<div class="data-row">${item}</div>`).join('') || '<div class="empty">No conflicts detected.</div>'}</div>`;
       }
