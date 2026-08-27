@@ -233,15 +233,6 @@ MONGODB_DB=academic_advisor
 python -m uvicorn backend.server:app --host 0.0.0.0 --port 8000 --reload
 `
 
-### 4b. Start the Hackathon Streamlit Demo
-`bash
-streamlit run streamlit_app.py
-`
-
-The Streamlit demo runs the same domain services through a LangGraph workflow and
-uses the local NetworkX graph and retrieval store by default. Neo4j Aura and
-ChromaDB are optional production upgrades; see [ARCHITECTURE.md](ARCHITECTURE.md).
-
 ### 5. Access the Platform
 - 🌐 **Web Interface**: http://localhost:8000
 - 📖 **Interactive Swagger API Docs**: http://localhost:8000/docs
