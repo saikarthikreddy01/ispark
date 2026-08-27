@@ -17,5 +17,5 @@ jobs:
           python-version: '3.11'
       - name: Install dependencies
         run: pip install -r requirements.txt
-      - name: Run academic-integrity regression tests
-        run: pytest -q test_academic_integrity.py
+      - name: Run academic and agent-entrypoint regression tests
+        run: pytest -q test_academic_integrity.py test_agent_entrypoint.py
