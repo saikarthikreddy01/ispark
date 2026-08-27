@@ -171,24 +171,81 @@ def render_retrieval(advisor: AcademicAdvisor, student: Student) -> None:
 
 def main() -> None:
     st.set_page_config(page_title="Academic AI Advisor", page_icon="🎓", layout="wide")
-    st.title("Academic AI Advisor")
-    st.caption("LangGraph workflow | NetworkX knowledge graph | local policy retrieval")
+    st.markdown(
+        """
+        <style>
+        @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Space+Grotesk:wght@500;600;700&display=swap');
+        :root { --ink: #173b40; --teal: #167c80; --mint: #dff4ed; --coral: #ef755e; --gold: #f2bd58; --paper: #f7f4ed; }
+        .stApp { background: radial-gradient(circle at 85% 0%, #dff4ed 0, transparent 30%), var(--paper); color: var(--ink); }
+        [data-testid="stSidebar"] { background: #173b40; }
+        [data-testid="stSidebar"] * { color: #f7f4ed !important; }
+        h1, h2, h3 { font-family: 'Space Grotesk', sans-serif; color: var(--ink); letter-spacing: 0; }
+        p, label, .stMarkdown { font-family: 'DM Sans', sans-serif; }
+        .hero { padding: 1.2rem 1.4rem 1.4rem; border-bottom: 1px solid #c8d8d1; margin-bottom: 1rem; }
+        .kicker { color: var(--coral); font-size: .76rem; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; }
+        .hero h1 { font-size: clamp(2rem, 5vw, 3.6rem); line-height: 1; margin: .35rem 0 .6rem; }
+        .hero p { max-width: 650px; color: #557174; font-size: 1.02rem; }
+        .pipeline { display: flex; gap: .45rem; flex-wrap: wrap; margin: .8rem 0 1.4rem; }
+        .node { background: white; border: 1px solid #c8d8d1; border-radius: 999px; padding: .38rem .72rem; font-size: .78rem; color: var(--ink); }
+        .node.active { background: var(--teal); color: white; border-color: var(--teal); }
+        .metric-card { background: white; border: 1px solid #c8d8d1; border-left: 4px solid var(--teal); padding: .85rem 1rem; min-height: 90px; }
+        .metric-card small { color: #557174; text-transform: uppercase; letter-spacing: .08em; font-size: .68rem; }
+        .metric-card strong { display: block; color: var(--ink); font: 700 1.55rem 'Space Grotesk', sans-serif; margin-top: .25rem; }
+        </style>
+        <div class="hero">
+          <div class="kicker">Academic intelligence studio · C24 curriculum</div>
+          <h1>Make the next semester make sense.</h1>
+          <p>Grounded advising that connects policy, prerequisites, risk, and alternatives in one decision workspace.</p>
+          <div class="pipeline"><span class="node active">Streamlit</span><span class="node">Orchestrator</span><span class="node">Retrieval</span><span class="node">Planner</span><span class="node">Rules</span><span class="node">Citations</span></div>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
 
     advisor = load_advisor()
     student = load_student()
+    with st.sidebar:
+        st.markdown("## Student workspace")
+        st.markdown(f"**{student.name}**")
+        st.caption(f"{student.id} · {student.major}")
+        st.divider()
+        st.metric("Current GPA", f"{student.gpa:.2f}")
+        st.metric("Completed courses", len(student.completed_course_ids))
+        st.metric("Target graduation", student.expected_grad)
+        st.divider()
+        st.markdown("**Live architecture**")
+        st.caption("NetworkX graph · local retrieval · LangGraph workflow")
+
+    feasibility = advisor.schedule_analyzer.analyze_graduation_feasibility(student)
+    summary_one, summary_two, summary_three, summary_four = st.columns(4)
+    summary_one.markdown(f'<div class="metric-card"><small>Graph nodes</small><strong>{len(advisor.kg.get_all_courses())}</strong></div>', unsafe_allow_html=True)
+    summary_two.markdown(f'<div class="metric-card"><small>Policy chunks</small><strong>{advisor.vector_store.count()}</strong></div>', unsafe_allow_html=True)
+    summary_three.markdown(f'<div class="metric-card"><small>Risk score</small><strong>{feasibility.get("risk_score", 0):.2f}</strong></div>', unsafe_allow_html=True)
+    summary_four.markdown(f'<div class="metric-card"><small>Credits remaining</small><strong>{feasibility.get("remaining_credits", 0)}</strong></div>', unsafe_allow_html=True)
+
     chat_tab, plan_tab, conflict_tab, substitution_tab, retrieval_tab, graph_tab = st.tabs([
         "Advisor chat", "Degree plan", "Conflict audit", "Substitutions", "Graph-RAG", "Knowledge graph"
     ])
 
     with chat_tab:
+        st.subheader("Ask the academic system")
+        st.caption("Every answer is routed through classification, retrieval, rules, and citation-aware explanation.")
+        if "messages" not in st.session_state:
+            st.session_state.messages = []
+        for message in st.session_state.messages:
+            with st.chat_message(message["role"]):
+                st.markdown(message["content"])
         question = st.chat_input("Ask about prerequisites, risk, pathway, or substitutions")
         if question:
+            st.session_state.messages.append({"role": "user", "content": question})
             with st.chat_message("user"):
                 st.write(question)
             with st.chat_message("assistant"):
                 with st.spinner("Running classify -> retrieve -> explain..."):
                     result = ask_advisor(question, student=student, advisor=advisor)
-                st.markdown(result.get("response", "No response generated."))
+                response = result.get("response", "No response generated.")
+                st.markdown(response)
+                st.session_state.messages.append({"role": "assistant", "content": response})
                 if result.get("citations"):
                     with st.expander("Citations"):
                         for citation in result["citations"]:
