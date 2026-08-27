@@ -1,233 +1,203 @@
-# 🎓 AcadGraph AI — Agentic Academic Advising + Graph-RAG
+# AcadGraph AI
 
-Academic pathway planning, curriculum graph reasoning, prerequisite/readiness analysis, bottleneck detection, candidate semester planning, citation-aware advising, and faculty review for exceptional cases.
+**Decentralized Graph-RAG Academic Advising & Prerequisite Conflict Resolver**
 
-The prototype is built around the supplied VFSTR CSE C24/R22-aligned course-structure and course-content document.
+AcadGraph AI converts a university curriculum into an explainable academic reasoning system. It combines a curriculum knowledge graph, source-aware retrieval, specialized LangGraph agents, deterministic constraint verification, career-aware advising, bottleneck analysis, and faculty governance.
 
-## Core design principle
+> **Graph retrieves. RAG grounds. Rules verify. Gemini explains. Faculty approves exceptions.**
 
-> **LLM proposes/explains → graph retrieves relationships → deterministic rules verify constraints → faculty approves exceptions.**
+## What the prototype demonstrates
 
-An LLM is never treated as the authority for whether a student may register, substitute a course, or graduate.
+The hackathon build is intentionally focused on the expected prototype:
 
-## Academic-integrity model
+- student-specific academic advising
+- semester-wise degree pathway visualization
+- formal prerequisite vs prerequisite-knowledge distinction
+- prerequisite and readiness conflict detection
+- bottleneck / planning-risk analysis
+- advisory career alignment
+- candidate course substitutions
+- source provenance and citation quality
+- deterministic final verification
+- human-in-the-loop faculty approval for exceptions
+- provenance-aware academic knowledge graph
 
-The project deliberately distinguishes two relationship types:
+## Unified application
 
-- `FORMAL_PREREQUISITE` — registration-blocking; may only be created from an authoritative regulation/registration source.
-- `REQUIRES_KNOWLEDGE_OF` — academic-readiness/background relationship derived from syllabus fields such as **PREREQUISITE KNOWLEDGE**; non-blocking by itself.
-
-Example source-backed relationships:
-
-- `24CS302 Artificial Intelligence` → prerequisite knowledge: Probability & Statistics.
-- `22CS804 Deep Learning` → prerequisite knowledge: Machine Learning and Python programming.
-- `24CS306 Machine Learning` → prerequisite knowledge: Probability/Linear Algebra and Python programming.
-
-The supplied curriculum does **not by itself prove** a minimum grade or formal registration block for those readiness statements, so AcadGraph does not silently convert them into hard prerequisites.
-
-## Source-status labels
-
-Every important rule should be interpreted through one of these statuses:
-
-- `VERIFIED` / `VERIFIED_FROM_SUPPLIED_DOCUMENT`
-- `CURRICULUM_DERIVED`
-- `CANDIDATE`
-- `DEMO_POLICY`
-- `UNVERIFIED`
-
-Candidate course substitutions require faculty review unless an authoritative equivalency source explicitly marks them `APPROVED`.
-
-## Implemented architecture
+The project now runs as one application instead of separate disconnected pages and backend paths.
 
 ```text
-Student UI
-   │
-   ▼
-FastAPI
-   │
-   ▼
-LangGraph Academic Advisor
-   ├── query classifier
-   ├── Graph-RAG retriever
-   ├── conflict/readiness agent
-   ├── pathway agent
-   ├── planning-risk agent
-   ├── substitution agent
-   └── answer synthesis
-            │
-            ├── NetworkX academic graph
-            ├── lexical/TF-IDF document retrieval
-            ├── deterministic constraint engine
-            └── curriculum / source registry
+Browser SPA
+   ↓
+FastAPI backend.app:app
+   ├─ Student / curriculum overview
+   ├─ Provenance-aware knowledge graph
+   ├─ LangGraph AcademicAdvisor
+   ├─ Graph-RAG retrieval
+   ├─ Deterministic verification
+   ├─ Faculty petition workflow
+   └─ Persistent data repository
+         ├─ Local JSON by default
+         └─ MongoDB when MONGODB_URI is configured
 ```
 
-### Important retrieval note
+### Frontend workspace
 
-The current `AcademicVectorStore` is a lightweight **lexical TF-IDF/cosine retriever**, not a neural embedding store. The system therefore describes itself as hybrid **graph + document retrieval**. FAISS/embedding dependencies are available for a later semantic-retrieval upgrade, but the README does not claim neural embeddings are already the active production retriever.
+The single-page UI contains five judge-friendly views:
 
-## Repository layout
+1. **Overview** — student context, observed progress, system trust architecture, and demo scenarios.
+2. **AI Advisor** — natural-language advising with verification decision, agent trace, and evidence panel.
+3. **Degree Pathway** — semester-by-semester curriculum with completed/planned/remaining status and flexible elective slots.
+4. **Knowledge Graph** — interactive visualization distinguishing formal prerequisite, readiness knowledge, and candidate equivalency edges.
+5. **Faculty Review** — pending exception/substitution requests with explicit human approval/rejection.
+
+## Agent architecture
 
 ```text
-backend/
-  database.py
-  server.py
-
-data/
-  courses.json
-  degree_requirements.json
-  equivalencies.json
-  policies.md
-  sample_students.json
-
-src/
-  agents/
-    orchestrator.py
-    conflict_agent.py
-    pathway_agent.py
-    risk_agent.py
-    substitution_agent.py
-    state.py
-  constraint_engine/
-    prerequisite_checker.py
-    credit_validator.py
-    schedule_feasibility.py
-  knowledge_graph/
-    graph_builder.py
-    graph_queries.py
-    graph_visualizer.py
-  models/
-  rag/
-
-web/
-  advisor.html
-  conflicts.html
-  curriculum.html
-  governance.html
-  graph.html
-  pathway.html
-  risk.html
-  substitutions.html
+Student question
+   ↓
+ProfileAgent
+   ↓
+SupervisorAgent
+   ↓
+FederatedSourceRouter
+   ↓
+GraphRAGAgent
+   ↓
+┌──────────────────────────────────────────┐
+│ ConstraintConflictAgent                 │
+│ PathwayAgent                            │
+│ RiskBottleneckAgent                     │
+│ CareerAlignmentAgent                    │
+│ SubstitutionAgent                       │
+└──────────────────────────────────────────┘
+   ↓
+FacultyEscalationAgent (when needed)
+   ↓
+FormalVerificationAgent
+   ↓
+CitationAgent
+   ↓
+AdvisorSynthesisAgent / Gemini explanation
 ```
 
-## Knowledge graph
-
-The NetworkX graph represents courses, departments, credit categories and academic relationships. It supports:
-
-- formal prerequisite traversal;
-- non-blocking prerequisite-knowledge traversal;
-- recursive dependency inspection;
-- cycle detection;
-- topological ordering of formal dependencies;
-- bottleneck scoring using downstream impact;
-- candidate equivalency relationships with approval status.
-
-A specific elective is **not** automatically a mandatory course. The degree-requirement schema represents Department Elective/Open Elective requirements as choice slots and treats Honours/Minors as an optional track in the base-degree planner.
-
-## Constraint behavior
-
-The deterministic constraint engine checks:
-
-- already-completed courses;
-- sourced formal prerequisites;
-- corequisites;
-- semester availability metadata;
-- prerequisite-knowledge/readiness gaps as warnings;
-- source-aware credit requirements.
-
-If an official credit minimum or semester cap is not verified by the currently loaded source set, the engine does not fabricate a blocking rule.
-
-## Planning risk
-
-`RiskAgent` returns a **Planning Risk Indicator**, not a statistical prediction that a student will or will not graduate. It uses transparent signals such as remaining source-defined required courses and high-impact dependency bottlenecks. Unverified credit rules do not create hard penalties.
-
-## Degree requirements
-
-`data/degree_requirements.json` separates:
-
-- explicitly named required courses;
-- elective choice pools;
-- Open Elective slots;
-- optional Honours/Minors slots;
-- source status for numeric graduation/credit rules.
-
-The historical `160 credits` project target is retained only as an **UNVERIFIED planning assumption** until a separate official Academic Regulations source is added. It must not be presented as a verified university graduation minimum based only on the supplied course-structure PDF.
-
-## Substitutions and faculty governance
-
-Entries in `data/equivalencies.json` are now `CANDIDATE` or `READINESS_BRIDGE` unless an authoritative equivalency source exists. They may be recommended for review but cannot automatically satisfy a formal requirement.
-
-Exceptional cases should follow:
-
-```text
-Student request
-   ↓
-Automated evidence + constraint pre-check
-   ↓
-Candidate resolution
-   ↓
-Faculty / HoD review
-   ↓
-Approve or reject
-```
+The LLM is not the academic authority. Formal blocking decisions come from verified deterministic rules. Syllabus **PREREQUISITE KNOWLEDGE** is represented as non-blocking readiness context and is never silently converted into a registration rule.
 
 ## Run locally
+
+### 1. Clone
 
 ```bash
 git clone https://github.com/saikarthikreddy01/ispark.git
 cd ispark
-python -m venv venv
 ```
+
+### 2. Create a Python environment
 
 Windows PowerShell:
 
 ```powershell
-.\venv\Scripts\Activate.ps1
+python -m venv .venv
+.venv\Scripts\Activate.ps1
 ```
 
-Linux/macOS:
+macOS / Linux:
 
 ```bash
-source venv/bin/activate
+python -m venv .venv
+source .venv/bin/activate
 ```
 
-Install and run:
+### 3. Install dependencies
 
 ```bash
+python -m pip install --upgrade pip
 pip install -r requirements.txt
-python -m uvicorn backend.server:app --host 0.0.0.0 --port 8000 --reload
 ```
 
-Then open:
+### 4. Configure Gemini
 
-- Web app: `http://localhost:8000`
-- Swagger: `http://localhost:8000/docs`
+Create `.env` in the project root:
 
-## Docker
+```env
+GEMINI_API_KEY=your_key_here
+MODEL_NAME=gemini-3.6-flash
+```
+
+MongoDB is optional. Without `MONGODB_URI`, AcadGraph AI uses `data/persistent_db.json` automatically.
+
+### 5. Start the complete app
 
 ```bash
-docker build -t acadgraph-ai .
-docker run -p 8080:8080 --env-file .env acadgraph-ai
+python -m uvicorn backend.app:app --reload --host 127.0.0.1 --port 8000
 ```
 
-## Recommended hackathon demo
+Open:
 
-Use a synthetic student record and ask:
+```text
+http://127.0.0.1:8000
+```
 
-> “I want an AI-focused pathway. What happens if I have not completed Probability & Statistics, and can I choose Deep Learning?”
+Health check:
 
-A good response should demonstrate:
+```text
+http://127.0.0.1:8000/api/health
+```
 
-1. curriculum entity resolution;
-2. graph retrieval;
-3. `REQUIRES_KNOWLEDGE_OF` warnings rather than fabricated hard blocks;
-4. candidate semester pathway;
-5. bottleneck/planning-risk analysis;
-6. source-status-aware citations;
-7. faculty escalation when an actual exception/substitution is requested.
+## Judge demo
 
-## Known prototype limitations
+Use the built-in one-click scenarios or ask:
 
-- The active document retriever is lexical rather than neural-embedding based.
-- The supplied course-structure PDF is not a complete replacement for official Registrar/Academic Regulations documents.
-- Some legacy FastAPI/UI paths still require security hardening before production use.
-- This is a hackathon academic-planning prototype, not an official registration or degree-audit system.
+```text
+I want to become an AI/ML engineer. Check my readiness for Machine Learning and Deep Learning and explain any academic risks.
+```
+
+Then demonstrate:
+
+```text
+Student context
+ → Supervisor routing
+ → Federated source selection
+ → Graph-RAG evidence
+ → Pathway / risk / career reasoning
+ → Formal verification
+ → Citations
+ → Gemini explanation
+```
+
+Second demo:
+
+```text
+Can I substitute an equivalent course for one of my remaining courses? Show only supported candidates and escalate anything unverified to faculty.
+```
+
+When faculty approval is required, send the generated packet to **Faculty Review** and make the human decision there.
+
+## Academic trust model
+
+| Status | Meaning |
+|---|---|
+| `VERIFIED` / `CURRICULUM_DERIVED` | Supported by a supplied curriculum/source |
+| `REQUIRES_KNOWLEDGE_OF` | Non-blocking academic readiness relationship |
+| `FORMAL_PREREQUISITE` | Blocking only when an authoritative formal rule exists |
+| `PROJECT_ADVISORY` | Career or planning recommendation, not a degree requirement |
+| `UNVERIFIED` | Must not be presented as an official academic rule |
+| `PENDING_HUMAN_REVIEW` | AI may recommend review but cannot approve the exception |
+
+The project intentionally does **not** present the retained 160-credit planning target as a verified graduation rule because the supplied course-structure source does not establish that policy by itself.
+
+## Technology
+
+- **Frontend:** HTML5, CSS3, vanilla JavaScript, SVG knowledge graph
+- **Backend:** FastAPI + Uvicorn
+- **Agent orchestration:** LangGraph
+- **LLM explanation:** Gemini (optional deterministic fallback remains)
+- **Knowledge graph:** NetworkX
+- **RAG:** curriculum/document retrieval + graph context
+- **Persistence:** local JSON by default; optional MongoDB
+- **Testing:** Pytest + GitHub Actions
+- **Deployment:** Docker-ready
+
+## Core project rule
+
+**The system reasons, verifies, and explains; it does not merely chat.**
