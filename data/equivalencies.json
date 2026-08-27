@@ -2,31 +2,49 @@
   {
     "course_id": "24CS402",
     "equivalent_course_id": "22CS953",
-    "notes": "Parallel & Distributed Computing (Core) equivalent to Honours version 22CS953"
+    "notes": "Candidate substitution based on similar Parallel & Distributed Computing content. Not established as an approved equivalency by the supplied course-structure document.",
+    "status": "CANDIDATE",
+    "requires_faculty_approval": true,
+    "source_reference": "Project-derived curriculum similarity; faculty verification required"
   },
   {
     "course_id": "24CS204",
     "equivalent_course_id": "22CS902",
-    "notes": "OOP through Java (Core) equivalent to Minor track 22CS902"
+    "notes": "Candidate mapping between OOP through Java and the Java OOP minor course. Faculty verification required.",
+    "status": "CANDIDATE",
+    "requires_faculty_approval": true,
+    "source_reference": "Project-derived curriculum similarity; faculty verification required"
   },
   {
     "course_id": "22TP201",
     "equivalent_course_id": "22CS801",
-    "notes": "Data Structures satisfies prerequisite bridge for Advanced Data Structures"
+    "notes": "Advanced Data Structures lists Data Structures as prerequisite knowledge; this is not an approved course substitution.",
+    "status": "READINESS_BRIDGE",
+    "requires_faculty_approval": true,
+    "source_reference": "CSE Department Electives: 22CS801 prerequisite knowledge = Data Structures"
   },
   {
     "course_id": "24CS102",
     "equivalent_course_id": "22CS901",
-    "notes": "Problem Solving through Python equivalent to 22CS901"
+    "notes": "Candidate mapping between Python courses. Not an approved substitution in the supplied source.",
+    "status": "CANDIDATE",
+    "requires_faculty_approval": true,
+    "source_reference": "Project-derived curriculum similarity; faculty verification required"
   },
   {
     "course_id": "24CS403",
     "equivalent_course_id": "22CS815",
-    "notes": "Privacy & Intrusion Detection equivalent to IDPS 22CS815"
+    "notes": "Candidate security-course mapping. Not an approved equivalency in the supplied source.",
+    "status": "CANDIDATE",
+    "requires_faculty_approval": true,
+    "source_reference": "Project-derived curriculum similarity; faculty verification required"
   },
   {
     "course_id": "24CS207",
     "equivalent_course_id": "22CS904",
-    "notes": "Full Stack Development (MERN) satisfies Web Technologies 22CS904"
+    "notes": "Candidate web/full-stack mapping. Not an approved substitution in the supplied source.",
+    "status": "CANDIDATE",
+    "requires_faculty_approval": true,
+    "source_reference": "Project-derived curriculum similarity; faculty verification required"
   }
 ]
