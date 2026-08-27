@@ -26,5 +26,7 @@ EXPOSE 8080
 # Health check
 HEALTHCHECK CMD curl --fail http://localhost:8080/api/courses || exit 1
 
-# Run FastAPI with Uvicorn
-ENTRYPOINT ["python", "-m", "uvicorn", "backend.server:app", "--host", "0.0.0.0", "--port", "8080"]
+# Run the focused production entrypoint. /api/chat is handled by the real
+# LangGraph AcademicAdvisor; the legacy app remains mounted for supporting
+# APIs and the static frontend.
+ENTRYPOINT ["python", "-m", "uvicorn", "backend.app:app", "--host", "0.0.0.0", "--port", "8080"]
