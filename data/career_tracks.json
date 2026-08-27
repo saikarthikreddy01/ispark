@@ -1,0 +1,26 @@
+{
+  "AI_ML_ENGINEER": {
+    "display_name": "AI / ML Engineer",
+    "aliases": ["ai engineer", "ml engineer", "artificial intelligence", "machine learning", "deep learning"],
+    "skills": ["python", "probability", "statistics", "linear algebra", "machine learning", "artificial intelligence", "deep learning", "algorithms", "data analysis"],
+    "note": "Career mapping is advisory project knowledge, not a degree requirement."
+  },
+  "BACKEND_ENGINEER": {
+    "display_name": "Backend Software Engineer",
+    "aliases": ["backend", "backend developer", "software engineer", "java backend"],
+    "skills": ["java", "object oriented programming", "database", "dbms", "algorithms", "operating systems", "computer networks", "distributed computing", "web development"],
+    "note": "Career mapping is advisory project knowledge, not a degree requirement."
+  },
+  "CYBERSECURITY_ENGINEER": {
+    "display_name": "Cybersecurity Engineer",
+    "aliases": ["cybersecurity", "security engineer", "application security", "pentester", "penetration tester"],
+    "skills": ["computer networks", "cryptography", "network security", "operating systems", "privacy", "intrusion detection", "web security", "programming"],
+    "note": "Career mapping is advisory project knowledge, not a degree requirement."
+  },
+  "DATA_ENGINEER": {
+    "display_name": "Data Engineer / Data Scientist",
+    "aliases": ["data engineer", "data scientist", "data science", "analytics"],
+    "skills": ["python", "database", "statistics", "probability", "machine learning", "data structures", "algorithms", "distributed computing", "optimization"],
+    "note": "Career mapping is advisory project knowledge, not a degree requirement."
+  }
+}

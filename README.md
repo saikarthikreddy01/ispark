@@ -1,260 +1,233 @@
-# 🎓 Academic AI Advisor — 3D Graph-RAG Platform
-### Decentralized Academic Advising, Multi-Semester Degree Sequencing & Prerequisite Constraint Auditor
-#### *Powered by VFSTR Deemed to be University C24 Curriculum (B.Tech Computer Science & Engineering)*
+# 🎓 AcadGraph AI — Agentic Academic Advising + Graph-RAG
 
-> **GitHub Repository**: [https://github.com/saikarthikreddy01/ispark](https://github.com/saikarthikreddy01/ispark)
+Academic pathway planning, curriculum graph reasoning, prerequisite/readiness analysis, bottleneck detection, candidate semester planning, citation-aware advising, and faculty review for exceptional cases.
 
----
+The prototype is built around the supplied VFSTR CSE C24/R22-aligned course-structure and course-content document.
 
-## 📌 Executive Summary
+## Core design principle
 
-**Academic AI Advisor** is an intelligent academic advising platform engineered to eliminate graduation delays, curriculum bottlenecks, and manual scheduling conflicts. Built upon the official **VFSTR C24 Regulation Curriculum (160 Credits)**, the system combines **3D Interactive Visualizations**, **Prerequisite Knowledge Graph DAGs (Directed Acyclic Graphs)**, **Topological Multi-Semester Pathway Sequencing**, and **Citation-Grounded Graph-RAG AI Advising** powered by Google Gemini and MongoDB Atlas.
+> **LLM proposes/explains → graph retrieves relationships → deterministic rules verify constraints → faculty approves exceptions.**
 
----
+An LLM is never treated as the authority for whether a student may register, substitute a course, or graduate.
 
-## 🛠️ Complete Technology Stack
+## Academic-integrity model
 
-`
-                                  TECH STACK OVERVIEW
-┌───────────────────────────────────────────────────────────────────────────────────┐
-│  FRONTEND PRESENTATION & VISUALIZATION LAYER                                      │
-│  ├── HTML5 / Modern CSS3 (Glassmorphism, CSS Grid, Responsive Flexbox)            │
-│  ├── JavaScript ES6+ (Fetch API, Web Storage, Canvas 2D / WebGL)                  │
-│  ├── Three.js r128 (3D Geodesic Lattice, Vertex Wave Shaders, Parallax Physics)   │
-│  └── Vis.js Network v9.1.2 (Interactive Prerequisite DAGs & Physics Simulation)   │
-├───────────────────────────────────────────────────────────────────────────────────┤
-│  BACKEND APPLICATION & REST API LAYER                                             │
-│  ├── Python 3.11+                                                                 │
-│  ├── FastAPI 0.115+ (Asynchronous High-Throughput REST Framework)                 │
-│  ├── Uvicorn 0.30+ (Lightning-fast ASGI Web Server)                               │
-│  └── Pydantic v2 (Strict Request/Response Validation & Data Serialization)        │
-├───────────────────────────────────────────────────────────────────────────────────┤
-│  GRAPH ALGORITHMS, CONSTRAINTS & MULTI-AGENT LAYER                                │
-│  ├── NetworkX 3.3 (Topological Sort, Ancestor/Descendant Closures, DAG Validation)│
-│  ├── Formal Constraint Engine (Prerequisite, Corequisite, Credit Overload Caps)   │
-│  └── Multi-Agent Framework (Pathway Agent, Conflict Auditor, Risk Evaluator)      │
-├───────────────────────────────────────────────────────────────────────────────────┤
-│  KNOWLEDGE-GRAPH RAG (RETRIEVAL-AUGMENTED GENERATION) & AI ADVISOR                │
-│  ├── Google Gemini 2.5 / 1.5 Flash via google-genai SDK                         │
-│  ├── Graph-RAG Hybrid Context Injector (Combines Graph Traversal + Vector Chunks) │
-│  └── Policy Citation Verifier (Grounded in VFSTR Vision, PEOs, PSOs & Policies)   │
-├───────────────────────────────────────────────────────────────────────────────────┤
-│  PERSISTENT DATA & DEPLOYMENT INFRASTRUCTURE                                      │
-│  ├── MongoDB Atlas / Local MongoDB 7.0+ via pymongo                             │
-│  ├── Docker (Containerized Microservice Runtime)                                  │
-│  └── Cloud-Ready (GCP Cloud Run, Render, Railway, AWS ECS)                        │
-└───────────────────────────────────────────────────────────────────────────────────┘
-`
+The project deliberately distinguishes two relationship types:
 
----
+- `FORMAL_PREREQUISITE` — registration-blocking; may only be created from an authoritative regulation/registration source.
+- `REQUIRES_KNOWLEDGE_OF` — academic-readiness/background relationship derived from syllabus fields such as **PREREQUISITE KNOWLEDGE**; non-blocking by itself.
 
-## 🌟 Core System Modules & Features
+Example source-backed relationships:
 
-### 1. 🔮 3D Interactive Geodesic Neural Hero (Three.js)
-- Real-time rotating icosahedron lattice with organic vertex oscillation.
-- Dynamic mouse cursor parallax tracking with ambient lighting.
-- Zero-external CDN latency (bundled local minified engine).
+- `24CS302 Artificial Intelligence` → prerequisite knowledge: Probability & Statistics.
+- `22CS804 Deep Learning` → prerequisite knowledge: Machine Learning and Python programming.
+- `24CS306 Machine Learning` → prerequisite knowledge: Probability/Linear Algebra and Python programming.
 
-### 2. 🔐 Student Authentication & Transcript Management
-- Secure Sign In & Sign Up with persistent MongoDB storage.
-- Auto-initialization of student transcripts, completed credits, CGPA, and semester standing.
-- Pre-configured with official VFSTR student profile: 241FA04077 - SAI KARTHIK REDDY.
+The supplied curriculum does **not by itself prove** a minimum grade or formal registration block for those readiness statements, so AcadGraph does not silently convert them into hard prerequisites.
 
-### 3. 🗺️ 8-Semester Interactive Kanban Timeline
-- Full visual roadmap of the entire 160-credit degree program (Semesters I-I to IV-II).
-- Traffic-light status badges: 🟢 Passed (with grades), 🔵 Planned, 🟡 In-Progress, 🔴 At-Risk.
-- Dynamic credit accumulator and graduation progress bar.
+## Source-status labels
 
-### 4. 🕸️ 2D Prerequisite Knowledge Graph DAG (Vis.js + NetworkX)
-- Directed Graph visualization connecting 82 C24 courses across Basic Sciences, Core, Electives, Honours, and Minors.
-- Real-time bottleneck detection (identifies courses that block >= 3 downstream graduation requirements).
-- Live physics simulation, node clustering, and instant course code highlighting.
+Every important rule should be interpreted through one of these statuses:
 
-### 5. 📚 Interactive C24 Curriculum & Syllabus Explorer
-- Complete course catalog extracted from the official 202-page VFSTR C24 curriculum document.
-- Live category pills: **All**, **I-I** through **IV-II**, **PE** (Professional Electives), **HN** (Honours Track), **MN** (Minors Track), **OE** (Open Electives).
-- Rich Course Modal displaying:
-  - **L-T-P-C** breakdown (e.g. 2-0-4-4, 3-0-2-4)
-  - **Module 1 & Module 2** units with contact hours
-  - **Laboratory Practice Experiments**
-  - **Bloom's Taxonomy Course Outcomes** (CO1–CO5) mapped to Program Outcomes (POs)
-  - **Prescribed Textbooks and Reference Books**
+- `VERIFIED` / `VERIFIED_FROM_SUPPLIED_DOCUMENT`
+- `CURRICULUM_DERIVED`
+- `CANDIDATE`
+- `DEMO_POLICY`
+- `UNVERIFIED`
 
-### 6. ⚠️ Formal Constraint & Conflict Auditor
-- Enforces institutional rules:
-  - **Prerequisite Validation**: Prevents enrollment if prerequisite course or minimum grade is missing.
-  - **Credit Load Caps**: Flags overloads (>18 credits/sem) and underloads (<12 credits/sem). Academic probation cap at 14 credits.
-  - **Semester Term Matching**: Validates Fall vs. Spring term course offerings.
-  - **Automated Equivalency Suggestions**: Suggests approved substitutions (24CS402 -> 22CS953, 24CS204 -> 22CS902).
+Candidate course substitutions require faculty review unless an authoritative equivalency source explicitly marks them `APPROVED`.
 
-### 7. 💬 Citation-Traceable Graph-RAG AI Advisor
-- Hybrid Retrieval: Combines knowledge graph neighbor subgraphs + vector policy chunks (policies.md).
-- Fully grounded responses with verifiable citations (e.g. [VFSTR C24 Regulation §1.1], [Policy §5.2]).
-- Auto-generates formal faculty exception memos and waiver petitions.
+## Implemented architecture
 
----
+```text
+Student UI
+   │
+   ▼
+FastAPI
+   │
+   ▼
+LangGraph Academic Advisor
+   ├── query classifier
+   ├── Graph-RAG retriever
+   ├── conflict/readiness agent
+   ├── pathway agent
+   ├── planning-risk agent
+   ├── substitution agent
+   └── answer synthesis
+            │
+            ├── NetworkX academic graph
+            ├── lexical/TF-IDF document retrieval
+            ├── deterministic constraint engine
+            └── curriculum / source registry
+```
 
-## 🏛️ Official Academic Dataset: VFSTR C24 CSE
+### Important retrieval note
 
-- **University**: Vignan's Foundation for Science, Technology & Research (VFSTR Deemed to be University)
-- **Program**: B.Tech. Computer Science & Engineering (M.P.C Stream)
-- **Regulation**: C24 Curriculum (w.e.f. 2024–28 batch)
-- **Graduation Requirement**: **160 Credits**
+The current `AcademicVectorStore` is a lightweight **lexical TF-IDF/cosine retriever**, not a neural embedding store. The system therefore describes itself as hybrid **graph + document retrieval**. FAISS/embedding dependencies are available for a later semantic-retrieval upgrade, but the README does not claim neural embeddings are already the active production retriever.
 
-### Credit Category Breakdown
+## Repository layout
 
-| Category | Description | Required Credits |
-|---|---|:---:|
-| **BS** | Basic Sciences (Math, Physics, Chemistry) | 23 |
-| **BE** | Basic Engineering (EEE, Graphics, Python, Cyber Security) | 20 |
-| **PC** | Professional Core (C, Java, Data Structures, DBMS, DAA, OS, Networks, AI, ML) | 48 |
-| **PE** | Department Professional Electives (Deep Learning, Forensics, Security) | 16 |
-| **OE** | Open Electives | 9 |
-| **HS** | Humanities & Social Sciences (English, Management, Aptitude) | 15 |
-| **PR** | Projects & Industrial Internship (Field Project, IDP, Capstone) | 15 |
-| **BG** | Binary Grade Mandatory Non-Credit Courses (Induction, UHV, Constitution) | 6 |
-| **HN / MN** | Optional Honours Track / Minor Specialization Track | 20 |
-| **Total** | **Minimum Degree Credits Required for Graduation** | **160** |
+```text
+backend/
+  database.py
+  server.py
 
----
+data/
+  courses.json
+  degree_requirements.json
+  equivalencies.json
+  policies.md
+  sample_students.json
 
-## 📂 Project Architecture & Directory Structure
+src/
+  agents/
+    orchestrator.py
+    conflict_agent.py
+    pathway_agent.py
+    risk_agent.py
+    substitution_agent.py
+    state.py
+  constraint_engine/
+    prerequisite_checker.py
+    credit_validator.py
+    schedule_feasibility.py
+  knowledge_graph/
+    graph_builder.py
+    graph_queries.py
+    graph_visualizer.py
+  models/
+  rag/
 
-`
-├── backend/
-│   ├── server.py              # FastAPI application & REST endpoints
-│   └── database.py            # MongoDB Atlas connection & dataset seeding
-├── data/
-│   ├── courses.json           # 82 C24 courses with full module syllabi & outcomes
-│   ├── degree_requirements.json # 160-credit B.Tech CSE degree requirements
-│   ├── equivalencies.json     # Approved course equivalencies & substitutions
-│   ├── policies.md            # VFSTR institutional regulations, vision, PEOs, PSOs
-│   └── sample_students.json   # Seed student profiles (e.g., 241FA04077)
-├── src/
-│   ├── agents/                # Multi-agent orchestrator, conflict & risk agents
-│   ├── constraint_engine/     # Prerequisite checker & credit load validator
-│   ├── knowledge_graph/       # NetworkX DAG graph builder, queries & visualizer
-│   ├── models/                # Pydantic schemas (Course, Student, Pathway)
-│   ├── rag/                   # Document loader, vector store, Graph-RAG retriever
-│   └── utils/                 # Configuration & environment loader
-├── web/ & root:
-│   ├── index.html             # Single-page full-stack UI
-│   ├── app.js                 # Frontend application logic & API client
-│   ├── style.css              # Glassmorphic dark theme stylesheet
-│   ├── three.min.js           # Three.js 3D library (bundled)
-│   └── vis-network.min.js     # Vis.js network graph library (bundled)
-├── Dockerfile                 # Docker container specification
-├── requirements.txt           # Python package dependencies
-├── .env.example               # Environment variables template
-└── README.md                  # System documentation
-`
+web/
+  advisor.html
+  conflicts.html
+  curriculum.html
+  governance.html
+  graph.html
+  pathway.html
+  risk.html
+  substitutions.html
+```
 
----
+## Knowledge graph
 
-## 📡 REST API Reference
+The NetworkX graph represents courses, departments, credit categories and academic relationships. It supports:
 
-### 🎓 Student & Curriculum Endpoints
-| Method | Endpoint | Description |
-|---|---|---|
-| `GET` | `/api/courses` | Returns all 82 C24 courses with full syllabus details |
-| `GET` | `/api/courses/{course_id}` | Returns single course syllabus (modules, labs, COs, books) |
-| `GET` | `/api/curriculum` | Returns 8-semester sequence, electives, honours, minors, requirements |
-| `GET` | `/api/equivalencies` | Returns approved course equivalency mappings |
-| `POST` | `/api/auth/login` | Student login authentication |
-| `POST` | `/api/auth/signup` | New student registration and transcript creation |
-| `GET` | `/api/students/{id}` | Fetches student profile, transcript, and GPA |
-| `POST` | `/api/pathway/generate` | Generates optimal topological 8-semester graduation pathway |
-| `POST` | `/api/audit/verify` | Formal constraint verification (prerequisites, overload, term offerings) |
-| `GET` | `/api/bottlenecks/{id}` | Calculates critical blocking courses & Graduation Risk Index |
-| `POST` | `/api/chat` | Citation-grounded Graph-RAG AI advising assistant |
-| `POST` | `/api/petitions/submit` | Submit prerequisite waiver or credit overload petition |
+- formal prerequisite traversal;
+- non-blocking prerequisite-knowledge traversal;
+- recursive dependency inspection;
+- cycle detection;
+- topological ordering of formal dependencies;
+- bottleneck scoring using downstream impact;
+- candidate equivalency relationships with approval status.
 
-### 👑 Faculty & Admin Governance Endpoints
-| Method | Endpoint | Description |
-|---|---|---|
-| `POST` | `/api/admin/login` | Admin & Faculty authentication (`admin` / `admin123`) |
-| `GET` | `/api/admin/stats` | Dean's overview KPIs (total students, courses, at-risk, avg GPA) |
-| `GET` | `/api/admin/students` | List all students with search & filter |
-| `POST` | `/api/admin/students` | Register new student profile into database |
-| `PUT` | `/api/admin/students/{id}` | Update student GPA, standing, and transcript |
-| `DELETE` | `/api/admin/students/{id}` | Delete student record |
-| `GET` | `/api/admin/courses` | List all courses in catalog |
-| `POST` | `/api/admin/courses` | Add new course or elective to catalog |
-| `PUT` | `/api/admin/courses/{id}` | Edit course syllabus, L-T-P-C, and prerequisites |
-| `DELETE` | `/api/admin/courses/{id}` | Remove course from catalog |
-| `GET` | `/api/admin/petitions` | List all student exception & waiver requests |
-| `POST` | `/api/petitions/{id}/review` | Issue official Dean decision with digital signature stamp |
-| `GET` | `/api/admin/equivalencies` | List all approved course substitution rules |
-| `POST` | `/api/admin/equivalencies` | Create new course substitution rule |
-| `DELETE` | `/api/admin/equivalencies/{c_id}/{sub_id}` | Remove course substitution rule |
-| `GET` | `/api/admin/bottlenecks` | Department-wide bottleneck impact & student delay ranking |
+A specific elective is **not** automatically a mandatory course. The degree-requirement schema represents Department Elective/Open Elective requirements as choice slots and treats Honours/Minors as an optional track in the base-degree planner.
 
----
+## Constraint behavior
 
-## 🚀 Quick Start Guide
+The deterministic constraint engine checks:
 
-### 1. Prerequisites
-- Python 3.11+
-- Git
+- already-completed courses;
+- sourced formal prerequisites;
+- corequisites;
+- semester availability metadata;
+- prerequisite-knowledge/readiness gaps as warnings;
+- source-aware credit requirements.
 
-### 2. Clone and Setup Environment
-`ash
-# Clone the repository
+If an official credit minimum or semester cap is not verified by the currently loaded source set, the engine does not fabricate a blocking rule.
+
+## Planning risk
+
+`RiskAgent` returns a **Planning Risk Indicator**, not a statistical prediction that a student will or will not graduate. It uses transparent signals such as remaining source-defined required courses and high-impact dependency bottlenecks. Unverified credit rules do not create hard penalties.
+
+## Degree requirements
+
+`data/degree_requirements.json` separates:
+
+- explicitly named required courses;
+- elective choice pools;
+- Open Elective slots;
+- optional Honours/Minors slots;
+- source status for numeric graduation/credit rules.
+
+The historical `160 credits` project target is retained only as an **UNVERIFIED planning assumption** until a separate official Academic Regulations source is added. It must not be presented as a verified university graduation minimum based only on the supplied course-structure PDF.
+
+## Substitutions and faculty governance
+
+Entries in `data/equivalencies.json` are now `CANDIDATE` or `READINESS_BRIDGE` unless an authoritative equivalency source exists. They may be recommended for review but cannot automatically satisfy a formal requirement.
+
+Exceptional cases should follow:
+
+```text
+Student request
+   ↓
+Automated evidence + constraint pre-check
+   ↓
+Candidate resolution
+   ↓
+Faculty / HoD review
+   ↓
+Approve or reject
+```
+
+## Run locally
+
+```bash
 git clone https://github.com/saikarthikreddy01/ispark.git
 cd ispark
-
-# Create virtual environment
 python -m venv venv
+```
 
-# Activate virtual environment (Windows PowerShell)
-.env\Scripts\Activate.ps1
-# On Linux / macOS:
-# source venv/bin/activate
+Windows PowerShell:
 
-# Install dependencies
+```powershell
+.\venv\Scripts\Activate.ps1
+```
+
+Linux/macOS:
+
+```bash
+source venv/bin/activate
+```
+
+Install and run:
+
+```bash
 pip install -r requirements.txt
-`
-
-### 3. Configure Environment Variables
-Copy .env.example to .env and provide your API keys (optional, default fallbacks included):
-`ash
-cp .env.example .env
-`
-Contents of .env:
-`ini
-GEMINI_API_KEY=your_gemini_api_key_here
-MODEL_NAME=gemini-2.5-flash
-MONGODB_URI=mongodb+srv://<user>:<password>@cluster0.xxxxx.mongodb.net/?retryWrites=true&w=majority
-MONGODB_DB=academic_advisor
-`
-
-### 4. Start the Application Server
-`ash
 python -m uvicorn backend.server:app --host 0.0.0.0 --port 8000 --reload
-`
+```
 
-### 5. Access the Platform
-- 🌐 **Web Interface**: http://localhost:8000
-- 📖 **Interactive Swagger API Docs**: http://localhost:8000/docs
-- 🧪 **ReDoc Documentation**: http://localhost:8000/redoc
+Then open:
 
----
+- Web app: `http://localhost:8000`
+- Swagger: `http://localhost:8000/docs`
 
-## 🐳 Docker Deployment
+## Docker
 
-`ash
-# Build Docker image
-docker build -t academic-ai-advisor .
+```bash
+docker build -t acadgraph-ai .
+docker run -p 8080:8080 --env-file .env acadgraph-ai
+```
 
-# Run container
-docker run -p 8080:8080 --env-file .env academic-ai-advisor
-`
+## Recommended hackathon demo
 
-Access at http://localhost:8080.
+Use a synthetic student record and ask:
 
----
+> “I want an AI-focused pathway. What happens if I have not completed Probability & Statistics, and can I choose Deep Learning?”
 
-## 🛡️ License & Institutional Rights
+A good response should demonstrate:
 
-Developed for the **Department of Computer Science & Engineering, VFSTR (Deemed to be University)**.  
-Curriculum contents referenced from VFSTR Academic Regulations (C24 / R22 aligned).
+1. curriculum entity resolution;
+2. graph retrieval;
+3. `REQUIRES_KNOWLEDGE_OF` warnings rather than fabricated hard blocks;
+4. candidate semester pathway;
+5. bottleneck/planning-risk analysis;
+6. source-status-aware citations;
+7. faculty escalation when an actual exception/substitution is requested.
+
+## Known prototype limitations
+
+- The active document retriever is lexical rather than neural-embedding based.
+- The supplied course-structure PDF is not a complete replacement for official Registrar/Academic Regulations documents.
+- Some legacy FastAPI/UI paths still require security hardening before production use.
+- This is a hackathon academic-planning prototype, not an official registration or degree-audit system.

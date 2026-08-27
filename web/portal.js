@@ -56,9 +56,11 @@ function toast(message) {
 
 function nav(active, faculty) {
   const items = [
-    ['home.html','Home','home'], ['curriculum.html','Curriculum','curriculum'], ['graph.html','Knowledge graph','graph'], ['retrieval.html','Graph-RAG','retrieval'], ['advisor.html','Advisor','advisor'],
-    ['pathway.html','Degree pathway','pathway'], ['conflicts.html','Conflict audit','conflicts'], ['risk.html','Risk','risk'],
-    ['substitutions.html','Substitutions','substitutions'], ['governance.html','Faculty review','governance']
+    ['home.html', 'Dashboard', 'home'],
+    ['advisor.html', 'Advisor', 'advisor'],
+    ['pathway.html', 'Degree pathway', 'pathway'],
+    ['graph.html', 'Knowledge graph', 'graph'],
+    ['governance.html', 'Faculty review', 'governance']
   ];
   const visibleItems = faculty ? items.filter(([, , key]) => key === 'governance') : items;
   return visibleItems.map(([href,label,key]) => `<a class="${key === active ? 'active' : ''}" href="${href}">${label}</a>`).join('');
@@ -127,7 +129,7 @@ function initGlobalChatbot(student) {
         <div id="global-chatbot-messages" class="global-chatbot-messages">
           <div class="global-chatbot-message assistant">
             <strong>Autonomous AI Advisor</strong>
-            <p>Hi ${esc(student.name.split(' ')[0])}! I am your Autonomous Academic AI Advisor. Ask me to audit courses, generate pathways, or evaluate graduation risks.</p>
+            <p>Hi ${esc(student.name.split(' ')[0])}! Ask me to verify course readiness, generate a degree pathway, identify bottlenecks, or review substitution options.</p>
           </div>
         </div>
         <div class="global-chatbot-chips">
@@ -136,7 +138,7 @@ function initGlobalChatbot(student) {
           <button type="button" class="global-chip" data-prompt="What courses are blocking my graduation?">🚨 Bottlenecks</button>
         </div>
         <form id="global-chatbot-form" class="global-chatbot-input">
-          <textarea name="question" placeholder="Ask or command (e.g. 'Audit 24CS209')..." required rows="1"></textarea>
+          <textarea name="question" placeholder="Ask about courses, pathways, conflicts, bottlenecks, or substitutions..." required rows="1"></textarea>
           <button type="submit" aria-label="Send">
             <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
           </button>
@@ -175,7 +177,7 @@ function initGlobalChatbot(student) {
     const question = input.value.trim();
     if (!question) return;
 
-    msgs.insertAdjacentHTML('beforeend', `<div class="global-chatbot-message user"><strong>You</strong><p>${esc(question)}</p></div><div class="global-chatbot-message assistant chat-loading"><strong>Autonomous AI Advisor</strong><p>⚡ Executing autonomous reasoning...</p></div>`);
+    msgs.insertAdjacentHTML('beforeend', `<div class="global-chatbot-message user"><strong>You</strong><p>${esc(question)}</p></div><div class="global-chatbot-message assistant chat-loading"><strong>Autonomous AI Advisor</strong><p>⚡ Executing academic reasoning...</p></div>`);
     msgs.scrollTop = msgs.scrollHeight;
     input.value = '';
     input.disabled = true;
@@ -192,7 +194,7 @@ function initGlobalChatbot(student) {
         .replace(/\n/g, '<br>');
       const loading = msgs.querySelector('.chat-loading:last-child');
       if (loading) {
-        loading.outerHTML = `<div class="global-chatbot-message assistant"><strong>Autonomous AI Advisor</strong>${toolBadge}<div class="reply-text">${replyHtml}</div>${citations.length ? `<div class="chat-citations">${citations.map(c => `<span class="badge">${esc(c)}</span>`).join('')}</div>` : ''}</div>`;
+        loading.outerHTML = `<div class="global-chatbot-message assistant"><strong>Autonomous AI Advisor</strong>${toolBadge}<div class="reply-text">${replyHtml}</div>${citations.length ? `<div class="chat-citations">${citations.map(c => `<span class="badge">${esc(typeof c === 'string' ? c : (c.reference || c.content || 'Source'))}</span>`).join('')}</div>` : ''}</div>`;
       }
     } catch (error) {
       const loading = msgs.querySelector('.chat-loading:last-child');
@@ -212,4 +214,3 @@ function initGlobalChatbot(student) {
     }
   };
 }
-

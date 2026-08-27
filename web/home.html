@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Home | Academic Advisor</title>
+  <title>Dashboard | AcadGraph AI</title>
   <link rel="stylesheet" href="portal.css">
 </head>
 <body data-page="home">
@@ -15,42 +15,35 @@
   <main class="page home-page">
     <div class="home-hero">
       <div>
-        <span class="eyebrow">Student command center</span>
+        <span class="eyebrow">AcadGraph AI</span>
         <h1>Welcome back, <span data-student-name>student</span>.</h1>
-        <p>Your degree progress, upcoming decisions, and academic signals in one place.</p>
+        <p>Plan your degree, inspect course dependencies, and get source-aware academic advice from one focused workspace.</p>
       </div>
-      <a class="btn btn-primary" href="advisor.html">Ask your advisor <span aria-hidden="true">&rarr;</span></a>
+      <a class="btn btn-primary" href="advisor.html">Ask the advisor <span aria-hidden="true">&rarr;</span></a>
     </div>
 
     <section data-summary class="home-metrics" aria-label="Degree progress"></section>
 
     <div class="home-grid">
       <section class="panel home-progress-panel">
-        <div class="section-heading"><div><span class="eyebrow">Degree progress</span><h2>Keep your momentum</h2></div><a class="text-link" href="curriculum.html">View curriculum &rarr;</a></div>
+        <div class="section-heading">
+          <div><span class="eyebrow">Degree progress</span><h2>Academic status</h2></div>
+          <a class="text-link" href="pathway.html">View pathway &rarr;</a>
+        </div>
         <div class="progress-track"><span data-progress-bar></span></div>
         <div class="progress-meta"><strong data-progress-label>Loading progress...</strong><span data-credits-label></span></div>
-        <div class="home-signal"><span class="signal-icon">&#10003;</span><div><strong data-standing>Checking academic standing</strong><p data-progress-note>We are checking your current record and degree requirements.</p></div></div>
+        <div class="home-signal"><span class="signal-icon">&#10003;</span><div><strong data-standing>Checking academic standing</strong><p data-progress-note>Checking your current record and curriculum structure.</p></div></div>
       </section>
 
       <section class="panel home-actions-panel">
-        <div class="section-heading"><div><span class="eyebrow">Next actions</span><h2>Make the next move</h2></div></div>
+        <div class="section-heading"><div><span class="eyebrow">Core prototype</span><h2>What you can do</h2></div></div>
         <div class="action-list">
-          <a class="action-item" href="pathway.html"><span class="action-index">01</span><span><strong>Review degree pathway</strong><small>See the recommended semester sequence.</small></span><span aria-hidden="true">&rarr;</span></a>
-          <a class="action-item" href="risk.html"><span class="action-index">02</span><span><strong>Check graduation signals</strong><small>Spot bottlenecks before they become delays.</small></span><span aria-hidden="true">&rarr;</span></a>
-          <a class="action-item" href="graph.html"><span class="action-index">03</span><span><strong>Explore course dependencies</strong><small>Understand what each prerequisite unlocks.</small></span><span aria-hidden="true">&rarr;</span></a>
+          <a class="action-item" href="advisor.html"><span class="action-index">01</span><span><strong>Ask the agentic advisor</strong><small>Check prerequisites, bottlenecks, risks, alternatives, and evidence.</small></span><span aria-hidden="true">&rarr;</span></a>
+          <a class="action-item" href="pathway.html"><span class="action-index">02</span><span><strong>Review degree pathway</strong><small>See a student-specific semester sequence with elective slots preserved as choices.</small></span><span aria-hidden="true">&rarr;</span></a>
+          <a class="action-item" href="graph.html"><span class="action-index">03</span><span><strong>Explore the knowledge graph</strong><small>Inspect course relationships and downstream bottlenecks.</small></span><span aria-hidden="true">&rarr;</span></a>
         </div>
       </section>
     </div>
-
-    <section class="home-links">
-      <div class="section-heading"><div><span class="eyebrow">Workspace</span><h2>Academic tools</h2></div></div>
-      <div class="home-tool-grid">
-        <a class="tool-tile" href="curriculum.html"><span class="tool-number">01</span><strong>Curriculum</strong><small>Browse courses and credits</small></a>
-        <a class="tool-tile" href="conflicts.html"><span class="tool-number">02</span><strong>Conflict audit</strong><small>Validate a semester plan</small></a>
-        <a class="tool-tile" href="substitutions.html"><span class="tool-number">03</span><strong>Substitutions</strong><small>Find approved equivalents</small></a>
-        <a class="tool-tile" href="retrieval.html"><span class="tool-number">04</span><strong>Graph-RAG</strong><small>Trace policy-backed answers</small></a>
-      </div>
-    </section>
   </main>
 
   <div id="toast"></div>
