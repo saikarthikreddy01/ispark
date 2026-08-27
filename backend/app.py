@@ -1,9 +1,8 @@
 """AcadGraph AI - unified hackathon application.
 
-This module is the single FastAPI entrypoint for the prototype. It connects the
-static single-page frontend, the resilient database layer, the academic
-knowledge graph, Graph-RAG retrieval, LangGraph agents, deterministic
-verification, and faculty review workflow.
+Single FastAPI entrypoint connecting the single-page frontend, resilient data
+repository, academic knowledge graph, Graph-RAG retrieval, LangGraph agents,
+deterministic verification, and human faculty review.
 
 Core principle:
     LLM explains -> graph/RAG retrieves -> rules verify -> faculty approves exceptions.
@@ -11,6 +10,7 @@ Core principle:
 
 from __future__ import annotations
 
+import datetime as dt
 import json
 import os
 import uuid
@@ -23,7 +23,6 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 
-from backend.database import db_manager
 from src.agents.orchestrator import AcademicAdvisor
 from src.models.graph_schema import REL_EQUIVALENT, REL_KNOWLEDGE, REL_REQUIRES
 
@@ -31,6 +30,17 @@ from src.models.graph_schema import REL_EQUIVALENT, REL_KNOWLEDGE, REL_REQUIRES
 ROOT_DIR = Path(__file__).resolve().parent.parent
 DATA_DIR = ROOT_DIR / "data"
 WEB_DIR = ROOT_DIR / "web"
+LOCAL_DB_PATH = DATA_DIR / "persistent_db.json"
+
+# MongoDB is optional for the hackathon. When MONGODB_URI is absent we avoid a
+# slow localhost connection attempt and use the durable JSON fallback directly.
+db_manager = None
+if os.getenv("MONGODB_URI", "").strip():
+    try:
+        from backend.database import db_manager as _mongo_db_manager
+        db_manager = _mongo_db_manager
+    except Exception as exc:
+        print(f"[WARN] MongoDB unavailable ({exc}); using local JSON repository.")
 
 
 def load_json(name: str, fallback: Any) -> Any:
@@ -41,8 +51,128 @@ def load_json(name: str, fallback: Any) -> Any:
         return json.load(handle)
 
 
+def _seed_local_db() -> dict:
+    return {
+        "students": load_json("sample_students.json", []),
+        "courses": load_json("courses.json", []),
+        "equivalencies": load_json("equivalencies.json", []),
+        "chat_history": [],
+        "petitions": [],
+    }
+
+
+def _read_local_db() -> dict:
+    if not LOCAL_DB_PATH.exists():
+        data = _seed_local_db()
+        _write_local_db(data)
+        return data
+    try:
+        with LOCAL_DB_PATH.open("r", encoding="utf-8") as handle:
+            data = json.load(handle)
+    except Exception:
+        data = _seed_local_db()
+        _write_local_db(data)
+    # Keep current curriculum data authoritative while preserving session logs.
+    data["courses"] = load_json("courses.json", data.get("courses", []))
+    data["equivalencies"] = load_json("equivalencies.json", data.get("equivalencies", []))
+    if not data.get("students"):
+        data["students"] = load_json("sample_students.json", [])
+    data.setdefault("chat_history", [])
+    data.setdefault("petitions", [])
+    return data
+
+
+def _write_local_db(data: dict) -> None:
+    LOCAL_DB_PATH.parent.mkdir(parents=True, exist_ok=True)
+    with LOCAL_DB_PATH.open("w", encoding="utf-8") as handle:
+        json.dump(data, handle, indent=2)
+
+
+def repo_students() -> list[dict]:
+    if db_manager is not None and getattr(db_manager, "is_connected", False):
+        return db_manager.get_all_students()
+    return _read_local_db().get("students", [])
+
+
+def repo_student(student_id: str) -> Optional[dict]:
+    needle = student_id.strip().upper()
+    if db_manager is not None and getattr(db_manager, "is_connected", False):
+        return db_manager.get_student_by_id(needle)
+    for student in repo_students():
+        sid = str(student.get("id") or student.get("student_id") or "").upper()
+        if sid == needle:
+            return dict(student)
+    return None
+
+
+def repo_courses() -> list[dict]:
+    if db_manager is not None and getattr(db_manager, "is_connected", False):
+        return db_manager.get_all_courses()
+    return _read_local_db().get("courses", [])
+
+
+def repo_save_chat(student_id: str, question: str, response: str, citations: list[str]) -> None:
+    if db_manager is not None and getattr(db_manager, "is_connected", False):
+        db_manager.save_chat_log(student_id, question, response, citations)
+        return
+    data = _read_local_db()
+    data["chat_history"].append({
+        "student_id": student_id,
+        "question": question,
+        "response": response,
+        "citations": citations,
+        "created_at": dt.datetime.now().isoformat(timespec="seconds"),
+    })
+    data["chat_history"] = data["chat_history"][-100:]
+    _write_local_db(data)
+
+
+def repo_chat_history(student_id: str) -> list[dict]:
+    if db_manager is not None and getattr(db_manager, "is_connected", False):
+        return db_manager.get_chat_history(student_id)
+    needle = student_id.upper()
+    return [x for x in _read_local_db().get("chat_history", []) if str(x.get("student_id", "")).upper() == needle]
+
+
+def repo_petitions() -> list[dict]:
+    if db_manager is not None and getattr(db_manager, "is_connected", False):
+        return db_manager.get_all_petitions()
+    return _read_local_db().get("petitions", [])
+
+
+def repo_create_petition(petition: dict) -> dict:
+    if db_manager is not None and getattr(db_manager, "is_connected", False):
+        return db_manager.create_petition(petition)
+    data = _read_local_db()
+    petition = dict(petition)
+    petition.setdefault("created_at", dt.datetime.now().isoformat(timespec="minutes"))
+    petition.setdefault("status", "PENDING")
+    data["petitions"] = [p for p in data["petitions"] if p.get("petition_id") != petition.get("petition_id")]
+    data["petitions"].append(petition)
+    _write_local_db(data)
+    return petition
+
+
+def repo_review_petition(petition_id: str, decision: str, reviewer: str, comments: str) -> Optional[dict]:
+    if db_manager is not None and getattr(db_manager, "is_connected", False):
+        return db_manager.review_petition(petition_id, decision, reviewer, comments)
+    data = _read_local_db()
+    for petition in data.get("petitions", []):
+        if petition.get("petition_id") == petition_id:
+            petition.update({
+                "status": decision,
+                "reviewer": reviewer,
+                "review_comments": comments,
+                "reviewed_at": dt.datetime.now().isoformat(timespec="minutes"),
+                "audit_stamp": f"SIG-{petition_id}-{dt.datetime.now().strftime('%Y%m%d%H%M')}",
+            })
+            _write_local_db(data)
+            return petition
+    return None
+
+
 def public_student(student: Optional[dict]) -> Optional[dict]:
-    """Return only fields that are safe and useful for the prototype UI."""
+    """Return only fields safe and useful for the prototype UI."""
     if not student:
         return None
     allowed = {
@@ -75,7 +205,7 @@ class PetitionRequest(BaseModel):
     course_id: Optional[str] = None
     request_type: str = "ACADEMIC_EXCEPTION_REVIEW"
     reason: str
-    evidence: list[dict] = []
+    evidence: list[dict] = Field(default_factory=list)
     faculty_packet: Optional[dict] = None
 
 
@@ -106,7 +236,7 @@ def health() -> dict:
         "status": "ok",
         "app": "AcadGraph AI",
         "version": "5.0.0",
-        "database": "mongodb" if db_manager.is_connected else "local-persistent-json",
+        "database": "mongodb" if db_manager is not None and getattr(db_manager, "is_connected", False) else "local-persistent-json",
         "gemini_configured": bool(os.getenv("GEMINI_API_KEY")),
         "architecture": "LangGraph + Graph-RAG + deterministic verification + human review",
     }
@@ -115,7 +245,7 @@ def health() -> dict:
 @app.get("/api/demo")
 def demo_catalog() -> dict:
     """Curated judge-demo profiles and prompts without inventing academic rules."""
-    students = [public_student(s) for s in db_manager.get_all_students()[:3]]
+    students = [public_student(s) for s in repo_students()[:3]]
     students = [s for s in students if s]
     prompts = [
         {
@@ -136,7 +266,7 @@ def demo_catalog() -> dict:
 
 @app.get("/api/student/{student_id}")
 def student_detail(student_id: str) -> dict:
-    student = public_student(db_manager.get_student_by_id(student_id))
+    student = public_student(repo_student(student_id))
     if not student:
         raise HTTPException(status_code=404, detail="Student not found")
     return student
@@ -144,7 +274,7 @@ def student_detail(student_id: str) -> dict:
 
 @app.get("/api/courses")
 def courses(q: str = Query(default="", max_length=120)) -> list[dict]:
-    items = db_manager.get_all_courses()
+    items = repo_courses()
     if q.strip():
         needle = q.strip().lower()
         items = [
@@ -170,12 +300,12 @@ def courses(q: str = Query(default="", max_length=120)) -> list[dict]:
 
 @app.get("/api/overview/{student_id}")
 def overview(student_id: str) -> dict:
-    student = public_student(db_manager.get_student_by_id(student_id))
+    student = public_student(repo_student(student_id))
     if not student:
         raise HTTPException(status_code=404, detail="Student not found")
 
     degree = load_json("degree_requirements.json", {})
-    courses_raw = db_manager.get_all_courses()
+    courses_raw = repo_courses()
     course_map = {c.get("id"): c for c in courses_raw if c.get("id")}
     completed = set(student.get("completed", []))
     planned = set(student.get("planned", []))
@@ -191,13 +321,13 @@ def overview(student_id: str) -> dict:
         semester_courses = []
         for cid in semester.get("courses", []):
             course = course_map.get(cid, {"id": cid, "name": cid, "credits": 0})
-            state = "completed" if cid in completed else "planned" if cid in planned else "remaining"
+            course_state = "completed" if cid in completed else "planned" if cid in planned else "remaining"
             semester_courses.append({
                 "id": cid,
                 "name": course.get("name", cid),
                 "credits": course.get("credits", 0),
                 "category": course.get("category", "Curriculum course"),
-                "state": state,
+                "state": course_state,
             })
         semesters.append({
             "semester": semester.get("semester"),
@@ -209,10 +339,7 @@ def overview(student_id: str) -> dict:
             "note": semester.get("note"),
         })
 
-    remaining_core = [
-        cid for cid in degree.get("required_courses", [])
-        if cid not in completed
-    ]
+    remaining_core = [cid for cid in degree.get("required_courses", []) if cid not in completed]
 
     return {
         "student": student,
@@ -235,16 +362,17 @@ def graph_data() -> dict:
     """Expose the provenance-aware course graph used by the agents."""
     advisor = get_advisor()
     kg = advisor.kg
-    nodes = []
-    for course in kg.get_all_courses():
-        nodes.append({
+    nodes = [
+        {
             "id": course.id,
             "name": course.name,
             "department": course.department,
             "credits": course.credits,
             "category": str(course.category),
             "semester": course.sem,
-        })
+        }
+        for course in kg.get_all_courses()
+    ]
 
     edges = []
     allowed = {REL_REQUIRES, REL_KNOWLEDGE, REL_EQUIVALENT}
@@ -265,7 +393,7 @@ def graph_data() -> dict:
 
 @app.post("/api/chat")
 def advisor_chat(req: ChatRequest) -> dict:
-    student = db_manager.get_student_by_id(req.student_id)
+    student = repo_student(req.student_id)
     if not student:
         raise HTTPException(status_code=404, detail="Student not found")
 
@@ -276,10 +404,7 @@ def advisor_chat(req: ChatRequest) -> dict:
     try:
         result = get_advisor().chat_sync(question, student=student)
     except Exception as exc:
-        raise HTTPException(
-            status_code=503,
-            detail=f"Academic advising workflow unavailable: {exc}",
-        ) from exc
+        raise HTTPException(status_code=503, detail=f"Academic advising workflow unavailable: {exc}") from exc
 
     citation_details = result.get("citations", []) or []
     citation_labels = []
@@ -292,7 +417,7 @@ def advisor_chat(req: ChatRequest) -> dict:
             citation_labels.append(str(citation))
 
     reply = result.get("response", "")
-    db_manager.save_chat_log(req.student_id, question, reply, citation_labels)
+    repo_save_chat(req.student_id, question, reply, citation_labels)
 
     return {
         "reply": reply,
@@ -317,19 +442,19 @@ def advisor_chat(req: ChatRequest) -> dict:
 
 @app.get("/api/chat/history/{student_id}")
 def chat_history(student_id: str) -> dict:
-    return {"history": db_manager.get_chat_history(student_id)}
+    return {"history": repo_chat_history(student_id)}
 
 
 @app.get("/api/faculty/petitions")
 def petitions() -> dict:
-    items = db_manager.get_all_petitions()
+    items = repo_petitions()
     items.sort(key=lambda item: item.get("created_at", ""), reverse=True)
     return {"petitions": items}
 
 
 @app.post("/api/faculty/petitions")
 def create_petition(req: PetitionRequest) -> dict:
-    if not db_manager.get_student_by_id(req.student_id):
+    if not repo_student(req.student_id):
         raise HTTPException(status_code=404, detail="Student not found")
     petition = {
         "petition_id": f"PET-{uuid.uuid4().hex[:8].upper()}",
@@ -342,7 +467,7 @@ def create_petition(req: PetitionRequest) -> dict:
         "status": "PENDING",
         "agent_action": "RECOMMEND_REVIEW_ONLY",
     }
-    return {"petition": db_manager.create_petition(petition)}
+    return {"petition": repo_create_petition(petition)}
 
 
 @app.post("/api/faculty/petitions/{petition_id}/review")
@@ -350,7 +475,7 @@ def review_petition(petition_id: str, req: ReviewRequest) -> dict:
     decision = req.decision.upper()
     if decision not in {"APPROVED", "REJECTED"}:
         raise HTTPException(status_code=400, detail="Decision must be APPROVED or REJECTED")
-    petition = db_manager.review_petition(petition_id, decision, req.reviewer, req.comments)
+    petition = repo_review_petition(petition_id, decision, req.reviewer, req.comments)
     if not petition:
         raise HTTPException(status_code=404, detail="Petition not found")
     return {"petition": petition}
@@ -362,5 +487,4 @@ if WEB_DIR.exists():
 
 if __name__ == "__main__":
     import uvicorn
-
     uvicorn.run("backend.app:app", host="0.0.0.0", port=int(os.getenv("PORT", "8000")))
