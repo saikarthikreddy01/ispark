@@ -7,6 +7,7 @@ class AdvisorState(TypedDict, total=False):
     student: Optional[Any]
     student_profile: dict
     query_type: str
+    source_plan: dict
     retrieved_context: str
     retrieval: Optional[Any]
     citations: list[dict]
