@@ -1,98 +1,80 @@
-# Vignan's Foundation for Science, Technology & Research (VFSTR)
-## Academic Regulations & C24 Curriculum Guidelines (w.e.f. Batch 2024-28)
-### Department of Computer Science & Engineering
+# VFSTR CSE Academic Source Registry for AcadGraph AI
 
----
+> **Academic-integrity note:** This file is intentionally conservative. It distinguishes facts supported by the supplied CSE course-structure PDF from rules that require a separate official Academic Regulations / Registrar source. The advisor must not present an unverified project assumption as official university policy.
 
-## 🏛️ Vision & Mission of the Institution and Department
+## Source A — Supplied CSE Course Structure & Course Contents
 
-### Institutional Vision
-To evolve into a Centre of Excellence in Science & Technology through creative and innovative practices in teaching – learning, towards promoting academic achievement and research excellence to produce internationally accepted, competitive and world class professionals who are psychologically strong & emotionally balanced, imbued with social consciousness & ethical values.
+**Document:** `R22C24_B.Tech_(CSE)_Course_Structure_and_Contents.pdf`  
+**Authority used by prototype:** VFSTR CSE curriculum/course-structure document supplied to the project  
+**Status:** `CURRICULUM_SOURCE`
 
-### Institutional Mission
-To provide high quality academic programmes, training activities, research facilities and opportunities supported by continuous industry - institute interaction aimed at promoting employability, entrepreneurship, leadership and research aptitude among students and contribute to the economic and technological development of the region, state and nation.
+### [SRC-A-01] Credit transfer / flexible academic pathways
+**Status:** `VERIFIED_FROM_SUPPLIED_DOCUMENT`
 
-### Department Vision
-To evolve as a centre of high repute in Computer Science & Engineering and create computer software professionals trained on problem solving skills imbued with ethics to serve the ever evolving and emerging requirements of IT Industry and society at large.
+The salient curriculum features explicitly mention:
+- lateral entry and lateral exit options;
+- credit earning by credit transfer;
+- Honours / Research Honours / Minor / add-on pathways and a dual B.Tech + M.Tech/MBA option;
+- semester drop for innovation/incubation/entrepreneurial/advanced exploratory activities with subsequent re-entry.
 
-### Department Mission
-- **M1 (Quality Education)**: Imparting quality education through well designed curriculum, innovative teaching and learning methodologies integrated with professional skill development activities to meet the challenges in the career.
-- **M2 (Research & Consultancy)**: Nurture research and consultancy activities amongst students and faculty by providing state-of-art facilities and Industry-Institute Interaction.
-- **M3 (Entrepreneurship & Innovation)**: Developing capacity to learn new technologies and apply to solve social and industrial problems to become an entrepreneur.
+### [SRC-A-02] Semester and course structure
+**Status:** `VERIFIED_FROM_SUPPLIED_DOCUMENT`
 
----
+The document provides semester-wise course titles/codes, L-T-P-C values, categories, Department Elective slots, Open Elective slots, Minors/Honours slots, and Internship/Project Work.
 
-## 🎯 Program Educational Objectives (PEOs) & Program Specific Outcomes (PSOs)
+Important modelling rule: a generic **Department Elective** or **Open Elective** slot is a choice slot. A specific elective such as Deep Learning must not be treated as mandatory merely because it exists in the elective pool.
 
-### Program Educational Objectives (PEOs)
-- **PEO1**: Graduates acquire extensive technical knowledge and related skills required to demonstrate themselves as professionals or pursue higher education.
-- **PEO2**: Graduates adapt to upskilling and excel in their careers despite future technological changes, and demonstrate research aptitude to generate innovative engineering solutions.
-- **PEO3**: Graduates acquire the potential to contribute for the field of computing as well as for societal development by demonstrating professional, social and ethical practices.
+### [SRC-A-03] Artificial Intelligence prerequisite knowledge
+**Status:** `VERIFIED_FROM_SUPPLIED_DOCUMENT`
 
-### Program Specific Outcomes (PSOs)
-- **PSO1 (Application Development Skills)**: Design and development of web and enterprise applications using modern full stack technologies (HTML5, CSS3, JS, React, Node.js, Java, Python, and SQL).
-- **PSO2 (Research & Intelligent Systems)**: Offer solutions which impact geo-socio-economic and environmental scenarios by using Machine Learning, Artificial Intelligence, Deep Learning, Cloud Computing, and IoT.
+`24CS302 Artificial Intelligence` lists **Probability and Statistics** under **PREREQUISITE KNOWLEDGE**.
 
----
+This is modelled as `REQUIRES_KNOWLEDGE_OF`, not as a registration-blocking formal prerequisite unless a separate official registration rule is supplied.
 
-## 📜 Salient Features of C24 / R22 Regulations
+### [SRC-A-04] Deep Learning prerequisite knowledge
+**Status:** `VERIFIED_FROM_SUPPLIED_DOCUMENT`
 
-1. **Multidisciplinary Holistic Education**: Continuous formative evaluation with creative summative assessments shifting away from high-stake exams towards comprehensive mastery.
-2. **Lateral Entry and Lateral Exit Options**: Multiple exit points with diploma/certification awards and lateral re-entry as per NEP guidelines.
-3. **Credit Transfer Framework**: Credit earning through verified MOOCs, NPTEL, SWAYAM, and accredited international university exchanges.
-4. **Honours & Minors Degree Specialization**:
-   - **Honours Degree**: Additional 20 credits in specialized domains (Advanced Graph Algorithms, Biometrics, Parallel & Distributed Computing, IoT, Wireless Sensor Networks, Capstone Project).
-   - **Minor Degree**: 20 credits in inter-departmental specializations (Python, Java OOP, DBMS, Web Tech, Mobile App Development, DAA, OS, Networks).
-   - **Dual Degree Option**: 5-Year B.Tech + M.Tech / MBA degree pathways.
-5. **Semester Drop for Innovation & Incubation**: Option to drop a semester to pursue venture incubation, entrepreneurial startups, or exploratory research with guaranteed subsequent re-entry.
+`22CS804 Deep Learning` lists **Machine Learning, Python programming** under **PREREQUISITE KNOWLEDGE**.
 
----
+This is a readiness/background relationship and is not automatically a formal registration block.
 
-## §1.0 Prerequisite & Academic Progression Policies
+### [SRC-A-05] Machine Learning prerequisite knowledge
+**Status:** `VERIFIED_FROM_SUPPLIED_DOCUMENT`
 
-### §1.1 Prerequisite Enforcement
-Every course with specified prerequisite requirements requires prior completion of the prerequisite course with a passing grade (Grade D / P or higher, Grade C for core progression). A student cannot register for downstream courses until the prerequisite requirement is satisfied.
+`24CS306 Machine Learning` course content identifies prerequisite knowledge in **Probability and Linear Algebra, Python programming**.
 
-### §1.2 Prerequisite Waivers & Exception Petitions
-Students facing scheduling bottlenecks, course cancellations, or demonstrating equivalent certified competency may submit a formal **Prerequisite Waiver Petition** through the Faculty Governance Portal. Waivers require recommendation by the course instructor and approval by the Head of Department (CSE).
+The prototype may map these concepts to relevant curriculum courses for readiness analysis, but the mapping must not be described as a formal minimum-grade registration rule without a separate authoritative regulation.
 
-### §1.3 Continuous Formative & Summative Evaluation Pattern
-- Theory & Lab Integrated courses (e.g. 2-0-4, 3-0-2, 2-2-2) are evaluated through 60% Continuous Internal Evaluation (CIE) and 40% Semester End Examination (SEE).
-- CIE components include lab practice assessments, weekly coding challenges, midterm exams, quizzes, and project reviews.
+### [SRC-A-06] Department elective pool
+**Status:** `VERIFIED_FROM_SUPPLIED_DOCUMENT`
 
-### §1.4 Attendance & Examination Eligibility
-Students must maintain a minimum of **75% attendance** in aggregate across all registered courses. Condonation up to 10% may be granted by the Vice Chancellor on valid medical grounds (65% minimum).
+The Department Elective pool includes courses such as Advanced Data Structures, Advanced Java Programming, Computer Graphics, Deep Learning, Digital Image Processing, Mobile Ad-hoc Networks, Text Mining, Numerical Algorithms, Operating System Design, and Simulation and Modeling.
 
----
+## Rules requiring a separate Academic Regulations source
 
-## §2.0 Graduation Requirements & Credit Distribution
+The following are **NOT VERIFIED by the supplied course-structure PDF** and must not be presented as official rules by AcadGraph AI until a Registrar/Academic Regulations source is added:
 
-- **Total Credits Required for B.Tech CSE**: Minimum **160 Credits** (excluding induction/binary credits).
-- **Minimum Cumulative Grade Point Average (CGPA)**: **5.0 / 10.0** (or equivalent 2.0 / 4.0 scale).
-- **Maximum Duration for Degree Completion**: Normal 4 years, maximum allowable 7 academic years.
+- minimum passing grade for prerequisite progression;
+- a specific 18/21/24-credit registration cap;
+- academic probation GPA/CGPA thresholds;
+- a 75% attendance requirement or condonation threshold;
+- prerequisite-waiver approval hierarchy;
+- a formal seven-year maximum degree duration;
+- an official 160-credit graduation minimum;
+- automatic equivalency/substitution approval between C24, Honours, and Minor courses.
 
-### Semester Credit Distribution (M.P.C Stream):
-| Semester | Credits | Contact Hours |
-|---|---|---|
-| I Year I Semester | 23 | 36 |
-| I Year II Semester | 22 | 30 |
-| II Year I Semester | 25 | 35 |
-| II Year II Semester | 25 | 35 |
-| III Year I Semester | 25 | 35 |
-| III Year II Semester | 25 | 35 |
-| IV Year I Semester | 25 | 35 |
-| IV Year II Semester | 16 | 30 |
-| **Total** | **160** | **Contact Hours: 266** |
+For hackathon demonstration, any such synthetic rule must be tagged `DEMO_POLICY` and displayed as **prototype logic, not official VFSTR policy**.
 
----
+## Substitution governance
 
-## §3.0 Board of Studies & Academic Governance
+Course similarity may produce a **CANDIDATE** substitution. Candidate substitutions require faculty review. Only a mapping supported by an authoritative equivalency source may be tagged `APPROVED` and used automatically to satisfy a formal degree requirement.
 
-**External BoS Committee Members**:
-1. **Prof. C. R. Rao**, Professor SCIS, University of Hyderabad.
-2. **Prof. R. B. V. Subramanyam**, Professor, Department of CSE, NIT Warangal.
-3. **Dr. B. Venkata Ramana**, Assoc. Professor & HoD, Department of CSE, IIT Tirupathi.
-4. **Dr. Nagesh Bhattu Sristy**, Asst. Professor, Department of CSE, NIT AP.
+## Human-in-the-loop principle
 
-**Department Leadership**:
-- **Dr. S. V. Phani Kumar**, Head, Department of Computer Science & Engineering, VFSTR Deemed to be University.
+AcadGraph AI may:
+- identify a conflict;
+- collect evidence;
+- generate a candidate resolution or petition draft;
+- route an exceptional case for review.
+
+AcadGraph AI must not autonomously approve a prerequisite waiver, credit exception, or course substitution that changes an academic rule.
