@@ -51,11 +51,12 @@ class SubstitutionAgent:
                 break
 
         if not target_course:
-            return {}
+            return {"substitutions": []}
 
         subs = self.find_substitutions(target_course, state.get("student"))
         text = f"\nSubstitution candidates for {target_course}: {subs}"
         return {
+            "substitutions": subs,
             "retrieved_context": state.get("retrieved_context", "") + text,
             "needs_faculty_approval": any(s["needs_approval"] for s in subs),
         }
