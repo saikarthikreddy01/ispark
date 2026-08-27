@@ -19,3 +19,21 @@ jobs:
         run: pip install -r requirements.txt
       - name: Run academic and agent-entrypoint regression tests
         run: pytest -q test_academic_integrity.py test_agent_entrypoint.py
+      - name: Start AcadGraph AI application
+        run: |
+          python -m uvicorn backend.app:app --host 127.0.0.1 --port 8000 > /tmp/acadgraph.log 2>&1 &
+          echo $! > /tmp/acadgraph.pid
+          for i in {1..20}; do
+            if curl -fsS http://127.0.0.1:8000/api/courses > /tmp/courses.json; then
+              break
+            fi
+            sleep 1
+          done
+          curl -fsS http://127.0.0.1:8000/api/courses | python -m json.tool > /dev/null
+          curl -fsS http://127.0.0.1:8000/ > /tmp/index.html
+          test -s /tmp/index.html
+      - name: Stop application
+        if: always()
+        run: |
+          if [ -f /tmp/acadgraph.pid ]; then kill $(cat /tmp/acadgraph.pid) || true; fi
+          if [ -f /tmp/acadgraph.log ]; then tail -n 80 /tmp/acadgraph.log; fi
