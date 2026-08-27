@@ -1,173 +1,90 @@
 <!doctype html>
 <html lang="en">
+
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#07111f">
-  <title>AcadGraph AI | Agentic Academic Intelligence</title>
-  <meta name="description" content="Explainable Agentic Graph-RAG academic advising with deterministic verification and faculty governance.">
-  <link rel="stylesheet" href="app.css?v=5">
+  <title>Academic Advisor | Sign in</title>
+  <link rel="stylesheet" href="index.css?v=20260825-2">
 </head>
-<body>
-  <div class="ambient ambient-a"></div>
-  <div class="ambient ambient-b"></div>
 
-  <header class="topbar">
-    <a class="brand" href="#overview" aria-label="AcadGraph AI home">
-      <span class="brand-mark">AG</span>
-      <span><strong>AcadGraph AI</strong><small>Academic Intelligence Engine</small></span>
-    </a>
-    <nav class="topnav" aria-label="Primary navigation">
-      <button class="nav-btn active" data-view="overview">Overview</button>
-      <button class="nav-btn" data-view="advisor">AI Advisor</button>
-      <button class="nav-btn" data-view="pathway">Degree Pathway</button>
-      <button class="nav-btn" data-view="graph">Knowledge Graph</button>
-      <button class="nav-btn" data-view="faculty">Faculty Review</button>
-    </nav>
-    <div class="top-actions">
-      <span class="system-pill" id="system-status"><i></i> Connecting</span>
-      <select id="student-select" class="student-select" aria-label="Demo student"></select>
-    </div>
-  </header>
+<body class="login-page">
+  <main class="login-shell">
+    <!-- 3D Holographic Visual Branding Section -->
+    <section class="login-visual" id="visual-section">
+      <!-- Interactive Constellation Canvas -->
+      <canvas id="visual-canvas" class="visual-canvas" aria-hidden="true"></canvas>
 
-  <main class="shell">
-    <section class="hero">
-      <div class="hero-copy">
-        <span class="eyebrow">DECENTRALIZED GRAPH-RAG · AGENTIC AI · HUMAN GOVERNANCE</span>
-        <h1>Turn a curriculum into an <span>explainable reasoning system.</span></h1>
-        <p>AcadGraph AI plans academic pathways, detects prerequisite and readiness conflicts, finds bottlenecks, aligns electives to career goals, and escalates exceptions to faculty—with evidence attached.</p>
-        <div class="hero-actions">
-          <button class="btn primary" data-open-view="advisor">Ask AcadGraph AI</button>
-          <button class="btn ghost" data-open-view="graph">Explore course graph</button>
+      <!-- Ambient Glow Orbs -->
+      <div class="visual-glow glow-top" aria-hidden="true"></div>
+      <div class="visual-glow glow-bottom" aria-hidden="true"></div>
+
+      <!-- Main Visual Content Container -->
+      <div class="visual-content">
+        <!-- Dynamic Hero Storytelling -->
+        <div class="visual-copy">
+          <span class="eyebrow" id="visual-eyebrow">AI-POWERED ACADEMIC INTELLIGENCE</span>
+          <h1 id="visual-heading">Plan your degree with <span class="text-glow">intelligence.</span></h1>
+          <p id="visual-text">Understand your degree dependencies, protect your graduation timeline, and move forward
+            with evidence &mdash; not guesswork.</p>
         </div>
-      </div>
-      <div class="hero-orbit" aria-hidden="true">
-        <div class="orbit-ring ring-one"></div>
-        <div class="orbit-ring ring-two"></div>
-        <div class="core-orb"><span>Graph</span><strong>RAG</strong></div>
-        <span class="orbit-node node-a">Rules</span>
-        <span class="orbit-node node-b">Agents</span>
-        <span class="orbit-node node-c">Faculty</span>
+
       </div>
     </section>
 
-    <section id="metric-grid" class="metric-grid" aria-label="Student snapshot"></section>
+    <!-- Interactive Authentication Form Panel -->
+    <section class="login-panel">
+      <div class="login-brand">
+        <span class="brand-mark">AA</span>
+        <span>Academic AI Advisor</span>
+      </div>
 
-    <section class="view active" id="view-overview" data-view-panel="overview">
-      <div class="section-title">
-        <div><span class="eyebrow">STUDENT COMMAND CENTER</span><h2>Academic situation at a glance</h2></div>
-        <span class="source-badge" id="curriculum-source">Curriculum source loading…</span>
+      <!-- Tab Selection between Student and Faculty UI contexts -->
+      <div class="role-switch" role="tablist" aria-label="Select account type">
+        <button class="role-btn active" role="tab" aria-selected="true" data-role="student" type="button"><span aria-hidden="true">&#127891;</span> Student access</button>
+        <button class="role-btn" role="tab" aria-selected="false" data-role="faculty" type="button"><span aria-hidden="true">&#10003;</span> Faculty access</button>
       </div>
-      <div class="overview-grid">
-        <article class="panel profile-panel">
-          <div class="panel-kicker">Profile context</div>
-          <div id="profile-card"></div>
-        </article>
-        <article class="panel principle-panel">
-          <div class="panel-kicker">Trust architecture</div>
-          <h3>What makes this different from a normal chatbot?</h3>
-          <div class="principle-flow">
-            <div><span>01</span><strong>Graph retrieves</strong><small>Course relationships and dependencies</small></div>
-            <div><span>02</span><strong>RAG grounds</strong><small>Curriculum and policy evidence</small></div>
-            <div><span>03</span><strong>Rules verify</strong><small>Deterministic constraint checks</small></div>
-            <div><span>04</span><strong>Human governs</strong><small>Faculty approves exceptions</small></div>
-          </div>
-        </article>
-      </div>
-      <div class="section-title compact"><div><span class="eyebrow">JUDGE DEMO</span><h2>One-click scenarios</h2></div></div>
-      <div id="demo-prompts" class="demo-grid"></div>
-    </section>
 
-    <section class="view" id="view-advisor" data-view-panel="advisor">
-      <div class="section-title">
-        <div><span class="eyebrow">AGENTIC ACADEMIC ADVISOR</span><h2>Ask in natural language. Verify with structure.</h2></div>
-        <span class="architecture-badge">Gemini explains · Rules decide</span>
+      <!-- Sign in / Create account mode selector (student only) -->
+      <div class="mode-switch" id="mode-switch">
+        <button class="mode-btn active" data-mode="login" type="button">Sign in</button>
+        <button class="mode-btn" data-mode="signup" type="button">Create account</button>
       </div>
-      <div class="advisor-grid">
-        <article class="panel chat-panel">
-          <div id="chat-stream" class="chat-stream" aria-live="polite">
-            <div class="message assistant">
-              <span class="avatar">AI</span>
-              <div><strong>AcadGraph AI</strong><p>Ask me about prerequisites, semester planning, bottlenecks, career alignment, or course substitutions. I will separate formal blocks from readiness warnings.</p></div>
-            </div>
-          </div>
-          <div id="quick-prompts" class="quick-prompts"></div>
-          <form id="chat-form" class="composer">
-            <textarea id="chat-input" rows="1" placeholder="Example: I want an AI career. Check ML/DL readiness and plan my remaining semesters." required></textarea>
-            <button class="send-btn" type="submit" aria-label="Send question">→</button>
-          </form>
-        </article>
-        <aside class="advisor-side">
-          <article class="panel verification-card">
-            <div class="panel-kicker">Formal verification</div>
-            <div id="verification-output" class="empty-state">Run an academic question to see the deterministic decision.</div>
-          </article>
-          <article class="panel trace-card">
-            <div class="panel-kicker">Live agent trace</div>
-            <div id="agent-trace" class="trace-list"><div class="empty-state">Agents will appear here in execution order.</div></div>
-          </article>
-          <article class="panel evidence-card">
-            <div class="panel-kicker">Evidence & citations</div>
-            <div id="citation-output" class="citation-list"><div class="empty-state">Source provenance will appear here.</div></div>
-          </article>
-        </aside>
-      </div>
-    </section>
 
-    <section class="view" id="view-pathway" data-view-panel="pathway">
-      <div class="section-title">
-        <div><span class="eyebrow">DEGREE CONSTRAINT MAP</span><h2>Semester-by-semester pathway</h2></div>
-        <span class="legend-inline"><i class="dot completed"></i>Completed <i class="dot planned"></i>Planned <i class="dot remaining"></i>Remaining</span>
-      </div>
-      <div class="panel pathway-panel">
-        <div id="pathway-board" class="pathway-board"></div>
-      </div>
-    </section>
+      <div class="auth-card" id="auth-card">
+        <div class="form-intro">
+          <span class="eyebrow" id="form-eyebrow">Student workspace</span>
+          <h2 id="form-title">Sign in to continue</h2>
+        </div>
 
-    <section class="view" id="view-graph" data-view-panel="graph">
-      <div class="section-title">
-        <div><span class="eyebrow">PROVENANCE-AWARE KNOWLEDGE GRAPH</span><h2>See what courses depend on what—and why</h2></div>
-        <div class="graph-legend"><span><i class="edge formal"></i>Formal prerequisite</span><span><i class="edge knowledge"></i>Readiness knowledge</span><span><i class="edge equivalent"></i>Candidate equivalency</span></div>
-      </div>
-      <div class="graph-layout">
-        <article class="panel graph-panel">
-          <div class="graph-toolbar">
-            <input id="graph-search" type="search" placeholder="Find course code or name…">
-            <button class="btn small ghost" id="graph-reset">Reset</button>
-          </div>
-          <svg id="graph-canvas" viewBox="0 0 1200 660" role="img" aria-label="Interactive academic knowledge graph"></svg>
-        </article>
-        <aside class="panel graph-inspector">
-          <div class="panel-kicker">Course inspector</div>
-          <div id="graph-inspector" class="empty-state">Select a course node to inspect its relationships.</div>
-        </aside>
-      </div>
-    </section>
+        <form id="auth-form" class="stack" novalidate>
+          <div id="field-stack" class="stack"></div>
 
-    <section class="view" id="view-faculty" data-view-panel="faculty">
-      <div class="section-title">
-        <div><span class="eyebrow">HUMAN-IN-THE-LOOP GOVERNANCE</span><h2>AI recommends. Faculty decides exceptions.</h2></div>
-        <button class="btn ghost small" id="refresh-petitions">Refresh queue</button>
+          <div id="message" class="notice" role="alert" style="display:none;"></div>
+
+          <button class="btn btn-primary login-submit" type="submit">
+            <span id="submit-label">Sign in to Academic Advisor</span>
+            <span class="submit-icon" aria-hidden="true">&rarr;</span>
+          </button>
+        </form>
       </div>
-      <div class="faculty-grid">
-        <article class="panel">
-          <div class="panel-kicker">Pending review queue</div>
-          <div id="petition-list" class="petition-list"></div>
-        </article>
-        <article class="panel">
-          <div class="panel-kicker">Create demo review</div>
-          <form id="petition-form" class="petition-form">
-            <label>Course code<input id="petition-course" placeholder="22CS804"></label>
-            <label>Reason<textarea id="petition-reason" rows="5" placeholder="Describe the exception or substitution request…" required></textarea></label>
-            <button class="btn primary" type="submit">Send to faculty review</button>
-          </form>
-          <div class="governance-note">No exception is auto-approved. Every pending request remains a human decision.</div>
-        </article>
+
+      <div class="auth-switch" id="auth-switch">
+        <span id="switch-copy">Don't have an account?</span>
+        <button type="button" id="switch-btn" class="text-link">Create account</button>
+      </div>
+
+      <div class="login-foot" id="login-foot">
+        Student accounts are linked to your official C24 academic record.
       </div>
     </section>
   </main>
 
-  <div id="toast" class="toast" role="status"></div>
-  <script src="app.js?v=5"></script>
+  <!-- Interactive 3D Graph Model Script -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="visual.js"></script>
+
+  <script src="auth.js?v=20260825-2"></script>
 </body>
+
 </html>

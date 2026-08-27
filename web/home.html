@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Dashboard | AcadGraph AI</title>
+  <link rel="stylesheet" href="portal.css">
+</head>
+<body data-page="home">
+  <header class="appbar">
+    <nav class="nav"></nav>
+    <div class="userbar"></div>
+  </header>
+
+  <main class="page home-page">
+    <div class="home-hero">
+      <div>
+        <span class="eyebrow">AcadGraph AI</span>
+        <h1>Welcome back, <span data-student-name>student</span>.</h1>
+        <p>Plan your degree, inspect course dependencies, and get source-aware academic advice from one focused workspace.</p>
+      </div>
+      <a class="btn btn-primary" href="advisor.html">Ask the advisor <span aria-hidden="true">&rarr;</span></a>
+    </div>
+
+    <section data-summary class="home-metrics" aria-label="Degree progress"></section>
+
+    <div class="home-grid">
+      <section class="panel home-progress-panel">
+        <div class="section-heading">
+          <div><span class="eyebrow">Degree progress</span><h2>Academic status</h2></div>
+          <a class="text-link" href="pathway.html">View pathway &rarr;</a>
+        </div>
+        <div class="progress-track"><span data-progress-bar></span></div>
+        <div class="progress-meta"><strong data-progress-label>Loading progress...</strong><span data-credits-label></span></div>
+        <div class="home-signal"><span class="signal-icon">&#10003;</span><div><strong data-standing>Checking academic standing</strong><p data-progress-note>Checking your current record and curriculum structure.</p></div></div>
+      </section>
+
+      <section class="panel home-actions-panel">
+        <div class="section-heading"><div><span class="eyebrow">Core prototype</span><h2>What you can do</h2></div></div>
+        <div class="action-list">
+          <a class="action-item" href="advisor.html"><span class="action-index">01</span><span><strong>Ask the agentic advisor</strong><small>Check prerequisites, bottlenecks, risks, alternatives, and evidence.</small></span><span aria-hidden="true">&rarr;</span></a>
+          <a class="action-item" href="pathway.html"><span class="action-index">02</span><span><strong>Review degree pathway</strong><small>See a student-specific semester sequence with elective slots preserved as choices.</small></span><span aria-hidden="true">&rarr;</span></a>
+          <a class="action-item" href="graph.html"><span class="action-index">03</span><span><strong>Explore the knowledge graph</strong><small>Inspect course relationships and downstream bottlenecks.</small></span><span aria-hidden="true">&rarr;</span></a>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <div id="toast"></div>
+  <script src="portal.js"></script>
+  <script src="feature.js"></script>
+</body>
+</html>

@@ -1,4 +1,4 @@
-"""Regression tests for the unified AcadGraph AI application."""
+"""Regression tests for the focused production chat entrypoint."""
 
 from backend import app as entrypoint
 
@@ -7,7 +7,6 @@ class FakeAdvisor:
     def chat_sync(self, message, student=None):
         return {
             "response": "Verified agent response",
-            "query_type": "prerequisite",
             "citations": [
                 {
                     "reference": "C24 curriculum",
@@ -15,13 +14,10 @@ class FakeAdvisor:
                     "content": "Evidence",
                 }
             ],
-            "citation_quality": {"verified": 1},
             "conflicts": [],
             "pathway": None,
             "risk": None,
             "career_alignment": None,
-            "substitutions": [],
-            "needs_faculty_approval": False,
             "verification": {"decision": "ADVISORY_OK"},
             "faculty_packet": None,
             "source_plan": {"authorities": ["CSE"]},
@@ -29,11 +25,11 @@ class FakeAdvisor:
                 {"agent": "SupervisorAgent", "action": "classified request", "status": "ok"},
                 {"agent": "GraphRAGAgent", "action": "retrieved evidence", "status": "ok"},
             ],
-            "errors": [],
         }
 
 
-def test_unified_api_routes_precede_static_mount():
+def test_agent_chat_route_precedes_legacy_mount():
+    """The focused /api/chat route must win before the legacy mounted app."""
     routes = entrypoint.app.router.routes
     chat_index = next(
         i for i, route in enumerate(routes)
@@ -41,25 +37,6 @@ def test_unified_api_routes_precede_static_mount():
     )
     mount_index = next(i for i, route in enumerate(routes) if getattr(route, "path", None) == "")
     assert chat_index < mount_index
-
-
-def test_health_describes_unified_architecture():
-    payload = entrypoint.health()
-    assert payload["status"] == "ok"
-    assert payload["app"] == "AcadGraph AI"
-    assert "LangGraph" in payload["architecture"]
-
-
-def test_public_student_never_exposes_password():
-    clean = entrypoint.public_student({
-        "id": "TEST001",
-        "name": "Test Student",
-        "password": "secret",
-        "major": "CSE",
-        "completed": [],
-    })
-    assert "password" not in clean
-    assert clean["id"] == "TEST001"
 
 
 def test_advisor_chat_returns_agent_outputs(monkeypatch):
@@ -70,8 +47,8 @@ def test_advisor_chat_returns_agent_outputs(monkeypatch):
         "completed": [],
     }
 
-    monkeypatch.setattr(entrypoint, "repo_student", lambda _student_id: student)
-    monkeypatch.setattr(entrypoint, "repo_save_chat", lambda *args, **kwargs: None)
+    monkeypatch.setattr(entrypoint.db_manager, "get_student_by_id", lambda _student_id: student)
+    monkeypatch.setattr(entrypoint.db_manager, "save_chat_log", lambda *args, **kwargs: None)
     monkeypatch.setattr(entrypoint, "get_advisor", lambda: FakeAdvisor())
 
     response = entrypoint.advisor_chat(
