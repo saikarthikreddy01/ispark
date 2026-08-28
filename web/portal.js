@@ -99,40 +99,45 @@ async function initShell(active) {
     const displayId = student.id || 'Faculty';
     const profileHref = faculty ? 'governance.html' : 'profile.html';
 
-    // Build profile link via DOM
+    // Build profile link via DOM with attributes and handlers
     const profileLink = document.createElement('a');
     profileLink.href = profileHref;
+    profileLink.className = 'profile-icon-btn';
+    profileLink.setAttribute('data-action', 'profile');
     profileLink.title = 'My Profile';
-    profileLink.style.cssText = 'display:inline-flex;align-items:center;gap:8px;text-decoration:none;border:1px solid var(--line,#e2e8f0);border-radius:8px;padding:5px 12px;font-size:13px;color:inherit;background:transparent;cursor:pointer;';
+    profileLink.style.cssText = 'display:inline-flex;align-items:center;gap:8px;text-decoration:none;border:1px solid var(--line,#e2e8f0);border-radius:8px;padding:5px 12px;font-size:13px;color:inherit;background:transparent;cursor:pointer;position:relative;z-index:9999;pointer-events:auto;';
     profileLink.onclick = function(e) {
       e.preventDefault();
+      e.stopPropagation();
       window.location.href = profileHref;
     };
 
     const avatar = document.createElement('span');
     avatar.textContent = initial;
-    avatar.style.cssText = 'width:26px;height:26px;border-radius:50%;background:#2563eb;color:#fff;display:inline-flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;flex-shrink:0;';
+    avatar.style.cssText = 'width:26px;height:26px;border-radius:50%;background:#2563eb;color:#fff;display:inline-flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;flex-shrink:0;pointer-events:none;';
 
     const nameSpan = document.createElement('span');
     nameSpan.textContent = student.name || '';
-    nameSpan.style.cssText = 'max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:500;';
+    nameSpan.style.cssText = 'max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:500;pointer-events:none;';
 
     const idSpan = document.createElement('span');
     idSpan.textContent = displayId;
-    idSpan.style.cssText = 'font-family:monospace;color:#64748b;font-size:11px;';
+    idSpan.style.cssText = 'font-family:monospace;color:#64748b;font-size:11px;pointer-events:none;';
 
     profileLink.appendChild(avatar);
     profileLink.appendChild(nameSpan);
     profileLink.appendChild(idSpan);
 
-    // Build sign out button
+    // Build sign out button with attributes and handlers
     const signOutBtn = document.createElement('button');
     signOutBtn.className = 'btn';
     signOutBtn.type = 'button';
+    signOutBtn.setAttribute('data-action', 'signout');
     signOutBtn.textContent = 'Sign out';
-    signOutBtn.style.cssText = 'cursor:pointer;';
+    signOutBtn.style.cssText = 'cursor:pointer;position:relative;z-index:9999;pointer-events:auto;';
     signOutBtn.onclick = function(e) {
       e.preventDefault();
+      e.stopPropagation();
       signOut();
     };
 
@@ -146,6 +151,28 @@ async function initShell(active) {
   }
   return student;
 }
+
+// Global click event delegation to guarantee clicks on Profile and Sign out always work
+document.addEventListener('click', function(e) {
+  const target = e.target;
+  if (!target) return;
+  // Sign Out click detection
+  const signoutElem = target.closest('[data-action="signout"]') || (target.tagName === 'BUTTON' && target.textContent.trim() === 'Sign out');
+  if (signoutElem) {
+    e.preventDefault();
+    e.stopPropagation();
+    signOut();
+    return;
+  }
+  // Profile click detection
+  const profileElem = target.closest('[data-action="profile"]') || target.closest('.profile-icon-btn') || target.closest('a[title="My Profile"]');
+  if (profileElem) {
+    e.preventDefault();
+    e.stopPropagation();
+    window.location.href = 'profile.html';
+    return;
+  }
+}, true);
 
 function coursePrereqs(course) {
   return course.prereqs || (course.prerequisite_groups || []).flatMap(group => (group.prerequisites || []).map(item => item.course_id));
