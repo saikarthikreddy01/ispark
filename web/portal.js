@@ -29,7 +29,7 @@ function signOut() {
   if (signingOut) return;
   signingOut = true;
   try {
-    fetch('/api/auth/logout', { method: 'POST' }).catch(function () {});
+    api('/api/auth/logout', { method: 'POST' }).catch(function () {});
   } catch (e) {
     console.warn('Backend logout call skipped:', e);
   }
