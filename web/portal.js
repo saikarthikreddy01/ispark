@@ -79,18 +79,42 @@ async function initShell(active) {
   const userbar = document.querySelector('.userbar');
   if (userbar) {
     const initial = (student.name || 'S').charAt(0).toUpperCase();
-    const displayId = student.id ? student.id : 'Faculty';
-    userbar.innerHTML = `
-      <a href="${faculty ? 'governance.html' : 'profile.html'}" class="profile-icon-btn" title="My Profile — ${esc(student.name)} (${esc(displayId)})" style="display:inline-flex;align-items:center;gap:8px;text-decoration:none;border:1px solid var(--line);border-radius:8px;padding:5px 10px;font-size:13px;color:inherit;background:transparent;">
-        <span style="width:26px;height:26px;border-radius:50%;background:var(--accent,#2563eb);color:#fff;display:inline-flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;flex-shrink:0;">${esc(initial)}</span>
-        <span style="max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:500;">${esc(student.name)}</span>
-        <span style="font-family:monospace;color:#64748b;font-size:11px;">${esc(displayId)}</span>
-      </a>
-      <button class="btn" type="button" data-action="signout">Sign out</button>`;
-    const btn = userbar.querySelector('[data-action="signout"]');
-    if (btn) {
-      btn.onclick = function(e) { e.preventDefault(); signOut(); };
-    }
+    const displayId = student.id || 'Faculty';
+    const profileHref = faculty ? 'governance.html' : 'profile.html';
+
+    // Build profile link via DOM (avoids quote/escaping bugs in innerHTML)
+    const profileLink = document.createElement('a');
+    profileLink.href = profileHref;
+    profileLink.title = 'My Profile';
+    profileLink.style.cssText = 'display:inline-flex;align-items:center;gap:8px;text-decoration:none;border:1px solid var(--line,#e2e8f0);border-radius:8px;padding:5px 12px;font-size:13px;color:inherit;background:transparent;cursor:pointer;';
+
+    const avatar = document.createElement('span');
+    avatar.textContent = initial;
+    avatar.style.cssText = 'width:26px;height:26px;border-radius:50%;background:#2563eb;color:#fff;display:inline-flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;flex-shrink:0;';
+
+    const nameSpan = document.createElement('span');
+    nameSpan.textContent = student.name || '';
+    nameSpan.style.cssText = 'max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:500;';
+
+    const idSpan = document.createElement('span');
+    idSpan.textContent = displayId;
+    idSpan.style.cssText = 'font-family:monospace;color:#64748b;font-size:11px;';
+
+    profileLink.appendChild(avatar);
+    profileLink.appendChild(nameSpan);
+    profileLink.appendChild(idSpan);
+
+    // Build sign out button
+    const signOutBtn = document.createElement('button');
+    signOutBtn.className = 'btn';
+    signOutBtn.type = 'button';
+    signOutBtn.textContent = 'Sign out';
+    signOutBtn.onclick = function(e) { e.preventDefault(); signOut(); };
+
+    // Clear and inject
+    userbar.innerHTML = '';
+    userbar.appendChild(profileLink);
+    userbar.appendChild(signOutBtn);
   }
   if (!document.getElementById('global-chatbot-widget') && !faculty) {
     initGlobalChatbot(student);
