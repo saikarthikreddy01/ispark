@@ -18,7 +18,21 @@ async function currentStudent() {
     return { id:'', name:'Faculty reviewer', major:'Faculty governance', completed:[] };
   }
   if (!savedId) return null;
-  try { return await api(`/api/student/${encodeURIComponent(savedId)}`); } catch { return null; }
+  try {
+    const s = await api(`/api/student/${encodeURIComponent(savedId)}`);
+    if (s && s.id) {
+      localStorage.setItem('academic_advisor_cached_student', JSON.stringify(s));
+      return s;
+    }
+  } catch (err) {
+    console.warn('API fetch student failed, checking cached student data:', err);
+    try {
+      const cached = localStorage.getItem('academic_advisor_cached_student');
+      if (cached) return JSON.parse(cached);
+    } catch {}
+    return { id: savedId, name: 'Student (' + savedId + ')', major: 'Computer Science', completed: [] };
+  }
+  return null;
 }
 
 function isFacultySession() {
@@ -26,21 +40,19 @@ function isFacultySession() {
 }
 
 function signOut() {
-  // Clear all session data immediately — do NOT block on backend call
   try {
     localStorage.removeItem('academic_advisor_permanent_active_user_v3');
     localStorage.removeItem('academic_advisor_faculty_session');
+    localStorage.removeItem('academic_advisor_cached_student');
     localStorage.clear();
     sessionStorage.clear();
   } catch (e) {
     console.warn('Storage clear error:', e);
   }
-  // Fire-and-forget backend logout (no await, no blocking)
   try {
     fetch(API + '/api/auth/logout', { method: 'POST' }).catch(function() {});
   } catch (e) {}
-  // Hard redirect to login page using absolute path
-  window.location.href = window.location.origin + '/index.html';
+  window.location.href = 'index.html';
 }
 window.signOut = signOut;
 
@@ -71,7 +83,7 @@ async function initShell(active) {
   const faculty = isFacultySession();
   if (faculty && active !== 'governance') { location.href = 'governance.html'; return null; }
   const appbar = document.querySelector('.appbar');
-  if (appbar) {
+  if (appbar && !appbar.querySelector('.brand')) {
     appbar.insertAdjacentHTML('afterbegin', `<a class="brand" href="${faculty ? 'governance.html' : 'home.html'}"><span class="brand-mark">AA</span><span>Academic Advisor</span></a>`);
   }
   const navNode = document.querySelector('.nav');
@@ -82,11 +94,15 @@ async function initShell(active) {
     const displayId = student.id || 'Faculty';
     const profileHref = faculty ? 'governance.html' : 'profile.html';
 
-    // Build profile link via DOM (avoids quote/escaping bugs in innerHTML)
+    // Build profile link via DOM
     const profileLink = document.createElement('a');
     profileLink.href = profileHref;
     profileLink.title = 'My Profile';
     profileLink.style.cssText = 'display:inline-flex;align-items:center;gap:8px;text-decoration:none;border:1px solid var(--line,#e2e8f0);border-radius:8px;padding:5px 12px;font-size:13px;color:inherit;background:transparent;cursor:pointer;';
+    profileLink.onclick = function(e) {
+      e.preventDefault();
+      window.location.href = profileHref;
+    };
 
     const avatar = document.createElement('span');
     avatar.textContent = initial;
@@ -109,7 +125,11 @@ async function initShell(active) {
     signOutBtn.className = 'btn';
     signOutBtn.type = 'button';
     signOutBtn.textContent = 'Sign out';
-    signOutBtn.onclick = function(e) { e.preventDefault(); signOut(); };
+    signOutBtn.style.cssText = 'cursor:pointer;';
+    signOutBtn.onclick = function(e) {
+      e.preventDefault();
+      signOut();
+    };
 
     // Clear and inject
     userbar.innerHTML = '';
