@@ -29,7 +29,14 @@
     <div class="profile-hero">
       <span class="eyebrow">Academic Records</span>
       <h1>My Profile</h1>
-      <p>Update your academic history to improve advisor accuracy. Add your completed subjects semester by semester.</p>
+      <div id="student-info-banner" style="display:flex;align-items:center;gap:16px;margin-top:10px;margin-bottom:4px;">
+        <div style="width:48px;height:48px;border-radius:50%;background:var(--accent);color:#fff;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:700;" id="student-avatar">?</div>
+        <div>
+          <div style="font-size:18px;font-weight:700;line-height:1.2;" id="student-fullname">Loading…</div>
+          <div style="font-size:13px;color:#64748b;font-family:monospace;" id="student-regno"></div>
+        </div>
+      </div>
+      <p style="margin-top:10px;">Update your academic history to improve advisor accuracy. Add your completed subjects semester by semester.</p>
     </div>
 
     <form id="profile-form">
@@ -62,6 +69,15 @@
       academicHistory = student.academic_history || [];
       careerGoals = student.career_goals || [];
       document.getElementById('career-goals-input').value = careerGoals.join(', ');
+
+      // Populate the profile hero banner
+      const nameEl = document.getElementById('student-fullname');
+      const regEl  = document.getElementById('student-regno');
+      const avatarEl = document.getElementById('student-avatar');
+      if (nameEl) nameEl.textContent = student.name || '—';
+      if (regEl)  regEl.textContent  = 'Reg No: ' + (student.id || '—');
+      if (avatarEl) avatarEl.textContent = (student.name || 'S').charAt(0).toUpperCase();
+
       renderSemesters();
     }
 

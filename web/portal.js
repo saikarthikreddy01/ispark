@@ -79,13 +79,18 @@ async function initShell(active) {
   if (navNode) navNode.innerHTML = nav(active, faculty);
   const userbar = document.querySelector('.userbar');
   if (userbar) {
-    userbar.innerHTML = `<a href="${faculty ? 'governance.html' : 'profile.html'}" class="user-chip" style="text-decoration:none;">${esc(student.name)} • ${esc(student.id || 'Faculty')}</a><button class="btn" type="button" data-action="signout">Sign out</button>`;
+    const initial = (student.name || 'S').charAt(0).toUpperCase();
+    const displayId = student.id ? student.id : 'Faculty';
+    userbar.innerHTML = `
+      <a href="${faculty ? 'governance.html' : 'profile.html'}" class="profile-icon-btn" title="My Profile — ${esc(student.name)} (${esc(displayId)})" style="display:inline-flex;align-items:center;gap:8px;text-decoration:none;border:1px solid var(--line);border-radius:8px;padding:5px 10px;font-size:13px;color:inherit;background:transparent;">
+        <span style="width:26px;height:26px;border-radius:50%;background:var(--accent,#2563eb);color:#fff;display:inline-flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;flex-shrink:0;">${esc(initial)}</span>
+        <span style="max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:500;">${esc(student.name)}</span>
+        <span style="font-family:monospace;color:#64748b;font-size:11px;">${esc(displayId)}</span>
+      </a>
+      <button class="btn" type="button" data-action="signout">Sign out</button>`;
     const btn = userbar.querySelector('[data-action="signout"]');
     if (btn) {
-      btn.onclick = function(e) {
-        e.preventDefault();
-        signOut();
-      };
+      btn.onclick = function(e) { e.preventDefault(); signOut(); };
     }
   }
   if (!document.getElementById('global-chatbot-widget') && !faculty) {
