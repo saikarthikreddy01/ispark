@@ -80,7 +80,7 @@ async function initShell(active) {
   if (navNode) navNode.innerHTML = nav(active, faculty);
   const userbar = document.querySelector('.userbar');
   if (userbar) {
-    userbar.innerHTML = `<span class="user-chip">${esc(student.name)} · ${esc(student.id || 'Faculty')}</span><button class="btn" type="button" data-action="signout">Sign out</button>`;
+    userbar.innerHTML = `<a href="${faculty ? 'governance.html' : 'profile.html'}" class="user-chip" style="text-decoration:none;">${esc(student.name)} • ${esc(student.id || 'Faculty')}</a><button class="btn" type="button" data-action="signout">Sign out</button>`;
     const btn = userbar.querySelector('[data-action="signout"]');
     if (btn) {
       btn.onclick = function(e) {
