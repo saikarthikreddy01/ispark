@@ -54,6 +54,9 @@ class SignUpRequest(BaseModel):
     expected_grad: Optional[str] = "Spring 2027"
     password: Optional[str] = "password"
 
+class StudentProfileUpdateRequest(BaseModel):
+    academic_history: List[Dict]
+
 class ChatRequest(BaseModel):
     student_id: str
     question: str
@@ -193,6 +196,42 @@ def get_student(student_id: str):
         raise HTTPException(status_code=404, detail="Student not found")
     return student
 
+@app.put("/api/student/{student_id}/profile")
+def update_student_profile(student_id: str, request: StudentProfileUpdateRequest):
+    student = db_manager.get_student_by_id(student_id)
+    if not student:
+        raise HTTPException(status_code=404, detail="Student not found")
+    
+    # Calculate GPA and completed credits based on academic history
+    total_points = 0.0
+    total_credits = 0
+    completed_courses = []
+    
+    for semester in request.academic_history:
+        for course in semester.get("courses", []):
+            try:
+                credits = float(course.get("credits", 0))
+                gpa = float(course.get("gpa", 0))
+                total_credits += int(credits)
+                total_points += credits * gpa
+                if course.get("code"):
+                    completed_courses.append(course.get("code"))
+            except ValueError:
+                continue
+                
+    new_gpa = round(total_points / total_credits, 2) if total_credits > 0 else student.get("gpa", 0)
+    
+    update_data = {
+        "academic_history": request.academic_history,
+        "gpa": new_gpa,
+        "completed": completed_courses
+    }
+    
+    updated = db_manager.update_student(student_id, update_data)
+    if not updated:
+        raise HTTPException(status_code=500, detail="Failed to update profile")
+    return {"message": "Profile updated successfully", "student": updated}
+
 @app.get("/api/courses")
 def get_courses():
     return db_manager.get_all_courses()
@@ -317,148 +356,45 @@ def get_gemini_status():
         "mode": "real_time_graph_rag",
         "live_interaction": True
     }
-
 # --- 3. GRAPH-RAG ADVISING WITH CITATIONS ---
+
+# Global advisor instance for caching
+_advisor_instance = None
 
 @app.post("/api/chat")
 def advisor_chat(req: ChatRequest):
+    global _advisor_instance
     student = db_manager.get_student_by_id(req.student_id)
-    student_ctx = ""
-    if student:
-        student_ctx = (
-            f"Student: {student.get('name', 'Student')} (ID: {student.get('id', req.student_id)})\n"
-            f"Major: {student.get('major', 'Computer Science')}\n"
-            f"GPA: {student.get('gpa', 3.5)} ({student.get('standing', 'Good Standing')})\n"
-            f"Completed Courses: {', '.join(student.get('completed', []))}\n"
-            f"Planned Courses: {', '.join(student.get('planned', []))}\n"
-            f"Expected Graduation: {student.get('expected_grad', 'Spring 2027')}\n"
+    
+    try:
+        if _advisor_instance is None:
+            from src.agents.orchestrator import AcademicAdvisor
+            _advisor_instance = AcademicAdvisor()
+            
+        result = _advisor_instance.chat_sync(req.question, student=student)
+        
+        reply = result.get("response", "I could not generate a response.")
+        citations = result.get("citations", [])
+        tool = result.get("query_type", "general")
+        
+        # Log to DB
+        db_manager.save_chat_log(
+            req.student_id, req.question, reply, 
+            [c.get("reference") if isinstance(c, dict) else c for c in citations]
         )
 
-    # Graph-RAG Policy Context Extraction
-    policy_doc = ""
-    policies_path = DATA_DIR / "policies.md"
-    if policies_path.exists():
-        with open(policies_path, "r", encoding="utf-8") as f:
-            policy_doc = f.read()
-
-    api_key = os.getenv("GEMINI_API_KEY")
-    reply = ""
-    citations = []
-
-    if api_key:
-        try:
-            from google import genai
-            client = genai.Client(api_key=api_key)
-            prompt = (
-                "You are an expert Academic AI Advisor for Vignan's Foundation for Science, Technology & Research (VFSTR Deemed to be University).\n"
-                "You specialize in the B.Tech Computer Science & Engineering (C24 Regulation, Batch 2024-28) curriculum, prerequisite validation, syllabi, course outcomes, and university policies.\n"
-                "Ground your answers using official institutional standards. Include specific course codes (e.g., 24CS101, 22TP201, 24CS204, 24CS209, 24CS306, 22CS401, 22CS804, 22CS951) and formal section citations like [VFSTR C24 Regulation §1.1] or [B.Tech CSE Catalog 2024-28].\n\n"
-                f"--- OFFICIAL UNIVERSITY POLICY TEXT ---\n{policy_doc[:4000]}\n\n"
-                f"--- STUDENT PROFILE ---\n{student_ctx}\n\n"
-                f"--- STUDENT QUESTION ---\n{req.question}\n\n"
-                "Provide a personalized, insightful, well-structured academic advising response answering the student's question directly with exact policy citations and actionable next steps:"
-            )
-            response = client.models.generate_content(
-                model="gemini-3.6-flash",
-                contents=prompt
-            )
-            if response and response.text:
-                reply = response.text
-            
-            # Extract citations from reply or add defaults
-            citations = ["[VFSTR C24 Regulation §1.1]", "[B.Tech CSE Course Catalog 2024-28]"]
-            if "§1.2" in reply or "waiver" in req.question.lower() or "petition" in req.question.lower():
-                citations.append("[Policy §1.2: Prerequisite Waivers]")
-            if "§1.3" in reply or "grade" in req.question.lower() or "evaluation" in req.question.lower():
-                citations.append("[Policy §1.3: Continuous Evaluation & Thresholds]")
-            if "§2.1" in reply or "substitut" in req.question.lower() or "equivalent" in req.question.lower():
-                citations.append("[Policy §2.1: Course Equivalencies]")
-            if "honour" in req.question.lower() or "minor" in req.question.lower():
-                citations.append("[VFSTR Regulation: Honours & Minors Track]")
-            if "graduat" in req.question.lower() or "credit" in req.question.lower():
-                citations.append("[Policy §2.0: 160 Total Credit Graduation Requirement]")
-        except Exception as e:
-            print(f"[WARN] Gemini API error ({e}), using Graph-RAG deterministic fallback.")
-
-    # High-precision Graph-RAG Rule-based Fallback for C24
-    if not reply:
-        q = req.question.lower()
-        if "24cs209" in q or "daa" in q or "algorithm" in q:
-            reply = (
-                "⚠️ **Prerequisite Policy on 24CS209 (Design and Analysis of Algorithms)**:\n\n"
-                "Under **VFSTR C24 Curriculum §1.1 (Prerequisite Enforcement)**, enrolling in **24CS209** requires:\n"
-                "1. Passing **22TP201 (Data Structures)** with a passing grade.\n"
-                "2. Completing **24MT203 (Discrete Mathematical Structures)**.\n\n"
-                "**Bottleneck Impact**: 24CS209 is a critical milestone blocking **24CS306 (Machine Learning)** and **22CS951 (Advanced Graph Algorithms)**. "
-                "Ensure Data Structures and Discrete Math are cleared to maintain normal 4-year graduation trajectory."
-            )
-            citations = ["[VFSTR C24 Curriculum §1.1]", "[B.Tech CSE Catalog 2024-28, II-II]", "[Policy §1.3: Grade Requirements]"]
-        elif "24cs306" in q or "machine learning" in q or "ml" in q:
-            reply = (
-                "📘 **Prerequisites for 24CS306 (Machine Learning)**:\n\n"
-                "According to the **VFSTR C24 Syllabus (III Year II Semester)**, **24CS306 (2-2-2, 4 Credits)** requires:\n"
-                "- **22ST202 (Probability and Statistics)**\n"
-                "- **24CS102 (Problem Solving through Python)**\n"
-                "- **24MT101 (Linear Algebra and ODE)**\n\n"
-                "Once satisfied, you are eligible to explore advanced electives like **22CS804 (Deep Learning)** and **22CS809 (Text Mining)**."
-            )
-            citations = ["[B.Tech CSE Catalog 2024-28, III-II]", "[Policy §1.1: Prerequisite Enforcement]"]
-        elif "22cs804" in q or "deep learning" in q:
-            reply = (
-                "🧠 **Curriculum Details for 22CS804 (Deep Learning)**:\n\n"
-                "Under **VFSTR C24 Department Electives (3-0-2, 4 Credits)**, **22CS804** covers:\n"
-                "- **Module 1**: Perceptron convergence, Shallow vs Deep networks, Optimizers (Adam, RMSProp, Adagrad), Regularization (Dropout, Batch Norm), and CNNs (AlexNet, VGGNet, ResNet).\n"
-                "- **Module 2**: Deep Unsupervised Learning (Autoencoders, Denoising, Contractive) and RNNs, LSTMs, GRUs for Text & Vision.\n\n"
-                "Prerequisites: **24CS306 (Machine Learning)** & **24CS102 (Python)**."
-            )
-            citations = ["[B.Tech CSE Department Electives, p.131]", "[VFSTR C24 Syllabus]"]
-        elif "waiver" in q or "petition" in q or "exception" in q:
-            reply = (
-                "📝 **Formal Faculty Exception & Waiver Policy (§1.2)**:\n\n"
-                "If you face an unavoidable scheduling conflict or hold certified equivalent competencies, you may submit a **Prerequisite Waiver Petition**:\n"
-                "1. Submit via the **Faculty Governance** tab with written justification.\n"
-                "2. Requires instructor recommendation and HoD (CSE) approval.\n"
-                "3. Petitions undergo automated formal constraint verification before final sign-off."
-            )
-            citations = ["[Policy §1.2: Prerequisite Waivers]", "[VFSTR Academic Governance Regulations]"]
-        elif "honour" in q or "minor" in q:
-            reply = (
-                "🌟 **Honours & Minors Degree Program (VFSTR C24 Regulation)**:\n\n"
-                "Students with CGPA ≥ 7.5 can enroll in an Honours or Minor track for an additional **20 Credits** (5 courses × 4 credits):\n"
-                "- **Honours Tracks**: Advanced Graph Algorithms (22CS951), Biometrics (22CS952), Parallel & Distributed Computing (22CS953), IoT (22CS954), Wireless Sensor Networks (22CS955), and Capstone Project (22CS956).\n"
-                "- **Minor Tracks**: Python (22CS901), Java OOP (22CS902), DBMS (22CS903), Web Tech (22CS904), Mobile App Dev (22CS905), DAA (22CS906), OS (22CS907), Networks (22CS908), Capstone (22CS909)."
-            )
-            citations = ["[VFSTR C24 Honours & Minors Regulation]", "[B.Tech CSE Structure, p.5]"]
-        elif "substitut" in q or "alternative" in q:
-            reply = (
-                "🔄 **Approved Course Substitution Standards (§2.1)**:\n\n"
-                "The Department of CSE approves the following direct equivalencies:\n"
-                "- **24CS402 (Parallel & Distributed Computing)** ➔ **22CS953 (Honours P&DC)**\n"
-                "- **24CS204 (OOP Java)** ➔ **22CS902 (Java OOP Minor)**\n"
-                "- **24CS403 (Privacy & Intrusion Detection)** ➔ **22CS815 (IDPS Elective)**\n"
-                "- **24CS207 (Full Stack MERN)** ➔ **22CS904 (Web Technologies)**\n\n"
-                "Approved substitutions satisfy degree requirements without extending graduation timeline."
-            )
-            citations = ["[Policy §2.1: Equivalent Courses]", "[VFSTR C24 Equivalence Standards]"]
-        else:
-            completed_cnt = len(student.get('completed', [])) if student else 18
-            gpa = student.get('gpa', 3.82) if student else 3.82
-            reply = (
-                "🟢 **VFSTR C24 Academic Progress Summary & Degree Trajectory**:\n\n"
-                f"- **Completed Courses**: {completed_cnt} courses completed in B.Tech CSE (C24 Regulation).\n"
-                f"- **Cumulative GPA / SGPA**: {gpa:.2f} ({student.get('standing', 'Good Standing') if student else 'Good Standing'}).\n"
-                f"- **Total Degree Target**: 160 Credits (Graduation Target: {student.get('expected_grad', 'May 2028') if student else 'May 2028'}).\n\n"
-                "You are progressing on track. Explore the **C24 Curriculum Explorer**, **Topological Pathway**, and **Knowledge Graph** to inspect upcoming semester courses and syllabi."
-            )
-            citations = ["[VFSTR C24 Degree Standards]", "[Policy §2.0: 160 Credit Graduation Requirement]"]
-
-    # Log conversation to MongoDB
-    db_manager.save_chat_log(req.student_id, req.question, reply, citations)
-
-    return {
-        "reply": reply,
-        "citations": citations
-    }
+        return {
+            "reply": reply,
+            "citations": citations,
+            "tool_executed": tool
+        }
+    except Exception as e:
+        print(f"[ERROR] Graph-RAG failure: {e}")
+        return {
+            "reply": f"⚠️ An error occurred during Graph-RAG verification: {e}",
+            "citations": [],
+            "tool_executed": "error"
+        }
 
 @app.get("/api/chat/history/{student_id}")
 def get_chat_history(student_id: str):
@@ -481,9 +417,14 @@ def generate_degree_pathway(req: PathwayGenerateRequest):
     course_map = {c["id"]: c for c in courses}
     completed = set(student.get("completed", []))
 
-    # All required core and elective courses from catalog
+    # All required core and elective courses from catalog structure
     req_file = load_json_file("degree_requirements.json")
-    required_ids = req_file.get("required_courses", [c["id"] for c in courses if c.get("category") == "Core"])
+    
+    structure_required = []
+    for sem in req_file.get("semesters_structure", []):
+        structure_required.extend(sem.get("courses", []))
+    
+    required_ids = structure_required
     
     # Remaining uncompleted courses
     remaining = [cid for cid in required_ids if cid not in completed and cid in course_map]
@@ -642,8 +583,26 @@ def verify_schedule_constraints(req: AuditRequest):
         for p in prereqs:
             pid = p.get("course_id")
             min_g = p.get("min_grade", "D")
-            if pid not in completed_set and pid not in selected_set:
-                issues.append(f"❌ {cid} missing prerequisite: requires {pid} with grade {min_g} or higher (Policy §1.1).")
+            
+            # Check if this prerequisite has an approved waiver in petitions
+            petitions = db_manager.get_all_petitions()
+            has_waiver = any(
+                pt.get("student_id") == req.student_id and 
+                pt.get("status") == "APPROVED" and 
+                pt.get("course_id") == cid and 
+                pt.get("petition_type") == "PREREQUISITE_WAIVER" and 
+                (pid in pt.get("justification", "") or pid in pt.get("waived_rule", ""))
+                for pt in petitions
+            )
+            
+            if has_waiver:
+                continue
+
+            if pid not in completed_set:
+                if p.get("can_be_concurrent") and pid in selected_set:
+                    pass
+                else:
+                    issues.append(f"❌ {cid} missing prerequisite: requires {pid} to be completed prior (Policy §1.1).")
 
         # 4. Corequisites
         coreqs = c.get("corequisites", [])

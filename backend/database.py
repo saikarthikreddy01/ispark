@@ -141,6 +141,8 @@ class MongoDBManager:
             s["conflicts"] = []
         if "password" not in s:
             s["password"] = "password123"
+        if "academic_history" not in s:
+            s["academic_history"] = []
         return s
 
     # --- Student Operations ---

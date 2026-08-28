@@ -57,6 +57,7 @@ function toast(message) {
 function nav(active, faculty) {
   const items = [
     ['home.html', 'Dashboard', 'home'],
+    ['profile.html', 'My Profile', 'profile'],
     ['advisor.html', 'Advisor', 'advisor'],
     ['pathway.html', 'Degree pathway', 'pathway'],
     ['graph.html', 'Knowledge graph', 'graph'],
