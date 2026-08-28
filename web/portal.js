@@ -56,13 +56,12 @@ function toast(message) {
 function nav(active, faculty) {
   const items = [
     ['home.html', 'Dashboard', 'home'],
-    ['profile.html', 'My Profile', 'profile'],
     ['advisor.html', 'Advisor', 'advisor'],
     ['pathway.html', 'Degree pathway', 'pathway'],
     ['graph.html', 'Knowledge graph', 'graph'],
     ['governance.html', 'Faculty review', 'governance']
   ];
-  const visibleItems = faculty ? items.filter(([, , key]) => key === 'governance') : items;
+  const visibleItems = faculty ? items.filter(([, , key]) => key === 'governance') : items.filter(([, , key]) => key !== 'profile');
   return visibleItems.map(([href,label,key]) => `<a class="${key === active ? 'active' : ''}" href="${href}">${label}</a>`).join('');
 }
 
