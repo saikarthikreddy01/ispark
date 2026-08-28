@@ -339,6 +339,8 @@
             }
 
             if (state.role === 'faculty') {
+                localStorage.removeItem('academic_advisor_permanent_active_user_v3');
+                localStorage.removeItem('academic_advisor_cached_student');
                 localStorage.setItem('academic_advisor_faculty_session', 'active');
                 showNotice('Welcome back. Opening your workspace\u2026', 'good');
                 window.setTimeout(function () { location.href = 'governance.html?faculty=1'; }, 450);
@@ -346,6 +348,7 @@
             }
 
             var studentId = data.student && data.student.id ? data.student.id : payload.regno;
+            localStorage.removeItem('academic_advisor_faculty_session');
             localStorage.setItem('academic_advisor_permanent_active_user_v3', studentId);
 
             if (state.mode === 'signup') {

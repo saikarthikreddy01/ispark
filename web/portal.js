@@ -36,6 +36,11 @@ async function currentStudent() {
 }
 
 function isFacultySession() {
+  const savedId = localStorage.getItem('academic_advisor_permanent_active_user_v3');
+  if (savedId) {
+    localStorage.removeItem('academic_advisor_faculty_session');
+    return false;
+  }
   return localStorage.getItem('academic_advisor_faculty_session') === 'active';
 }
 
