@@ -25,10 +25,18 @@ class SourceRouterAgent:
                 if dept and dept not in authorities:
                     authorities.append(dept)
 
-        if any(k in q for k in ["policy", "waiver", "credit", "transfer", "regulation", "graduation"]):
+        if any(k in q for k in ["policy", "waiver", "credit", "transfer", "regulation", "graduation", "substitution", "substitute", "equivalent"]):
             authorities.append("CENTRAL_ACADEMIC_POLICY")
 
         if not authorities:
+            academic_terms = ["academic", "course", "subject", "credit", "semester", "grade", "gpa", "cgpa", "degree", "curriculum", "faculty", "college", "take", "enroll", "register"]
+            if not any(term in q for term in academic_terms):
+                return {
+                    "mode": "NO_ACADEMIC_SOURCE_REQUIRED",
+                    "authorities": [],
+                    "course_targets": [],
+                    "note": "The request is outside the academic-advising source scope.",
+                }
             authorities = ["CSE", "CENTRAL_ACADEMIC_POLICY"]
 
         # stable unique order

@@ -32,14 +32,35 @@ class CreditValidator:
         return value, status
 
     def calculate_student_credits(self, student) -> CreditSummary:
-        completed = (
-            student.completed_course_ids
-            if hasattr(student, "completed_course_ids")
-            else set(student.completed_courses if hasattr(student, "completed_courses") else [])
-        )
-        planned = getattr(student, "planned_courses", [])
+        if isinstance(student, dict):
+            history = student.get("academic_history", []) or []
+            completed = set()
+            transcript_credits = 0
+            for semester in history:
+                for item in semester.get("courses", []) if isinstance(semester, dict) else []:
+                    cid = item.get("course_id") or item.get("code") or item.get("id")
+                    grade = str(item.get("grade", "A")).strip().upper()
+                    if cid and grade not in {"F", "W", "I"}:
+                        completed.add(cid)
+                        transcript_credits += int(item.get("credits", self.kg.get_course_credits(cid)) or 0)
+            if not completed:
+                raw = student.get("completed_course_ids", student.get("completed", student.get("completed_courses", [])))
+                for item in raw or []:
+                    cid = item if isinstance(item, str) else item.get("course_id") or item.get("id") if isinstance(item, dict) else None
+                    if cid:
+                        completed.add(cid)
+                transcript_credits = sum(self.kg.get_course_credits(c) for c in completed)
+            planned = student.get("planned_courses", student.get("planned", [])) or []
+            total_completed = transcript_credits
+        else:
+            completed = (
+                student.completed_course_ids
+                if hasattr(student, "completed_course_ids")
+                else set(student.completed_courses if hasattr(student, "completed_courses") else [])
+            )
+            planned = getattr(student, "planned_courses", [])
+            total_completed = sum(self.kg.get_course_credits(c) for c in completed)
 
-        total_completed = sum(self.kg.get_course_credits(c) for c in completed)
         total_in_progress = 0
         for item in planned:
             cid = item if isinstance(item, str) else item.get("course_id", "") if isinstance(item, dict) else getattr(item, "course_id", "")

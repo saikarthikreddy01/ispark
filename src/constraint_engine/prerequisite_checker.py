@@ -95,12 +95,12 @@ class PrerequisiteChecker:
         return self._check_groups(groups, completed_grades, enforce_grade=False)
 
     def _grade_meets_min(self, earned_grade: str, min_grade: str) -> bool:
-        from src.models.student import GRADE_POINTS
-        earned_pt = GRADE_POINTS.get(earned_grade)
-        min_pt = GRADE_POINTS.get(min_grade)
-        if earned_pt is None or min_pt is None:
+        from src.models.student import GRADE_RANK
+        earned_rank = GRADE_RANK.get(str(earned_grade).strip().upper())
+        min_rank = GRADE_RANK.get(str(min_grade).strip().upper())
+        if earned_rank is None or min_rank is None:
             return False
-        return earned_pt >= min_pt
+        return earned_rank >= min_rank
 
     def check_corequisites(self, course_id: str, semester_courses: set[str], completed: set[str]) -> tuple[bool, list[str]]:
         course = self.kg.get_course(course_id)

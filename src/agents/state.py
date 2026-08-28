@@ -19,6 +19,7 @@ class AdvisorState(TypedDict, total=False):
     risk_assessment: Optional[dict]
     verification: Optional[dict]
     needs_faculty_approval: bool
+    exception_request: Optional[dict]
     faculty_packet: Optional[dict]
     agent_trace: list[dict]
     errors: list[dict]

@@ -3634,5 +3634,45 @@
       "SPRING"
     ],
     "difficulty_level": 2
+  },
+  {
+    "id": "22SA220",
+    "name": "Computational Thinking",
+    "department": "CSE",
+    "credits": 1,
+    "ltpc": "",
+    "category": "Binary Grade",
+    "sem": 3,
+    "description": "Completed binary-grade course imported from the verified student academic record.",
+    "prerequisite_groups": [],
+    "corequisites": [],
+    "credit_categories": [
+      "BINARY_GRADE"
+    ],
+    "offered_semesters": [
+      "FALL",
+      "SPRING"
+    ],
+    "difficulty_level": 1
+  },
+  {
+    "id": "24CS956",
+    "name": "UI or UX Design",
+    "department": "CSE",
+    "credits": 4,
+    "ltpc": "",
+    "category": "Honours",
+    "sem": 4,
+    "description": "Completed Honours course imported from the verified student academic record.",
+    "prerequisite_groups": [],
+    "corequisites": [],
+    "credit_categories": [
+      "HONOURS"
+    ],
+    "offered_semesters": [
+      "FALL",
+      "SPRING"
+    ],
+    "difficulty_level": 2
   }
 ]

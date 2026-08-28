@@ -15,7 +15,10 @@ class AcademicVectorStore:
         self.idf: dict[str, float] = {}
 
     def _tokenize(self, text: str) -> list[str]:
-        return re.findall(r'\b[a-zA-Z0-9_§]+\b', text.lower())
+        return [
+            token for token in re.findall(r'\b[a-zA-Z0-9_§]+\b', text.lower())
+            if token not in self.STOPWORDS and len(token) > 1
+        ]
 
     def _compute_vector(self, tokens: list[str]) -> dict[str, float]:
         tf = Counter(tokens)
@@ -52,7 +55,14 @@ class AcademicVectorStore:
     def count(self) -> int:
         return len(self.documents)
 
-    def search(self, query: str, n_results: int = 5, filter_metadata: Optional[dict] = None, top_k: Optional[int] = None) -> list[dict]:
+    def search(
+        self,
+        query: str,
+        n_results: int = 5,
+        filter_metadata: Optional[dict] = None,
+        top_k: Optional[int] = None,
+        min_similarity: float = 0.08,
+    ) -> list[dict]:
         limit = top_k if top_k is not None else n_results
         if not self.documents:
             return []
@@ -79,15 +89,16 @@ class AcademicVectorStore:
                     similarity += q_w * doc_vec[token]
                     
             # Keyword exact boost
+            doc_tokens = set(self._tokenize(doc.content))
             for token in q_tokens:
-                if len(token) > 2 and token in doc.content.lower():
+                if len(token) > 2 and token in doc_tokens:
                     similarity += 0.15
                     
             scores.append((similarity, idx, doc))
             
         # Sort descending by similarity
         scores.sort(key=lambda x: x[0], reverse=True)
-        top_results = scores[:limit]
+        top_results = [item for item in scores if item[0] >= min_similarity][:limit]
         
         results = []
         for sim, idx, doc in top_results:
@@ -103,3 +114,8 @@ class AcademicVectorStore:
         self.documents = []
         self.doc_vectors = []
         self.idf = {}
+    STOPWORDS = {
+        "a", "an", "and", "are", "as", "at", "be", "can", "do", "for", "from",
+        "how", "i", "in", "is", "it", "me", "my", "of", "on", "or", "should",
+        "the", "to", "what", "when", "where", "which", "with", "would", "you",
+    }

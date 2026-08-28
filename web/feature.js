@@ -143,10 +143,45 @@ function formatAgentMarkdown(text) {
   return formatted;
 }
 
+function citationLabel(citation) {
+  if (typeof citation === 'string') return citation;
+  if (!citation || typeof citation !== 'object') return 'Academic source';
+  const reference = citation.reference || citation.title || citation.content || 'Academic source';
+  const status = citation.source_status ? ` · ${citation.source_status}` : '';
+  return `${reference}${status}`;
+}
+
+function renderAgentTrace(trace) {
+  if (!Array.isArray(trace) || !trace.length) return '';
+  return `<details class="agent-trace"><summary>View agent execution trace <span>${esc(trace.length)} steps</span></summary><ol>${trace.map(item => `<li><span class="agent-trace-status ${item.status === 'ok' ? 'good' : ''}"></span><div><strong>${esc(item.agent || 'Advisor agent')}</strong><p>${esc(item.action || 'Completed academic reasoning')}</p></div></li>`).join('')}</ol></details>`;
+}
+
+function renderAdvisorEvidence(result) {
+  const details = Array.isArray(result.citation_details) && result.citation_details.length
+    ? result.citation_details
+    : (Array.isArray(result.citations) ? result.citations : []);
+  const verification = result.verification || {};
+  const conflicts = Array.isArray(result.conflicts) ? result.conflicts : [];
+  const decision = verification.decision || (result.query_type === 'out_of_scope' ? 'OUT_OF_SCOPE' : 'ADVISORY_RESULT');
+  const decisionTone = ['VERIFIED', 'VALID', 'ELIGIBLE'].some(word => String(decision).includes(word)) ? 'good' : (String(decision).includes('REVIEW') ? 'warn' : '');
+  const meta = `<div class="advisor-result-meta"><span class="badge">${esc(result.query_type || 'general')}</span><span class="badge ${decisionTone}">${esc(decision)}</span><span class="badge">${esc((result.agent_trace || []).length)} agent steps</span></div>`;
+  const conflictHtml = conflicts.length ? `<div class="advisor-findings"><strong>Detected academic signals</strong>${conflicts.slice(0, 5).map(item => `<p><span>${esc(item.type || 'Finding')}</span>${esc(item.message || item.detail || item.course_id || 'Review required')}</p>`).join('')}</div>` : '';
+  const citationsHtml = details.length ? `<div class="chat-citations"><span>Verified evidence</span>${details.map(citation => `<span class="badge">${esc(citationLabel(citation))}</span>`).join('')}</div>` : '<div class="chat-citations evidence-empty"><span>No external policy citation was required for this response.</span></div>';
+  const facultyHtml = result.needs_faculty_approval ? '<div class="notice advisor-faculty-note">This recommendation requires faculty review. The advisor prepared an evidence packet but did not approve the exception.</div>' : '';
+  const pathwayLink = result.query_type === 'pathway' ? '<a class="advisor-follow-link" href="pathway.html">Open the interactive degree pathway <span aria-hidden="true">&rarr;</span></a>' : '';
+  return `${meta}${conflictHtml}${facultyHtml}${citationsHtml}${renderAgentTrace(result.agent_trace)}${pathwayLink}`;
+}
+
 async function advisor(student) {
   const form = document.querySelector('[data-form]');
   const out = document.querySelector('[data-output]');
   const quickChips = document.querySelectorAll('[data-quick-actions] .quick-chip');
+  const status = document.querySelector('[data-agent-status]');
+  const context = document.querySelector('[data-advisor-context]');
+
+  if (context) {
+    context.innerHTML = `<div><span>Student</span><strong>${esc(student?.id || 'Unknown')}</strong></div><div><span>Current term</span><strong>${esc(student?.current_semester || 'Not set')}</strong></div><div><span>GPA</span><strong>${esc(student?.gpa ?? '—')} / ${esc(student?.gpa_scale || 10)}</strong></div><div><span>Completed</span><strong>${esc(student?.completed?.length || 0)} subjects</strong></div>`;
+  }
 
   if (quickChips.length && form) {
     quickChips.forEach(chip => {
@@ -154,7 +189,8 @@ async function advisor(student) {
         const prompt = chip.getAttribute('data-prompt');
         if (prompt && form.elements.question) {
           form.elements.question.value = prompt;
-          form.dispatchEvent(new Event('submit'));
+          if (form.requestSubmit) form.requestSubmit();
+          else form.dispatchEvent(new Event('submit'));
         }
       };
     });
@@ -167,22 +203,23 @@ async function advisor(student) {
       const question = input.value.trim();
       if (!question) return;
       const studentId = student?.id || '241FA04077';
-      out.insertAdjacentHTML('beforeend', `<article class="chat-message user"><strong>You</strong><p>${esc(question)}</p></article><article class="chat-message assistant chat-loading"><strong>Autonomous AI Advisor</strong><p>⚡ Agent is reasoning and executing tools...</p></article>`);
+      out.insertAdjacentHTML('beforeend', `<article class="chat-message user"><strong>You</strong><p>${esc(question)}</p></article><article class="chat-message assistant chat-loading"><strong>Academic AI Advisor</strong><p>Routing the request, retrieving graph evidence, and verifying constraints&hellip;</p></article>`);
       out.scrollTop = out.scrollHeight;
       input.value = '';
       input.disabled = true;
       form.querySelector('button').disabled = true;
+      if (status) status.textContent = 'Agents working…';
       try {
         const result = await api('/api/chat', { method:'POST', body:JSON.stringify({ student_id:studentId, question }) });
-        const citations = Array.isArray(result.citations) ? result.citations : [];
-        const toolBadge = result.tool_executed ? `<span class="badge good" style="font-size:11px;margin-bottom:8px;display:inline-block;">⚡ Tool: ${esc(result.tool_executed)}</span>` : '';
         const loading = out.querySelector('.chat-loading:last-child');
         if (loading) {
-          loading.outerHTML = `<article class="chat-message assistant"><strong>Academic AI Advisor</strong>${toolBadge}<div class="agent-reply-content">${formatAgentMarkdown(result.reply || 'I could not generate an answer. Please try again.')}</div>${citations.length ? `<div class="chat-citations"><span>Sources</span>${citations.map(citation => `<span class="badge">${esc(citation)}</span>`).join('')}</div>` : ''}</article>`;
+          loading.outerHTML = `<article class="chat-message assistant advisor-result"><strong>Academic AI Advisor</strong><div class="agent-reply-content">${formatAgentMarkdown(result.reply || 'I could not generate an answer. Please try again.')}</div>${renderAdvisorEvidence(result)}</article>`;
         }
+        if (status) status.textContent = result.needs_faculty_approval ? 'Faculty review required' : 'Answer verified';
       } catch (error) {
         const loading = out.querySelector('.chat-loading:last-child');
-        if (loading) loading.outerHTML = `<article class="chat-message assistant"><strong>Academic AI Advisor</strong><p>${esc(error.message)}</p></article>`;
+        if (loading) loading.outerHTML = `<article class="chat-message assistant advisor-error"><strong>Academic AI Advisor</strong><p>${esc(error.message)}</p><small>Check that the FastAPI server is running, then try again.</small></article>`;
+        if (status) status.textContent = 'Unable to complete request';
       } finally {
         input.disabled = false;
         form.querySelector('button').disabled = false;
@@ -190,17 +227,54 @@ async function advisor(student) {
         out.scrollTop = out.scrollHeight;
       }
     };
+
+    form.elements.question.onkeydown = event => {
+      if (event.key === 'Enter' && !event.shiftKey) {
+        event.preventDefault();
+        if (form.requestSubmit) form.requestSubmit();
+      }
+    };
   }
 }
 
 async function pathway(student) {
   const studentId = student?.id || '241FA04077';
-  const data = await api('/api/pathway/generate', { method:'POST', body:JSON.stringify({ student_id:studentId, max_credits_per_semester:16, target_graduation:student?.expected_grad || 'May 2028' }) });
+  const form = document.querySelector('[data-pathway-form]');
   const summaryNode = document.querySelector('[data-summary]');
-  if (summaryNode) summaryNode.innerHTML = `<div class="grid grid-3"><div class="metric"><strong>${esc(data.total_planned_credits)}</strong><span>planned credits</span></div><div class="metric"><strong>${esc(data.total_semesters)}</strong><span>terms generated</span></div><div class="metric"><strong>${esc(data.target_graduation)}</strong><span>target graduation</span></div></div>`;
-  
   const out = document.querySelector('[data-output]');
-  if (out) out.innerHTML = `<div class="grid grid-2">${(data.pathway || []).map(term => `<article class="panel"><span class="eyebrow">${esc(term.name)}</span><h3>${esc(term.total_credits)} credits · ${esc(term.status)}</h3><div class="data-list">${(term.courses || []).map(course => courseRow(course, student)).join('') || '<div class="empty">No eligible courses in this term.</div>'}</div></article>`).join('')}</div>`;
+  const planStatus = document.querySelector('[data-plan-status]');
+
+  if (form?.elements.target_graduation) form.elements.target_graduation.value = student?.expected_grad || 'May 2028';
+
+  async function generatePlan() {
+    const maxCredits = Number(form?.elements.max_credits?.value || 16);
+    const targetGraduation = form?.elements.target_graduation?.value.trim() || student?.expected_grad || 'May 2028';
+    const submit = form?.querySelector('button[type="submit"]');
+    if (submit) submit.disabled = true;
+    if (out) out.innerHTML = '<div class="empty pathway-loading">Building the prerequisite-safe semester sequence&hellip;</div>';
+    if (planStatus) planStatus.innerHTML = '';
+
+    try {
+      const data = await api('/api/pathway/generate', { method:'POST', body:JSON.stringify({ student_id:studentId, max_credits_per_semester:maxCredits, target_graduation:targetGraduation }) });
+      const progress = Number(data.degree_progress_percent || 0);
+      if (summaryNode) summaryNode.innerHTML = `<div class="grid grid-3 pathway-metrics"><div class="metric"><strong>${esc(progress)}%</strong><span>degree credits completed</span></div><div class="metric"><strong>${esc(data.total_planned_credits || 0)}</strong><span>remaining planned credits</span></div><div class="metric"><strong>${esc(data.total_semesters || 0)}</strong><span>future terms generated</span></div></div><div class="degree-progress"><span style="width:${Math.min(100, Math.max(0, progress))}%"></span></div><p class="pathway-credit-label">${esc(data.completed_credits || 0)} of ${esc(data.degree_credits_required || 160)} required credits completed · projected ${esc(data.projected_credits || 0)} credits after this plan</p>`;
+
+      const unscheduled = Array.isArray(data.unscheduled_courses) ? data.unscheduled_courses : [];
+      const constraints = Array.isArray(data.constraints_checked) ? data.constraints_checked : [];
+      if (planStatus) planStatus.innerHTML = `<div class="notice ${data.success ? 'good' : ''}"><strong>${data.success ? 'Verified candidate pathway' : 'Faculty or advisor review required'}</strong><span>Target: ${esc(data.target_graduation)} · ${esc(maxCredits)}-credit semester limit</span><div class="constraint-tags">${constraints.map(item => `<span>${esc(item)}</span>`).join('')}</div>${unscheduled.length ? `<p><strong>Unscheduled:</strong> ${unscheduled.map(esc).join(', ')}</p>` : '<p>All catalog courses selected for this candidate plan were scheduled.</p>'}</div>`;
+
+      const terms = Array.isArray(data.pathway) ? data.pathway : [];
+      if (out) out.innerHTML = terms.length ? `<div class="pathway-timeline">${terms.map((term, index) => `<article class="panel pathway-term"><div class="pathway-term-index"><span>${String(index + 1).padStart(2, '0')}</span><i></i></div><div class="pathway-term-body"><header><div><span class="eyebrow">${esc(term.name)}</span><h3>${esc(term.total_credits)} credits</h3></div><span class="badge ${Number(term.total_credits) > maxCredits ? 'danger' : 'good'}">${esc(term.status || 'Planned')}</span></header><div class="pathway-course-list">${(term.courses || []).map(course => `<div class="pathway-course"><div><span class="code">${esc(course.id)}</span><strong>${esc(course.name)}</strong><small>${coursePrereqs(course).length ? `After: ${coursePrereqs(course).map(esc).join(', ')}` : 'No blocking prerequisite listed'}</small></div><span>${esc(course.credits || 0)} CR</span></div>`).join('') || '<div class="empty">No eligible courses in this term.</div>'}</div></div></article>`).join('')}</div>` : '<div class="notice">No pathway could be generated. Review the unscheduled courses and prerequisite data.</div>';
+    } catch (error) {
+      if (out) out.innerHTML = `<div class="notice">${esc(error.message)}</div>`;
+      if (planStatus) planStatus.innerHTML = '<div class="notice">The pathway could not be generated. Confirm that the FastAPI server and student record are available.</div>';
+    } finally {
+      if (submit) submit.disabled = false;
+    }
+  }
+
+  if (form) form.onsubmit = event => { event.preventDefault(); generatePlan(); };
+  await generatePlan();
 }
 
 async function conflicts(student) {

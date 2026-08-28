@@ -1,5 +1,32 @@
-const API = 'http://127.0.0.1:8000';
+const API = window.location.protocol === 'file:' ? 'http://127.0.0.1:8000' : window.location.origin;
 let signingOut = false;
+const AUTH_STORAGE_KEYS = [
+  'academic_advisor_permanent_active_user_v3',
+  'academic_advisor_faculty_session',
+  'academic_advisor_cached_student'
+];
+
+function loginPageUrl() {
+  return new URL('login.html', document.baseURI).href;
+}
+
+function hasActiveSession() {
+  try {
+    return Boolean(
+      localStorage.getItem('academic_advisor_permanent_active_user_v3') ||
+      localStorage.getItem('academic_advisor_faculty_session') === 'active'
+    );
+  } catch (error) {
+    return false;
+  }
+}
+
+function clearAuthStorage() {
+  AUTH_STORAGE_KEYS.forEach(key => {
+    localStorage.removeItem(key);
+    sessionStorage.removeItem(key);
+  });
+}
 
 async function api(path, options = {}) {
   const response = await fetch(`${API}${path}`, { headers: { 'Content-Type': 'application/json' }, ...options });
@@ -44,40 +71,38 @@ function isFacultySession() {
   return localStorage.getItem('academic_advisor_faculty_session') === 'active';
 }
 
-let isLoggingOut = false;
-
-function signOut() {
-  if (isLoggingOut) return;
-  isLoggingOut = true;
+function signOut(event) {
+  if (event) {
+    event.preventDefault();
+    event.stopPropagation();
+  }
+  if (signingOut) return;
+  signingOut = true;
 
   try {
-    localStorage.removeItem('academic_advisor_permanent_active_user_v3');
-    localStorage.removeItem('academic_advisor_faculty_session');
-    localStorage.removeItem('academic_advisor_cached_student');
-    localStorage.clear();
-    sessionStorage.clear();
+    clearAuthStorage();
   } catch (e) {
     console.warn('Storage clear error:', e);
   }
 
   try {
-    fetch(API + '/api/auth/logout', { method: 'POST', cache: 'no-store' }).catch(function() {});
+    fetch(API + '/api/auth/logout', {
+      method: 'POST',
+      credentials: 'include',
+      keepalive: true
+    }).catch(function() {});
   } catch (e) {}
 
-  window.location.replace('index.html?logout=' + Date.now());
+  // replace() prevents the authenticated page from remaining in browser history.
+  window.location.replace(loginPageUrl());
 }
 window.signOut = signOut;
 
-// Back-Forward Cache (bfcache) guard: prevents restored cached pages from appearing logged in after sign-out
-window.addEventListener('pageshow', function(event) {
-  const isLoginPage = window.location.pathname.endsWith('index.html') || window.location.pathname === '/';
-  if (isLoginPage) return;
-
-  const studentId = localStorage.getItem('academic_advisor_permanent_active_user_v3');
-  const isFaculty = localStorage.getItem('academic_advisor_faculty_session') === 'active';
-
-  if (!studentId && !isFaculty) {
-    window.location.replace('index.html?unauthorized=' + Date.now());
+// Browsers may restore a protected page from the back-forward cache. Re-check
+// storage whenever the page is shown and return signed-out users to login.
+window.addEventListener('pageshow', function() {
+  if (!hasActiveSession()) {
+    window.location.replace(loginPageUrl());
   }
 });
 
@@ -104,15 +129,9 @@ function nav(active, faculty) {
 
 async function initShell(active) {
   const student = await currentStudent();
-  if (!student) {
-    window.location.replace('index.html?unauthorized=' + Date.now());
-    return null;
-  }
+  if (!student) { location.href = 'login.html'; return null; }
   const faculty = isFacultySession();
-  if (faculty && active !== 'governance') {
-    window.location.replace('governance.html');
-    return null;
-  }
+  if (faculty && active !== 'governance') { location.href = 'governance.html'; return null; }
   const appbar = document.querySelector('.appbar');
   if (appbar && !appbar.querySelector('.brand')) {
     appbar.insertAdjacentHTML('afterbegin', `<a class="brand" href="${faculty ? 'governance.html' : 'home.html'}"><span class="brand-mark">AA</span><span>Academic Advisor</span></a>`);
@@ -125,16 +144,14 @@ async function initShell(active) {
     const displayId = student.id || 'Faculty';
     const profileHref = faculty ? 'governance.html' : 'profile.html';
 
-    // Build profile link via DOM
+    // Use a real anchor so profile navigation works even if JavaScript event
+    // delegation changes. Students go to profile; faculty remain in governance.
     const profileLink = document.createElement('a');
     profileLink.href = profileHref;
     profileLink.className = 'profile-icon-btn';
+    profileLink.setAttribute('data-action', 'profile');
     profileLink.title = 'My Profile';
-    profileLink.style.cssText = 'display:inline-flex;align-items:center;gap:8px;text-decoration:none;border:1px solid var(--line,#e2e8f0);border-radius:8px;padding:5px 12px;font-size:13px;color:inherit;background:transparent;cursor:pointer;position:relative;z-index:9999;';
-    profileLink.onclick = function(e) {
-      e.preventDefault();
-      window.location.href = profileHref;
-    };
+    profileLink.style.cssText = 'display:inline-flex;align-items:center;gap:8px;text-decoration:none;border:1px solid var(--line,#e2e8f0);border-radius:8px;padding:5px 12px;font-size:13px;color:inherit;background:transparent;cursor:pointer;position:relative;z-index:9999;pointer-events:auto;';
 
     const avatar = document.createElement('span');
     avatar.textContent = initial;
@@ -152,16 +169,14 @@ async function initShell(active) {
     profileLink.appendChild(nameSpan);
     profileLink.appendChild(idSpan);
 
-    // Build sign out button
+    // Build sign out button with attributes and handlers
     const signOutBtn = document.createElement('button');
     signOutBtn.className = 'btn';
     signOutBtn.type = 'button';
+    signOutBtn.setAttribute('data-action', 'signout');
     signOutBtn.textContent = 'Sign out';
-    signOutBtn.style.cssText = 'cursor:pointer;position:relative;z-index:9999;';
-    signOutBtn.onclick = function(e) {
-      e.preventDefault();
-      signOut();
-    };
+    signOutBtn.style.cssText = 'cursor:pointer;position:relative;z-index:9999;pointer-events:auto;';
+    signOutBtn.addEventListener('click', signOut);
 
     // Clear and inject
     userbar.innerHTML = '';
@@ -173,6 +188,19 @@ async function initShell(active) {
   }
   return student;
 }
+
+// Global sign-out delegation is retained as a fallback. Profile navigation is
+// handled by the anchor's href and must not be intercepted here.
+document.addEventListener('click', function(e) {
+  const target = e.target instanceof Element ? e.target : e.target?.parentElement;
+  if (!target) return;
+  // Sign Out click detection
+  const signoutElem = target.closest('[data-action="signout"]') || (target.tagName === 'BUTTON' && target.textContent.trim() === 'Sign out');
+  if (signoutElem) {
+    signOut(e);
+    return;
+  }
+}, true);
 
 function coursePrereqs(course) {
   return course.prereqs || (course.prerequisite_groups || []).flatMap(group => (group.prerequisites || []).map(item => item.course_id));
@@ -215,7 +243,7 @@ function initGlobalChatbot(student) {
         <div class="global-chatbot-chips">
           <button type="button" class="global-chip" data-prompt="Audit 24CS209 for Sem 1">⚡ Audit 24CS209</button>
           <button type="button" class="global-chip" data-prompt="Generate my optimal 4-year degree pathway">🗺️ Degree Pathway</button>
-          <button type="button" class="global-chip" data-prompt="What courses are blocking my graduation?">🚨 Bottlenecks</button>
+          <button type="button" class="global-chip" data-prompt="What are my graduation bottlenecks and delay risks?">🚨 Bottlenecks</button>
         </div>
         <form id="global-chatbot-form" class="global-chatbot-input">
           <textarea name="question" placeholder="Ask about courses, pathways, conflicts, bottlenecks, or substitutions..." required rows="1"></textarea>

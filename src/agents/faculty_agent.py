@@ -18,6 +18,7 @@ class FacultyEscalationAgent:
             "student_id": profile.get("student_id"),
             "student_name": profile.get("name"),
             "request": query,
+            "exception_request": state.get("exception_request"),
             "candidate_substitutions": substitutions,
             "blocking_conflicts": [c for c in conflicts if c.get("blocking")],
             "readiness_warnings": [c for c in conflicts if not c.get("blocking")],

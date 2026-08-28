@@ -5,6 +5,7 @@ Connects to local or MongoDB Atlas cluster, with automatic seeding and resilient
 
 import os
 import json
+import time
 from pathlib import Path
 from typing import Dict, List, Optional, Any
 from dotenv import load_dotenv
@@ -23,14 +24,18 @@ class MongoDBManager:
         self.client = None
         self.db = None
         self.is_connected = False
+        self._last_connection_attempt = 0.0
+        self._reconnect_cooldown_seconds = int(os.getenv("MONGODB_RECONNECT_COOLDOWN", "30"))
         self._init_connection()
 
     def _init_connection(self):
+        self._last_connection_attempt = time.monotonic()
         try:
             from pymongo import MongoClient
+            timeout_ms = int(os.getenv("MONGODB_TIMEOUT_MS", "2000"))
             client_kwargs = {
-                "serverSelectionTimeoutMS": 5000,
-                "connectTimeoutMS": 5000
+                "serverSelectionTimeoutMS": timeout_ms,
+                "connectTimeoutMS": timeout_ms,
             }
             if "mongodb+srv" in MONGODB_URI:
                 try:
@@ -54,7 +59,8 @@ class MongoDBManager:
 
     def ensure_connected(self):
         """Attempts to reconnect if connection dropped or failed earlier."""
-        if not self.is_connected:
+        retry_due = time.monotonic() - self._last_connection_attempt >= self._reconnect_cooldown_seconds
+        if not self.is_connected and retry_due:
             self._init_connection()
 
     def _init_file_db(self):
@@ -541,4 +547,3 @@ class MongoDBManager:
 
 # Singleton Database Manager
 db_manager = MongoDBManager()
-

@@ -101,18 +101,23 @@ class AcademicAdvisor:
 
     def classify_query(self, query: str) -> str:
         q = query.lower()
-        if any(k in q for k in ["substitute", "instead of", "equivalent", "alternative course", "replacement"]):
+        if any(k in q for k in ["substitute", "substitution", "substitutions", "instead of", "equivalent", "alternative course", "replacement"]):
             return "substitution"
         if any(k in q for k in ["career", "ai engineer", "ml engineer", "backend", "cybersecurity", "data scientist", "data engineer"]):
             return "career"
+        if "waiver" in q and any(k in q for k in ["request", "apply", "need", "prepare", "approve", "exception"]):
+            return "waiver"
+        if any(k in q for k in ["risk", "delay", "bottleneck", "blocking my graduation", "blocks my graduation", "blocked graduation"]):
+            return "risk"
         if any(k in q for k in ["pathway", "plan", "roadmap", "schedule", "semesters", "graduate", "graduation plan"]):
             return "pathway"
-        if any(k in q for k in ["risk", "delay", "bottleneck", "standing", "blocked graduation"]):
-            return "risk"
         if any(k in q for k in ["policy", "waiver", "transfer", "repeat", "credit limit", "regulation"]):
             return "policy"
         if any(k in q for k in ["prereq", "prerequisite", "require", "eligible", "can i take", "enroll", "register"]):
             return "prerequisite"
+        academic_terms = ["academic", "course", "subject", "credit", "semester", "grade", "gpa", "cgpa", "degree", "curriculum", "faculty", "college"]
+        if not any(k in q for k in academic_terms):
+            return "out_of_scope"
         return "general"
 
     def _trace(self, state: AdvisorState, agent: str, action: str, status: str = "ok") -> list[dict]:
@@ -178,6 +183,17 @@ class AcademicAdvisor:
         out["agent_trace"] = self._trace(state, "SubstitutionAgent", "searched candidate substitutions/equivalencies")
         return out
 
+    def _waiver_node(self, state: AdvisorState) -> AdvisorState:
+        out = self.conflict_agent.process(state)
+        out["needs_faculty_approval"] = True
+        out["exception_request"] = {
+            "type": "PREREQUISITE_WAIVER",
+            "status": "PENDING_HUMAN_REVIEW",
+            "note": "The advisor can prepare evidence but cannot approve an academic exception.",
+        }
+        out["agent_trace"] = self._trace(state, "ExceptionReviewAgent", "prepared waiver request for mandatory human review")
+        return out
+
     def _career_node(self, state: AdvisorState) -> AdvisorState:
         out = self.career_agent.process(state)
         out["agent_trace"] = self._trace(state, "CareerAlignmentAgent", "matched curriculum courses to advisory career skills")
@@ -219,6 +235,7 @@ class AcademicAdvisor:
             ("source_router", self._source_router_node), ("retrieve", self._retrieve_node),
             ("conflicts", self._conflict_node), ("pathway", self._pathway_node),
             ("risk", self._risk_node), ("substitution", self._substitution_node),
+            ("waiver", self._waiver_node),
             ("career", self._career_node), ("verify", self._verification_node),
             ("citations", self._citation_node), ("faculty", self._faculty_node),
             ("synthesize", self._synthesis_node),
@@ -231,13 +248,15 @@ class AcademicAdvisor:
         graph.add_edge("source_router", "retrieve")
         graph.add_conditional_edges("retrieve", self._route_after_retrieval, {
             "prerequisite": "conflicts", "pathway": "pathway", "risk": "risk",
-            "substitution": "substitution", "career": "career", "policy": "verify", "general": "conflicts",
+            "substitution": "substitution", "career": "career", "policy": "verify", "general": "conflicts", "out_of_scope": "verify",
+            "waiver": "waiver",
         })
         graph.add_edge("pathway", "risk")
         graph.add_edge("risk", "career")
         graph.add_edge("career", "verify")
         graph.add_edge("conflicts", "verify")
         graph.add_conditional_edges("substitution", self._route_after_substitution, {"faculty": "faculty", "verify": "verify"})
+        graph.add_edge("waiver", "faculty")
         graph.add_edge("faculty", "verify")
         graph.add_edge("verify", "citations")
         graph.add_edge("citations", "synthesize")
@@ -302,6 +321,8 @@ Answer directly. Clearly label FORMAL BLOCK, READINESS WARNING, ADVISORY RECOMME
     def _deterministic_response(self, state: AdvisorState) -> str:
         lines = ["### Academic advising result"]
         verification = state.get("verification") or {}
+        if verification.get("decision") == "OUT_OF_SCOPE":
+            return "I can help with curriculum courses, prerequisites, credits, semester pathways, graduation risks, substitutions, career alignment, and faculty-review requests."
         lines.append(f"\n**Verification:** {verification.get('decision', 'ADVISORY_OK')}")
         blocking = verification.get("blocking_conflicts", [])
         warnings = verification.get("readiness_warnings", [])
@@ -349,6 +370,8 @@ Answer directly. Clearly label FORMAL BLOCK, READINESS WARNING, ADVISORY RECOMME
             state.update(self._substitution_node(state))
             if state.get("needs_faculty_approval"):
                 state.update(self._faculty_node(state))
+        elif route == "waiver":
+            state.update(self._waiver_node(state)); state.update(self._faculty_node(state))
         elif route == "career":
             state.update(self._career_node(state))
         for node in [self._verification_node, self._citation_node, self._synthesis_node]:
@@ -375,4 +398,5 @@ Answer directly. Clearly label FORMAL BLOCK, READINESS WARNING, ADVISORY RECOMME
             "faculty_packet": final_state.get("faculty_packet"),
             "agent_trace": final_state.get("agent_trace", []),
             "errors": final_state.get("errors", []),
+            "workflow_mode": "LANGGRAPH" if self.workflow else "DETERMINISTIC_FALLBACK",
         }

@@ -1,0 +1,3976 @@
+{
+  "students": [
+    {
+      "id": "241FA04077",
+      "name": "SAI KARTHIK REDDY",
+      "password": "password123",
+      "major": "B.Tech Computer Science & Engineering",
+      "reg_regulation": "C24",
+      "current_semester": "III Year I Semester",
+      "gpa": 7.83,
+      "gpa_scale": 10,
+      "completed": [
+        "24CS101",
+        "24CT101",
+        "24CY101",
+        "24EE101",
+        "24EN101",
+        "24MS101",
+        "24MT101",
+        "24SA103",
+        "24SS101",
+        "24CS102",
+        "24CT103",
+        "24EN102",
+        "24ME101",
+        "24MT102",
+        "24PY102",
+        "24SA101",
+        "24SA102",
+        "24SS102",
+        "22CS201",
+        "22SA220",
+        "22TP201",
+        "24CS204",
+        "24CS205",
+        "24CS208",
+        "24CS299",
+        "24CS801",
+        "24MT203",
+        "22CS207",
+        "22ST202",
+        "24CS201",
+        "24CS207",
+        "24CS209",
+        "24CS210",
+        "24CS956",
+        "24SA201"
+      ],
+      "academic_history": [
+        {
+          "title": "I Year - I Semester",
+          "courses": [
+            {"code": "24CS101", "name": "Programming in C", "credits": 4, "grade": "A", "gpa": 7.52, "month_year": "DECEMBER-2024"},
+            {"code": "24CT101", "name": "Engineering Chemistry", "credits": 4, "grade": "A", "gpa": 7.34, "month_year": "DECEMBER-2024"},
+            {"code": "24CY101", "name": "IT Tools and Cyber Security", "credits": 2, "grade": "S", "gpa": 8.54, "month_year": "DECEMBER-2024"},
+            {"code": "24EE101", "name": "Basics of Electrical and Electronics Engineering", "credits": 3, "grade": "A", "gpa": 8.15, "month_year": "DECEMBER-2024"},
+            {"code": "24EN101", "name": "English Proficiency and Communication Skills", "credits": 1, "grade": "B", "gpa": 6.73, "month_year": "DECEMBER-2024"},
+            {"code": "24MS101", "name": "Management Science", "credits": 3, "grade": "A", "gpa": 7.83, "month_year": "DECEMBER-2024"},
+            {"code": "24MT101", "name": "Linear Algebra and Ordinary Differential Equations", "credits": 4, "grade": "A", "gpa": 7.83, "month_year": "DECEMBER-2024"},
+            {"code": "24SA103", "name": "Physical Fitness, Sports & Games*", "credits": 1, "grade": "-", "gpa": null, "month_year": "DECEMBER-2024"},
+            {"code": "24SS101", "name": "Constitution of India*", "credits": 1, "grade": "-", "gpa": null, "month_year": "DECEMBER-2024"}
+          ]
+        },
+        {
+          "title": "I Year - II Semester",
+          "courses": [
+            {"code": "24CS102", "name": "Problem Solving Using Python", "credits": 3, "grade": "A", "gpa": 7.87, "month_year": "MAY-2025"},
+            {"code": "24CT103", "name": "Environmental Studies", "credits": 3, "grade": "B", "gpa": 6.43, "month_year": "MAY-2025"},
+            {"code": "24EN102", "name": "Technical English Communication", "credits": 3, "grade": "A", "gpa": 7.23, "month_year": "MAY-2025"},
+            {"code": "24ME101", "name": "Engineering Graphics", "credits": 3, "grade": "A", "gpa": 7.02, "month_year": "MAY-2025"},
+            {"code": "24MT102", "name": "Calculus", "credits": 4, "grade": "A", "gpa": 7.81, "month_year": "MAY-2025"},
+            {"code": "24PY102", "name": "Engineering Physics", "credits": 4, "grade": "A", "gpa": 7.21, "month_year": "MAY-2025"},
+            {"code": "24SA101", "name": "Orientation Session*", "credits": 1, "grade": "-", "gpa": null, "month_year": "MAY-2025"},
+            {"code": "24SA102", "name": "Self-Empowerment and Gender Sensitization*", "credits": 1, "grade": "-", "gpa": null, "month_year": "MAY-2025"},
+            {"code": "24SS102", "name": "Indian Knowledge Systems*", "credits": 1, "grade": "-", "gpa": null, "month_year": "MAY-2025"}
+          ]
+        },
+        {
+          "title": "II Year - I Semester",
+          "courses": [
+            {"code": "22CS201", "name": "Database Management Systems", "credits": 4, "grade": "A", "gpa": 8.19, "month_year": "NOVEMBER-2025"},
+            {"code": "22SA220", "name": "Computational Thinking*", "credits": 1, "grade": "-", "gpa": null, "month_year": "NOVEMBER-2025"},
+            {"code": "22TP201", "name": "Data Structures", "credits": 4, "grade": "A", "gpa": 7.03, "month_year": "NOVEMBER-2025"},
+            {"code": "24CS204", "name": "Object Oriented Programming Through Java", "credits": 4, "grade": "A", "gpa": 8.47, "month_year": "NOVEMBER-2025"},
+            {"code": "24CS205", "name": "Front End Application Development", "credits": 2, "grade": "S", "gpa": 8.59, "month_year": "NOVEMBER-2025"},
+            {"code": "24CS208", "name": "Digital Logic Design", "credits": 4, "grade": "A", "gpa": 8.16, "month_year": "NOVEMBER-2025"},
+            {"code": "24CS299", "name": "Design Thinking and Engineering Orientation", "credits": 1, "grade": "A", "gpa": 8.35, "month_year": "NOVEMBER-2025"},
+            {"code": "24CS801", "name": "Industry Interface Course*", "credits": 1, "grade": "-", "gpa": null, "month_year": "NOVEMBER-2025"},
+            {"code": "24MT203", "name": "Discrete Mathematical Structures", "credits": 4, "grade": "A", "gpa": 8.01, "month_year": "NOVEMBER-2025"}
+          ]
+        },
+        {
+          "title": "II Year - II Semester",
+          "courses": [
+            {"code": "22CS207", "name": "Operating Systems", "credits": 3, "grade": "A", "gpa": 8.14, "month_year": "MAY-2026"},
+            {"code": "22ST202", "name": "Probability & Statistics", "credits": 4, "grade": "A", "gpa": 8.10, "month_year": "MAY-2026"},
+            {"code": "24CS201", "name": "Field Projects", "credits": 1, "grade": "A", "gpa": 8.28, "month_year": "MAY-2026"},
+            {"code": "24CS207", "name": "Full Stack Development", "credits": 2, "grade": "S", "gpa": 8.95, "month_year": "MAY-2026"},
+            {"code": "24CS209", "name": "Design and Analysis of Algorithms", "credits": 4, "grade": "A", "gpa": 8.04, "month_year": "MAY-2026"},
+            {"code": "24CS210", "name": "Computer Organization", "credits": 3, "grade": "A", "gpa": 7.15, "month_year": "MAY-2026"},
+            {"code": "24CS956", "name": "UI or UX Design (H*)", "credits": 4, "grade": "S", "gpa": 9.03, "month_year": "MAY-2026"},
+            {"code": "24SA201", "name": "Universal Human Values*", "credits": 1, "grade": "-", "gpa": null, "month_year": "MAY-2026"}
+          ]
+        }
+      ],
+      "planned": [
+        "22SA201",
+        "22TP301",
+        "24CS301",
+        "24CS302",
+        "24CS303",
+        "24CS305",
+        "22CS804",
+        "24EN301",
+        "24TP301",
+        "24CS306",
+        "22CS401",
+        "22CS805",
+        "22CS807",
+        "24CS307",
+        "24CS401",
+        "24CS402",
+        "24CS403",
+        "22CS813",
+        "22CS802",
+        "22CS810",
+        "22CS404"
+      ],
+      "conflicts": [],
+      "expected_grad": "May 2028",
+      "standing": "Good Standing",
+      "honours_enrolled": true,
+      "honours_track": "AI & High Performance Computing"
+    },
+    {
+      "id": "241FA04001",
+      "name": "Ananya Sharma",
+      "password": "password123",
+      "major": "B.Tech Computer Science & Engineering",
+      "reg_regulation": "C24",
+      "current_semester": "II Year II Semester",
+      "gpa": 3.91,
+      "completed": [
+        "24SA101",
+        "24MT101",
+        "24PY102",
+        "24EE101",
+        "24CS101",
+        "24EN101",
+        "24CY101",
+        "24CT103",
+        "24SA103",
+        "24SS101",
+        "24MT102",
+        "24CT101",
+        "24ME101",
+        "24CS102",
+        "24EN102",
+        "24MS101",
+        "24SA102",
+        "24SS102",
+        "24MT203",
+        "22TP201",
+        "22CS201",
+        "24CS204",
+        "24CS208",
+        "24CS205",
+        "24CS299",
+        "24CS801",
+        "22SA201"
+      ],
+      "planned": [
+        "22ST202",
+        "24CS209",
+        "22CS207",
+        "24CS210",
+        "24CS207",
+        "24CS201",
+        "24SA201",
+        "22CS951",
+        "22TP301",
+        "24CS301",
+        "24CS302",
+        "24CS303",
+        "24CS305",
+        "22CS804",
+        "24EN301",
+        "22CS952",
+        "24TP301",
+        "24CS306",
+        "22CS401",
+        "22CS805",
+        "24CS307",
+        "22CS953",
+        "24CS401",
+        "24CS402",
+        "24CS403",
+        "22CS404",
+        "22CS956"
+      ],
+      "conflicts": [],
+      "expected_grad": "May 2028",
+      "standing": "Dean's Merit List",
+      "honours_enrolled": true,
+      "honours_track": "Data Intelligence & Algorithms"
+    },
+    {
+      "id": "241FA04123",
+      "name": "Rahul Verma",
+      "password": "password123",
+      "major": "B.Tech Computer Science & Engineering",
+      "reg_regulation": "C24",
+      "current_semester": "II Year I Semester",
+      "gpa": 2.45,
+      "completed": [
+        "24SA101",
+        "24MT101",
+        "24PY102",
+        "24EE101",
+        "24EN101",
+        "24CY101",
+        "24CT103",
+        "24SA103",
+        "24SS101",
+        "24MT102",
+        "24CT101",
+        "24ME101",
+        "24CS102",
+        "24EN102",
+        "24MS101"
+      ],
+      "planned": [
+        "22TP201",
+        "22CS201",
+        "24CS204",
+        "24CS208"
+      ],
+      "conflicts": [
+        "22TP201"
+      ],
+      "expected_grad": "May 2028",
+      "standing": "Academic Warning",
+      "honours_enrolled": false
+    },
+    {
+      "id": "S1001",
+      "name": "Alice Johnson",
+      "password": "password123",
+      "major": "B.Tech Computer Science & Engineering",
+      "reg_regulation": "C24",
+      "current_semester": "III Year I Semester",
+      "gpa": 3.65,
+      "completed": [
+        "24SA101",
+        "24MT101",
+        "24PY102",
+        "24EE101",
+        "24CS101",
+        "24EN101",
+        "24CY101",
+        "24CT103",
+        "24SA103",
+        "24SS101",
+        "24MT102",
+        "24CT101",
+        "24ME101",
+        "24CS102",
+        "24EN102",
+        "24MS101",
+        "24SA102",
+        "24SS102",
+        "24MT203",
+        "22TP201",
+        "22CS201",
+        "24CS204",
+        "24CS208",
+        "24CS205",
+        "24CS299",
+        "24CS801",
+        "22SA201",
+        "22ST202",
+        "24CS209",
+        "22CS207",
+        "24CS210",
+        "24CS207",
+        "24CS201",
+        "24SA201"
+      ],
+      "planned": [
+        "22TP301",
+        "24CS301",
+        "24CS302",
+        "24CS303",
+        "24CS305",
+        "22CS804",
+        "24EN301"
+      ],
+      "conflicts": [],
+      "expected_grad": "May 2028",
+      "standing": "Good Standing",
+      "honours_enrolled": false
+    }
+  ],
+  "courses": [
+    {
+      "id": "24SA101",
+      "name": "Orientation Session",
+      "department": "CSE",
+      "credits": 1,
+      "ltpc": "0-2-0-1",
+      "category": "Binary Grade",
+      "sem": 0,
+      "description": "Induction programme to help fresh entrants get adjusted with the university environment, develop bonding with peers and faculty, and learn institutional policies under SAGE (Socializing, Associating, Governing, Experiencing).",
+      "prerequisite_groups": [],
+      "corequisites": [],
+      "credit_categories": [
+        "BINARY_GRADE"
+      ],
+      "offered_semesters": [
+        "FALL",
+        "SPRING"
+      ],
+      "difficulty_level": 1,
+      "modules": [
+        {
+          "module_number": 1,
+          "hours": "0L+8T+0P=8 Hours",
+          "units": [
+            {
+              "unit_number": 1,
+              "title": "Socializing",
+              "content": "Interaction with faculty members, Deans, peers, student bodies and alumni."
+            },
+            {
+              "unit_number": 2,
+              "title": "Associating",
+              "content": "Eco-friendly practice and sustainable living, teaching sessions to school children of adopted villages, interaction with farmers and identifying problems, field visits."
+            }
+          ]
+        },
+        {
+          "module_number": 2,
+          "hours": "0L+8T+0P=8 Hours",
+          "units": [
+            {
+              "unit_number": 1,
+              "title": "Governing",
+              "content": "Brief about regulations and assessment pattern, interaction with Chancellor, Vice Chancellor and Registrar."
+            },
+            {
+              "unit_number": 2,
+              "title": "Experiencing",
+              "content": "Physical activity, creative arts, literary activities, customizing daily routines and habits, practicing meditation."
+            }
+          ]
+        }
+      ],
+      "practices": [
+        "Stress assessment and management",
+        "Sustainable living",
+        "Iconic visit",
+        "Yoga and meditation",
+        "Sports and games",
+        "Any creative art"
+      ],
+      "skills": [
+        "Institute ethics and culture familiarity",
+        "Stress management",
+        "Social consciousness",
+        "Peer and faculty bonding"
+      ],
+      "course_outcomes": [
+        {
+          "co_no": 1,
+          "outcome": "Become familiar with institute ethics and culture",
+          "blooms": "Analyze",
+          "module": 1,
+          "pos": "7,8,9,10,12"
+        },
+        {
+          "co_no": 2,
+          "outcome": "Cope up with stress management through meditation",
+          "blooms": "Analyze",
+          "module": 1,
+          "pos": "7,8,9,10,12"
+        },
+        {
+          "co_no": 3,
+          "outcome": "Socially conscious towards society and environment",
+          "blooms": "Apply",
+          "module": 2,
+          "pos": "7,8,9,10,12"
+        },
+        {
+          "co_no": 4,
+          "outcome": "Build bonds with peers and faculty members",
+          "blooms": "Apply",
+          "module": 2,
+          "pos": "7,8,9,10,12"
+        }
+      ]
+    },
+    {
+      "id": "24MT101",
+      "name": "Linear Algebra and Ordinary Differential Equations",
+      "department": "Mathematics",
+      "credits": 4,
+      "ltpc": "3-2-0-4",
+      "category": "Basic Sciences",
+      "sem": 1,
+      "description": "Builds a firm grasp of mathematical principles through matrices, system of linear equations, eigenvalues/eigenvectors, and first/second order ordinary differential equations with engineering applications.",
+      "prerequisite_groups": [],
+      "corequisites": [],
+      "credit_categories": [
+        "BASIC_SCIENCES",
+        "MATH"
+      ],
+      "offered_semesters": [
+        "FALL",
+        "SPRING"
+      ],
+      "difficulty_level": 3,
+      "modules": [
+        {
+          "module_number": 1,
+          "hours": "24L+16T+0P=40 Hours",
+          "units": [
+            {
+              "unit_number": 1,
+              "title": "Matrices",
+              "content": "Definition of matrix, Types of matrices, Algebra of matrices, adjoint, inverse of a matrix through adjoint and elementary row operations, Rank, Echelon form, Normal form, Eigen values and Eigen vectors (up to 3x3 matrices) and properties."
+            },
+            {
+              "unit_number": 2,
+              "title": "Applications of Matrices",
+              "content": "Consistency of system of linear equations, Solution of system of linear equations by Gauss elimination and Gauss Jordan methods; Cayley-Hamilton theorem, Power of a matrix, Inverse of a matrix; Strength of materials and beams using eigenvalues/eigenvectors."
+            }
+          ]
+        },
+        {
+          "module_number": 2,
+          "hours": "24L+16T+0P=40 Hours",
+          "units": [
+            {
+              "unit_number": 1,
+              "title": "Ordinary Differential Equations (ODE)",
+              "content": "First Order Differential Equations: Variable separable method, homogeneous and non-homogeneous differential equations, linear differential equations, Bernoulli equations. Second Order Linear Differential Equations with constant coefficients with RHS of form e^(ax), x^n, sin(ax) or cos(ax)."
+            },
+            {
+              "unit_number": 2,
+              "title": "Applications of ODE",
+              "content": "Newton\u2019s law of cooling, Law of natural growth and decay; LR circuits."
+            }
+          ]
+        }
+      ],
+      "practices": [
+        "Compute inverse of a matrix if exists",
+        "Evaluate rank of matrix and prove uniqueness",
+        "Eigen values and vectors calculation",
+        "Newton's law of cooling & LR circuit modeling"
+      ],
+      "skills": [
+        "Find rank of matrix using different methods",
+        "Compute eigenvalues and eigenvectors",
+        "Find analytical solution of differential equations",
+        "Apply numerical methods to solve differential equations"
+      ],
+      "course_outcomes": [
+        {
+          "co_no": 1,
+          "outcome": "Apply concepts of rank, Eigen values and Eigenvectors of a matrix and finding inverse/powers of a matrix",
+          "blooms": "Apply",
+          "module": 1,
+          "pos": "1,2,3,9,10,12"
+        },
+        {
+          "co_no": 2,
+          "outcome": "Apply differential equations in real life problems",
+          "blooms": "Apply",
+          "module": 2,
+          "pos": "1,2,3,9,10,12"
+        },
+        {
+          "co_no": 3,
+          "outcome": "Analyse the solution of a system of linear equations and find it",
+          "blooms": "Analyze",
+          "module": 1,
+          "pos": "1,2,3,9,10,12"
+        },
+        {
+          "co_no": 4,
+          "outcome": "Inspect the analytical method for solving differential equations and applications",
+          "blooms": "Analyze",
+          "module": 2,
+          "pos": "1,2,3,9,10,12"
+        }
+      ],
+      "textbooks": [
+        "B. S. Grewal, Higher Engineering Mathematics, 44th Edition, Khanna Publishers, 2018.",
+        "N. P. Bali, K. L. Sai Prasad, A Textbook of Engineering Mathematics I, II, III, 2nd Edition, 2018."
+      ],
+      "reference_books": [
+        "H. K. Dass and Er. Rajanish Verma, Higher Engineering Mathematics, 3rd revised ed, S. Chand, 2015.",
+        "B. V. Ramana, Advanced Engineering Mathematics, TMH, 2011."
+      ]
+    },
+    {
+      "id": "24MT102",
+      "name": "Calculus",
+      "department": "Mathematics",
+      "credits": 4,
+      "ltpc": "3-2-0-4",
+      "category": "Basic Sciences",
+      "sem": 1,
+      "description": "Differential calculus, integral calculus, multivariable extreme values, double and triple integrals in polar coordinates, vector calculus, gradient, divergence, curl, and Green's/Stokes'/Gauss Divergence theorems.",
+      "prerequisite_groups": [],
+      "corequisites": [],
+      "credit_categories": [
+        "BASIC_SCIENCES",
+        "MATH"
+      ],
+      "offered_semesters": [
+        "FALL",
+        "SPRING"
+      ],
+      "difficulty_level": 3,
+      "modules": [
+        {
+          "module_number": 1,
+          "hours": "24L+16T+0P=20 Hours",
+          "units": [
+            {
+              "unit_number": 1,
+              "title": "Differential Calculus",
+              "content": "Functions, Limits, Continuity, Differentiability, Tangent and normal, Mean value theorems; Extreme value and critical points, Increasing/decreasing intervals, Concavity and inflection, graphical transformation."
+            },
+            {
+              "unit_number": 2,
+              "title": "Integral Calculus",
+              "content": "Double integral, Triple integral, Change of order, integration in polar coordinates, Finding Areas and Volumes."
+            }
+          ]
+        },
+        {
+          "module_number": 2,
+          "hours": "24L+16T+0P=20 Hours",
+          "units": [
+            {
+              "unit_number": 1,
+              "title": "Vector Calculus",
+              "content": "Introduction to vectors, Vector algebra, Scalar and vector point functions, Gradient, Divergence and Curl."
+            },
+            {
+              "unit_number": 2,
+              "title": "Applications of Vector Calculus",
+              "content": "Normal vector, Directional Derivative, Solenoidal and Irrotational vectors, Scalar potential; Line integral, surface integral, volume integral, Green\u2019s theorem, Gauss divergence theorem, Stokes\u2019 theorem."
+            }
+          ]
+        }
+      ],
+      "textbooks": [
+        "N. P. Bali, K. L. Sai Prasad, A Textbook of Engineering Mathematics, 2nd Edition, 2018.",
+        "B. S. Grewal, Higher Engineering Mathematics, 44th Edition, 2018."
+      ],
+      "reference_books": [
+        "Erwin Kreyszig, Advanced Engineering Mathematics, 10th Edition, Wiley, 2010."
+      ]
+    },
+    {
+      "id": "24PY102",
+      "name": "Engineering Physics",
+      "department": "Physics",
+      "credits": 4,
+      "ltpc": "3-0-2-4",
+      "category": "Basic Sciences",
+      "sem": 1,
+      "description": "Quantum Mechanics, wave-particle duality, Schr\u00f6dinger wave equation, 1D potential well, free electron theory of solids, semiconductor physics, Hall Effect, and optoelectronics including Lasers and Optical Fibers.",
+      "prerequisite_groups": [],
+      "corequisites": [],
+      "credit_categories": [
+        "BASIC_SCIENCES",
+        "SCIENCE",
+        "LAB"
+      ],
+      "offered_semesters": [
+        "FALL",
+        "SPRING"
+      ],
+      "difficulty_level": 3,
+      "modules": [
+        {
+          "module_number": 1,
+          "hours": "24L+0T+16P=40 Hours",
+          "units": [
+            {
+              "unit_number": 1,
+              "title": "Quantum Mechanics",
+              "content": "Wave and particle duality, de Broglie matter waves, Schr\u00f6dinger\u2019s time-independent wave equation, Eigen values/functions, 1D infinite and finite potential well, Quantum Tunnelling, Applications in SEM and Quantum dots."
+            },
+            {
+              "unit_number": 2,
+              "title": "Free Electron Theory",
+              "content": "Classical and Quantum free electron theory, electrical conductivity, Fermi-Dirac distribution, electronic specific heat, Density of states, Bloch\u2019s Theorem, Energy bands in solids."
+            }
+          ]
+        },
+        {
+          "module_number": 2,
+          "hours": "24L+0T+16P=40 Hours",
+          "units": [
+            {
+              "unit_number": 1,
+              "title": "Semiconductor Physics",
+              "content": "Direct and indirect bandgap semiconductors, Intrinsic and extrinsic semiconductors; Carrier concentration, Fermi level, Hall Effect and temperature variation."
+            },
+            {
+              "unit_number": 2,
+              "title": "Optoelectronics",
+              "content": "Photovoltaic cell, LED, LASERs (characteristics, population inversion, semiconductor diode Laser), Optical fibers (acceptance angle, numerical aperture, applications)."
+            }
+          ]
+        }
+      ],
+      "practices": [
+        "Photoelectric Effect - Planck\u2019s constant",
+        "I-V characteristics of p-n junction diode",
+        "Energy bandgap of p-n junction",
+        "Thermistor resistivity",
+        "Hall Effect coefficient",
+        "Laser wavelength",
+        "Optical fibre Numerical aperture"
+      ],
+      "textbooks": [
+        "S.M. Sze, Semiconductor Devices Physics and Technology, 3rd Ed, Wiley, 2015.",
+        "C. Kittel, Introduction to Solid State Physics, 9th Ed, Wiley, 2019."
+      ],
+      "reference_books": [
+        "N. Zettili, Quantum Mechanics, Wiley, 2022.",
+        "M. N. Avadhanulu, A Textbook of Engineering Physics, S. Chand, 2010."
+      ]
+    },
+    {
+      "id": "24CT101",
+      "name": "Engineering Chemistry",
+      "department": "Chemistry",
+      "credits": 4,
+      "ltpc": "3-0-2-4",
+      "category": "Basic Sciences",
+      "sem": 1,
+      "description": "Polymers, elastomers, conducting polymers, electrochemical devices, batteries (lead-acid, Li-ion, fuel cells), nanomaterials (carbon nanotubes, graphene), and chemistry for electronics and display systems (OLEDs, QLEDs).",
+      "prerequisite_groups": [],
+      "corequisites": [],
+      "credit_categories": [
+        "BASIC_SCIENCES",
+        "SCIENCE",
+        "LAB"
+      ],
+      "offered_semesters": [
+        "FALL",
+        "SPRING"
+      ],
+      "difficulty_level": 3,
+      "modules": [
+        {
+          "module_number": 1,
+          "hours": "24L+0T+16P=40 Hours",
+          "units": [
+            {
+              "unit_number": 1,
+              "title": "Polymer Technology",
+              "content": "Classification, Polymerization techniques, PE, Nylon-6,6, Natural rubber, vulcanization, Buna N and S, Polythiophene conducting polymers."
+            },
+            {
+              "unit_number": 2,
+              "title": "Electrochemical Devices",
+              "content": "Galvanic and electrolytic cells, EMF, Standard Hydrogen Electrode, Lead-acid storage cell, Lithium-ion battery, H2-O2 fuel cell, Redox-flow batteries."
+            }
+          ]
+        },
+        {
+          "module_number": 2,
+          "hours": "24L+0T+16P=40 Hours",
+          "units": [
+            {
+              "unit_number": 1,
+              "title": "Materials Chemistry",
+              "content": "Refractories, Lubricants, Nanomaterials (Sol-Gel, Ball milling), Carbon Nanotubes, Graphene, Nanocomposites."
+            },
+            {
+              "unit_number": 2,
+              "title": "Chemistry for Electronics and Computing",
+              "content": "Electronic memory devices, Organic-Inorganic hybrids, Display systems (OLEDs, QLEDs), Computational Chemistry introduction."
+            }
+          ]
+        }
+      ],
+      "practices": [
+        "Synthesis of Bakelite",
+        "Preparation of Nylon-6,6",
+        "Fe (II) by dichrometry",
+        "Weak acid pH titration",
+        "Conductometry",
+        "Viscosity of oil",
+        "Magnetic Iron oxide nanoparticles",
+        "Chemsketch & Avogadro"
+      ],
+      "textbooks": [
+        "S. Chawala, Engineering Chemistry Materials and Applications, Dhanpat Rai, 2015.",
+        "K. S. Maheswaramma, Engineering Chemistry, Pearson, 2015."
+      ]
+    },
+    {
+      "id": "24EE101",
+      "name": "Basics of Electrical and Electronics Engineering",
+      "department": "EEE",
+      "credits": 3,
+      "ltpc": "2-0-2-3",
+      "category": "Basic Engineering",
+      "sem": 1,
+      "description": "DC Circuits (Ohm's Law, KCL, KVL, Mesh/Nodal analysis), AC Circuits, P-N junction diode, Zener diode regulator, BJT transistors, AC machines, Single-phase transformer, and 3-phase induction motors.",
+      "prerequisite_groups": [],
+      "corequisites": [],
+      "credit_categories": [
+        "BASIC_ENGINEERING",
+        "LAB"
+      ],
+      "offered_semesters": [
+        "FALL",
+        "SPRING"
+      ],
+      "difficulty_level": 2,
+      "modules": [
+        {
+          "module_number": 1,
+          "hours": "16L+0T+16P=32 Hours",
+          "units": [
+            {
+              "unit_number": 1,
+              "title": "Fundamentals of Electric Circuits",
+              "content": "DC Circuits: Active and passive elements, Ohm\u2019s Law, Kirchhoff\u2019s Laws, Mesh and nodal analysis. AC circuits: AC voltage generation, Frequency, RMS, Average, Form and Peak factor."
+            },
+            {
+              "unit_number": 2,
+              "title": "Semiconductor Devices",
+              "content": "P-N junction diode characteristics, Half wave and Full wave rectifiers, Zener diode voltage regulator, Bipolar Junction Transistors (NPN & PNP)."
+            }
+          ]
+        },
+        {
+          "module_number": 2,
+          "hours": "16L+0T+16P=32 Hours",
+          "units": [
+            {
+              "unit_number": 1,
+              "title": "Analysis of AC Circuits",
+              "content": "Single-phase AC circuits with R, L, C, RL, RC series/parallel. Three-phase system, Star and Delta connected systems."
+            },
+            {
+              "unit_number": 2,
+              "title": "AC Machines",
+              "content": "Electromagnetism, Single-phase transformer EMF equation and operation, Three-phase induction motor, Synchronous machines."
+            }
+          ]
+        }
+      ],
+      "practices": [
+        "Verification of Ohm\u2019s Law",
+        "Verification of KCL and KVL",
+        "RMS values of sinusoidal waveforms",
+        "PN Junction forward/reverse bias",
+        "Zener diode reverse bias",
+        "Transformer transformation ratio",
+        "Balanced 3-phase measurements"
+      ],
+      "textbooks": [
+        "V. K. Mehta, Principles of Electrical Engineering and Electronics, S. Chand, 2019.",
+        "D. P. Kothari, Basic Electrical and Electronics Engineering, TMH, 2017."
+      ]
+    },
+    {
+      "id": "24ME101",
+      "name": "Engineering Graphics",
+      "department": "Mechanical",
+      "credits": 3,
+      "ltpc": "2-0-2-3",
+      "category": "Basic Engineering",
+      "sem": 1,
+      "description": "Engineering curves, orthographic projections of points, lines, planes, and solids, development of lateral surfaces, isometric views, and 2D drafting using AutoCAD.",
+      "prerequisite_groups": [],
+      "corequisites": [],
+      "credit_categories": [
+        "BASIC_ENGINEERING",
+        "LAB"
+      ],
+      "offered_semesters": [
+        "FALL",
+        "SPRING"
+      ],
+      "difficulty_level": 2,
+      "modules": [
+        {
+          "module_number": 1,
+          "hours": "16L+0T+16P=32 Hours",
+          "units": [
+            {
+              "unit_number": 1,
+              "title": "Engineering Curves",
+              "content": "Types of lines, Lettering, Dimensioning, Polygons, Conic curves, Ellipse by Oblong method."
+            },
+            {
+              "unit_number": 2,
+              "title": "Orthographic Projections",
+              "content": "Principles of projection; Projections of points in all quadrants; Lines inclined to one/both planes; Planes inclined to one plane."
+            }
+          ]
+        },
+        {
+          "module_number": 2,
+          "hours": "16L+0T+16P=32 Hours",
+          "units": [
+            {
+              "unit_number": 1,
+              "title": "Projections of Solids & Development of Surfaces",
+              "content": "Prisms, pyramids, cylinders, cones inclined to reference plane; Lateral surface development."
+            },
+            {
+              "unit_number": 2,
+              "title": "Orthographic Views & CAD Drafting",
+              "content": "Isometric to orthographic conversion, 2D AutoCAD drafting of simple castings and solids."
+            }
+          ]
+        }
+      ],
+      "practices": [
+        "Polygon constructions",
+        "Conic tracing (Ellipse, Parabola, Hyperbola)",
+        "Point and line projections in 4 quadrants",
+        "Surface development of prisms & cones",
+        "AutoCAD 2D orthographic drawing"
+      ],
+      "textbooks": [
+        "J. Hole, Engineering Drawing, Tata McGraw-Hill, 2019.",
+        "N. D. Bhatt, Engineering Drawing, Charotar, 2014."
+      ]
+    },
+    {
+      "id": "24CS101",
+      "name": "Programming in C",
+      "department": "CSE",
+      "credits": 4,
+      "ltpc": "2-0-4-4",
+      "category": "Basic Engineering",
+      "sem": 1,
+      "description": "Fundamental computational problem solving using C: tokens, operators, control flow, loops, functions, recursion, pointers, 1D/2D arrays, strings, structures, unions, dynamic memory, and file I/O operations.",
+      "prerequisite_groups": [],
+      "corequisites": [],
+      "credit_categories": [
+        "BASIC_ENGINEERING",
+        "CORE",
+        "LAB"
+      ],
+      "offered_semesters": [
+        "FALL",
+        "SPRING"
+      ],
+      "difficulty_level": 2,
+      "modules": [
+        {
+          "module_number": 1,
+          "hours": "16L+0T+32P=48 Hours",
+          "units": [
+            {
+              "unit_number": 1,
+              "title": "Introduction to Algorithms and C Language",
+              "content": "Algorithms & Flowcharts, Structure of C program, Tokens, Data Types, Operators (arithmetic, relational, logical, bitwise, ternary), Expressions, Control statements (if-else, nested-if, switch case), Iterative statements (for, while, do-while, nested loops), Jump statements (break, continue, goto)."
+            },
+            {
+              "unit_number": 2,
+              "title": "Functions & Pointers",
+              "content": "User-defined functions, Call by value, Call by address, Recursion, Storage classes, Scope; Pointers declaration, initialization, multiple indirection, pointer arithmetic."
+            }
+          ]
+        },
+        {
+          "module_number": 2,
+          "hours": "16L+0T+32P=48 Hours",
+          "units": [
+            {
+              "unit_number": 1,
+              "title": "Arrays & Strings",
+              "content": "Single and multidimensional arrays, Passing arrays to functions, Arrays & pointers relationship, Pointer to array, Dynamic memory allocation (malloc, calloc, realloc, free); Strings, standard string library functions."
+            },
+            {
+              "unit_number": 2,
+              "title": "Structures, Unions & Files",
+              "content": "Structures definition, operations, pointers to structures, array of structures, nested structures, passing structures to functions, Typedef; Unions; File handling (file streams, character/line/block/formatted I/O, error handling)."
+            }
+          ]
+        }
+      ],
+      "practices": [
+        "Temperature conversion Celsius to Fahrenheit",
+        "Max of 2 and 3 numbers using conditional operators",
+        "Check leap year, quadratic equation roots, grading system",
+        "Sum of digits, reverse number, Armstrong, prime, palindrome, LCM/HCF",
+        "Pattern printing (number triangle, character triangle)",
+        "Simple calculator using switch-case",
+        "Recursive factorial, Fibonacci, GCD functions",
+        "1D Array reverse, sort, second largest/smallest",
+        "String length, copy, concatenate, reverse, palindrome, strstr",
+        "2D Array zigzag traversal, matrix addition, multiplication, transpose",
+        "Complex numbers arithmetic using structures",
+        "Employee array of structures with highest salary finder",
+        "Student file management system (Roll No, Name, Stream, Address)",
+        "File uppercase converter and string occurrence counter"
+      ],
+      "skills": [
+        "Problem analysis and algorithm formulation",
+        "Static and dynamic memory manipulation in C",
+        "File handling and stream processing",
+        "Debugging and structured modular C programming"
+      ],
+      "course_outcomes": [
+        {
+          "co_no": 1,
+          "outcome": "Identify suitable data types for operands and design expressions with operator precedence",
+          "blooms": "Apply",
+          "module": 1,
+          "pos": "1"
+        },
+        {
+          "co_no": 2,
+          "outcome": "Apply decision making and iterative features of C effectively",
+          "blooms": "Apply",
+          "module": 1,
+          "pos": "1"
+        },
+        {
+          "co_no": 3,
+          "outcome": "Select problem specific data structures and accessing methods",
+          "blooms": "Analyze",
+          "module": 1,
+          "pos": "1,2"
+        },
+        {
+          "co_no": 4,
+          "outcome": "Design modular recursive/non-recursive functions and string manipulation algorithms",
+          "blooms": "Create",
+          "module": 2,
+          "pos": "3"
+        },
+        {
+          "co_no": 5,
+          "outcome": "Develop robust, maintainable, debuggable C programs for real world problems",
+          "blooms": "Evaluate",
+          "module": 2,
+          "pos": "3,4"
+        }
+      ],
+      "textbooks": [
+        "Behrouz A. Forouzan, Richard F. Gilberg, Programming for Problem Solving, 1st Ed, Cengage, 2019.",
+        "Ajay Mittal, Programming in C - A Practical Approach, Pearson Education, 2010."
+      ],
+      "reference_books": [
+        "Reema Thareja, Computer Fundamentals and Programming in C, Oxford University Press, 2013.",
+        "Herbert Schildt, C: The Complete Reference, 4th Ed, Tata McGraw-Hill, 2017."
+      ]
+    },
+    {
+      "id": "24CS102",
+      "name": "Problem Solving through Python",
+      "department": "CSE",
+      "credits": 3,
+      "ltpc": "2-0-2-3",
+      "category": "Basic Engineering",
+      "sem": 2,
+      "description": "Python programming fundamentals, data structures (lists, tuples, sets, dictionaries, comprehensions), functional programming, OOP (classes, inheritance, polymorphism, operator overloading), exception handling, and file operations.",
+      "prerequisite_groups": [],
+      "corequisites": [],
+      "credit_categories": [
+        "BASIC_ENGINEERING",
+        "CORE",
+        "LAB"
+      ],
+      "offered_semesters": [
+        "FALL",
+        "SPRING"
+      ],
+      "difficulty_level": 2,
+      "modules": [
+        {
+          "module_number": 1,
+          "hours": "16L+0T+16P=32 Hours",
+          "units": [
+            {
+              "unit_number": 1,
+              "title": "Introduction & Control Structures",
+              "content": "Python syntax, variables, basic types, operators, REPL shell, conditional branching (if-elif-else), loop control (for, while, nested loops, break, continue, pass)."
+            },
+            {
+              "unit_number": 2,
+              "title": "Data Structures and Functions",
+              "content": "Lists, Tuples, Sets, Dictionaries, List comprehensions, Functions, Keyword/default/variable arguments, Lambda functions, Recursion, Scope."
+            }
+          ]
+        },
+        {
+          "module_number": 2,
+          "hours": "16L+0T+16P=32 Hours",
+          "units": [
+            {
+              "unit_number": 1,
+              "title": "Modules, Packages and OOPs",
+              "content": "Creating modules, import statements, standard modules (sys, math, os, random, itertools), Classes, Objects, __init__ and __del__, Encapsulation, Inheritance, Polymorphism, Operator Overloading."
+            },
+            {
+              "unit_number": 2,
+              "title": "Errors, Exceptions and Files",
+              "content": "Try-except-else-finally, custom exceptions, File processing (read, write, append, seek, tell)."
+            }
+          ]
+        }
+      ],
+      "practices": [
+        "Nth prime number calculation",
+        "Currency note denomination calculator",
+        "List rotation and palindrome validation",
+        "Dictionary generation with cubic numbers",
+        "Student, Employee, and Department classes in Python",
+        "Abstract Polygon class with Rectangle and Triangle subclasses",
+        "Operator overloading for Student (+) and Distance (-) objects",
+        "Robust file processing with line numbering and exception handling"
+      ],
+      "course_outcomes": [
+        {
+          "co_no": 1,
+          "outcome": "Analyze programming features to write, compile and debug Python code",
+          "blooms": "Analyze",
+          "module": 1,
+          "pos": "1,2"
+        },
+        {
+          "co_no": 2,
+          "outcome": "Make use of data types to design programs with loops and functions",
+          "blooms": "Apply",
+          "module": 1,
+          "pos": "1,2,5"
+        },
+        {
+          "co_no": 3,
+          "outcome": "Apply Python data structures for practical application tasks",
+          "blooms": "Analyze",
+          "module": 1,
+          "pos": "1,2,3,5"
+        },
+        {
+          "co_no": 4,
+          "outcome": "Handle exceptions and use file processing in reusable modules",
+          "blooms": "Apply",
+          "module": 2,
+          "pos": "1,2,3,5"
+        },
+        {
+          "co_no": 5,
+          "outcome": "Develop OOP applications using inheritance and polymorphism",
+          "blooms": "Apply",
+          "module": 2,
+          "pos": "1,2,3,4,5"
+        }
+      ],
+      "textbooks": [
+        "Kenneth A. Lambert, The Fundamentals of Python: First Programs, Cengage, 2011.",
+        "Mark Lutz, Learning Python, 5th Ed, O'Reilly, 2013.",
+        "Reema Thareja, Python Programming, Oxford, 2017."
+      ]
+    },
+    {
+      "id": "24CY101",
+      "name": "IT Tools & Cyber Security",
+      "department": "CSE",
+      "credits": 2,
+      "ltpc": "0-2-2-2",
+      "category": "Basic Engineering",
+      "sem": 1,
+      "description": "Productivity software mastery (MS Word, Excel pivot tables, PowerPoint, LaTeX documentation) and foundational cybersecurity, cybercrimes, social media hygiene, IT Act 2000, e-commerce security, and endpoint defense.",
+      "prerequisite_groups": [],
+      "corequisites": [],
+      "credit_categories": [
+        "BASIC_ENGINEERING",
+        "LAB"
+      ],
+      "offered_semesters": [
+        "FALL",
+        "SPRING"
+      ],
+      "difficulty_level": 1,
+      "modules": [
+        {
+          "module_number": 1,
+          "hours": "0L+16T+16P=16 Hours",
+          "units": [
+            {
+              "unit_number": 1,
+              "title": "Office Software & LaTeX Documentation",
+              "content": "Word document formatting, mail merge, Excel payroll and pivot tables, PowerPoint decks, brochure design, LaTeX professional reports and math typesetting."
+            },
+            {
+              "unit_number": 2,
+              "title": "Advanced Document Tools",
+              "content": "LaTeX equations, tables, images, and department festival posters."
+            }
+          ]
+        },
+        {
+          "module_number": 2,
+          "hours": "0L+16T+16P=16 Hours",
+          "units": [
+            {
+              "unit_number": 1,
+              "title": "Cyber Security & Cybercrimes",
+              "content": "Cyberspace, Cyber hygiene, Classification of cybercrimes, social engineering attacks, IT Act 2000, Social media security & privacy."
+            },
+            {
+              "unit_number": 2,
+              "title": "E-Commerce & Device Security",
+              "content": "Digital payment frauds, RBI guidelines, Endpoint security, Password policy, Host firewall, Antivirus, Wi-Fi security."
+            }
+          ]
+        }
+      ],
+      "textbooks": [
+        "Reema Thareja, Fundamentals of Computers, Oxford, 2019.",
+        "Sumit Belapure & Nina Godbole, Cyber Security, Wiley India, 2018."
+      ]
+    },
+    {
+      "id": "24EN101",
+      "name": "English Proficiency & Communication Skills (PET)",
+      "department": "Humanities",
+      "credits": 1,
+      "ltpc": "0-0-2-1",
+      "category": "Humanities",
+      "sem": 1,
+      "description": "Functional English language proficiency aligned with Cambridge B1 Preliminary standard: grammar, reading comprehension, listening, vocabulary, and speaking in everyday situations.",
+      "prerequisite_groups": [],
+      "corequisites": [],
+      "credit_categories": [
+        "HUMANITIES"
+      ],
+      "offered_semesters": [
+        "FALL",
+        "SPRING"
+      ],
+      "difficulty_level": 1
+    },
+    {
+      "id": "24EN102",
+      "name": "Technical English Communication",
+      "department": "Humanities",
+      "credits": 3,
+      "ltpc": "2-0-2-3",
+      "category": "Humanities",
+      "sem": 2,
+      "description": "ESP instruction for technical students: Note making/taking, technical report writing, professional presentations, business communication, and Cambridge Linguaskill preparation.",
+      "prerequisite_groups": [],
+      "corequisites": [],
+      "credit_categories": [
+        "HUMANITIES"
+      ],
+      "offered_semesters": [
+        "FALL",
+        "SPRING"
+      ],
+      "difficulty_level": 2
+    },
+    {
+      "id": "24CT103",
+      "name": "Environmental Studies",
+      "department": "Chemistry",
+      "credits": 3,
+      "ltpc": "2-2-0-3",
+      "category": "Basic Sciences",
+      "sem": 1,
+      "description": "Multidisciplinary study of sustainable development (SDGs), natural ecosystems, biodiversity conservation (in-situ/ex-situ), industrial pollution control, waste management, and environmental health.",
+      "prerequisite_groups": [],
+      "corequisites": [],
+      "credit_categories": [
+        "BASIC_SCIENCES"
+      ],
+      "offered_semesters": [
+        "FALL",
+        "SPRING"
+      ],
+      "difficulty_level": 1
+    },
+    {
+      "id": "24MS101",
+      "name": "Management Science",
+      "department": "Management",
+      "credits": 3,
+      "ltpc": "2-2-0-3",
+      "category": "Humanities",
+      "sem": 2,
+      "description": "Managerial practices in engineering: Taylor's Scientific Management, Fayol's Principles, Operations Management (EOQ, ABC analysis, Control charts X/R), Human Resources, and Marketing mix (4Ps/7Ps).",
+      "prerequisite_groups": [],
+      "corequisites": [],
+      "credit_categories": [
+        "HUMANITIES"
+      ],
+      "offered_semesters": [
+        "FALL",
+        "SPRING"
+      ],
+      "difficulty_level": 2
+    },
+    {
+      "id": "24SA103",
+      "name": "Physical Fitness, Sports & Games",
+      "department": "Physical Education",
+      "credits": 1,
+      "ltpc": "0-0-2-1",
+      "category": "Binary Grade",
+      "sem": 1,
+      "description": "Physical health and mental alertness through Yoga, meditation, running, and athletic sports (Volleyball, Basketball, Kabaddi, Kho Kho, Badminton, Football).",
+      "prerequisite_groups": [],
+      "corequisites": [],
+      "credit_categories": [
+        "BINARY_GRADE"
+      ],
+      "offered_semesters": [
+        "FALL",
+        "SPRING"
+      ],
+      "difficulty_level": 1
+    },
+    {
+      "id": "24SA102",
+      "name": "Self-empowerment & Gender Sensitization",
+      "department": "Humanities",
+      "credits": 1,
+      "ltpc": "0-0-2-1",
+      "category": "Binary Grade",
+      "sem": 1,
+      "description": "Gender roles, equality, constitutional legal perspectives, etiquette, time management, stress management, and conflict resolution.",
+      "prerequisite_groups": [],
+      "corequisites": [],
+      "credit_categories": [
+        "BINARY_GRADE"
+      ],
+      "offered_semesters": [
+        "FALL",
+        "SPRING"
+      ],
+      "difficulty_level": 1
+    },
+    {
+      "id": "24SS101",
+      "name": "Constitution of India",
+      "department": "Social Sciences",
+      "credits": 1,
+      "ltpc": "0-2-0-1",
+      "category": "Binary Grade",
+      "sem": 1,
+      "description": "Indian Polity, Fundamental Rights (Articles 14, 19, 21), Fundamental Duties, Directive Principles, Parliamentary government, Federal structure, and Local Self-Government (73rd & 74th Amendments).",
+      "prerequisite_groups": [],
+      "corequisites": [],
+      "credit_categories": [
+        "BINARY_GRADE"
+      ],
+      "offered_semesters": [
+        "FALL",
+        "SPRING"
+      ],
+      "difficulty_level": 1
+    },
+    {
+      "id": "24SS102",
+      "name": "Indian Knowledge Systems",
+      "department": "Social Sciences",
+      "credits": 1,
+      "ltpc": "0-2-0-1",
+      "category": "Binary Grade",
+      "sem": 2,
+      "description": "India's intellectual heritage: Vedic, Buddhist, and Jain philosophies, ancient centers of learning, traditional science, technology, mathematics, and their modern integration.",
+      "prerequisite_groups": [],
+      "corequisites": [],
+      "credit_categories": [
+        "BINARY_GRADE"
+      ],
+      "offered_semesters": [
+        "FALL",
+        "SPRING"
+      ],
+      "difficulty_level": 1
+    },
+    {
+      "id": "24MT203",
+      "name": "Discrete Mathematical Structures",
+      "department": "Mathematics",
+      "credits": 4,
+      "ltpc": "3-2-0-4",
+      "category": "Basic Sciences",
+      "sem": 3,
+      "description": "Discrete mathematics: Group theory, Lagrange\u2019s theorem, Boolean algebra, CNF/DNF, K-Maps, Pigeonhole principle, Combinatorics, Recurrence relations, Generating functions, Graph theory, and Trees.",
+      "prerequisite_groups": [],
+      "corequisites": [],
+      "credit_categories": [
+        "BASIC_SCIENCES",
+        "MATH"
+      ],
+      "offered_semesters": [
+        "FALL",
+        "SPRING"
+      ],
+      "difficulty_level": 3,
+      "modules": [
+        {
+          "module_number": 1,
+          "hours": "16L+16T+0P=32 Hours",
+          "units": [
+            {
+              "unit_number": 1,
+              "title": "Algebraic Structures and Boolean Algebra",
+              "content": "Groups, Subgroups, Lagrange's Theorem, Rings, Fields, Boolean algebra, Truth tables, Logic gates, Postulates, Duality, Propositions, Connectives."
+            },
+            {
+              "unit_number": 2,
+              "title": "Applications of Logic & Boolean Algebra",
+              "content": "Normal forms (CNF, DNF, CDNF, CCNF), K-Maps minimization, Generalized Pigeonhole Principle."
+            }
+          ]
+        },
+        {
+          "module_number": 2,
+          "hours": "16L+16T+0P=32 Hours",
+          "units": [
+            {
+              "unit_number": 1,
+              "title": "Combinatorics and Graph Theory",
+              "content": "Counting, Permutations & Combinations, Discrete Numeric Functions, Recurrence relations, Generating functions, Graph terminology, Isomorphism, Euler & Hamiltonian paths, Planar graphs, Trees."
+            },
+            {
+              "unit_number": 2,
+              "title": "Applications of Combinatorics and Graphs",
+              "content": "Graph coloring, Chromatic number, Matrix representation, DFS, BFS, Minimum Spanning Trees (Kruskal\u2019s & Prim\u2019s)."
+            }
+          ]
+        }
+      ],
+      "textbooks": [
+        "Tremblay & Manohar, Discrete Mathematical Structures with Applications to Computer Science, TMH, 2017.",
+        "Kenneth H. Rosen, Discrete Mathematics and its Applications, 7th Ed, TMH, 2018."
+      ]
+    },
+    {
+      "id": "22TP201",
+      "name": "Data Structures",
+      "department": "CSE",
+      "credits": 4,
+      "ltpc": "2-2-2-4",
+      "category": "Basic Engineering",
+      "sem": 3,
+      "description": "Comprehensive data structures: Arrays, Sorting (Selection, Bubble, Insertion, Quick, Merge), Searching, Linked Lists (Singly, Doubly, Circular), Stacks, Queues, Binary Trees, BST, AVL Trees, Graphs (BFS/DFS), and Hashing.",
+      "prerequisite_groups": [
+        {
+          "prerequisites": [
+            {
+              "course_id": "24CS101",
+              "min_grade": "D"
+            }
+          ],
+          "logic_type": "AND"
+        }
+      ],
+      "corequisites": [],
+      "credit_categories": [
+        "BASIC_ENGINEERING",
+        "CORE",
+        "LAB"
+      ],
+      "offered_semesters": [
+        "FALL",
+        "SPRING"
+      ],
+      "difficulty_level": 3,
+      "modules": [
+        {
+          "module_number": 1,
+          "hours": "16L+16T+16P=48 Hours",
+          "units": [
+            {
+              "unit_number": 1,
+              "title": "Data Structures Basics, Sorting & Searching",
+              "content": "Data vs Information, Storage representations, Classification, Sorting (Selection, Bubble, Insertion, Quick, Merge), Searching (Linear, Binary)."
+            },
+            {
+              "unit_number": 2,
+              "title": "Linked Lists, Stacks & Queues",
+              "content": "Singly, Doubly, Circular linked lists, Stack operations and applications (expression evaluation, symbol balancing), Queues (Linear, Circular, Deque)."
+            }
+          ]
+        },
+        {
+          "module_number": 2,
+          "hours": "16L+16T+16P=48 Hours",
+          "units": [
+            {
+              "unit_number": 1,
+              "title": "Trees",
+              "content": "Binary Trees, Properties, Traversals, Expression trees, Binary Search Trees (BST), AVL Tree construction and rotations."
+            },
+            {
+              "unit_number": 2,
+              "title": "Graphs & Hashing",
+              "content": "Graph representations (Adjacency Matrix/List), BFS, DFS, Hashing functions, Collision resolution techniques (Chaining, Open Addressing)."
+            }
+          ]
+        }
+      ],
+      "practices": [
+        "Recursive problems: factorial, Fibonacci, prime checker, binary conversion",
+        "Sorting algorithms implementation: Quick Sort, Merge Sort, Insertion Sort",
+        "Singly Linked List insert (asc/desc), delete, search, reverse, swap alternate nodes",
+        "Doubly Linked List & Circular Linked List full operations",
+        "Stack implementation using arrays and linked lists, postfix evaluation, symbol balancing",
+        "Queue implementation: Circular queue, Deque, Priority queue",
+        "Binary Search Tree insertion, deletion, and inorder/preorder/postorder traversals",
+        "Graph traversals: BFS and DFS iterative and recursive",
+        "Hash table implementation with collision resolution"
+      ],
+      "textbooks": [
+        "Reema Thareja, Data Structures Using C, 2nd Ed, Oxford, 2014.",
+        "Seymour Lipschutz, Data Structures with C, McGraw Hill, 2017."
+      ]
+    },
+    {
+      "id": "22CS201",
+      "name": "Database Management Systems",
+      "department": "CSE",
+      "credits": 4,
+      "ltpc": "2-2-2-4",
+      "category": "Professional core",
+      "sem": 3,
+      "description": "Relational database systems: ER modeling, relational algebra, SQL DDL/DML, functional dependencies, normalization (1NF to BCNF), transaction processing, ACID properties, concurrency control (2PL, timestamps), recovery (ARIES), and B+ trees.",
+      "prerequisite_groups": [
+        {
+          "prerequisites": [
+            {
+              "course_id": "24MT203",
+              "min_grade": "D"
+            }
+          ],
+          "logic_type": "AND"
+        }
+      ],
+      "corequisites": [],
+      "credit_categories": [
+        "PROFESSIONAL_CORE",
+        "CORE",
+        "LAB"
+      ],
+      "offered_semesters": [
+        "FALL",
+        "SPRING"
+      ],
+      "difficulty_level": 3,
+      "modules": [
+        {
+          "module_number": 1,
+          "hours": "16L+16T+16P=48 Hours",
+          "units": [
+            {
+              "unit_number": 1,
+              "title": "Database System Concepts & Conceptual Design",
+              "content": "DBMS architecture, 3-schema model, Data independence, Conceptual data modeling with ER diagrams (Entities, Relationships, Weak entities, Keys)."
+            },
+            {
+              "unit_number": 2,
+              "title": "Relational Model, Relational Algebra & SQL",
+              "content": "ER-to-Relational mapping, Constraints, Relational Algebra (Select, Project, Join, Division), SQL DDL, DML, Constraints, Aggregates, Group By, Having, Order By."
+            }
+          ]
+        },
+        {
+          "module_number": 2,
+          "hours": "16L+16T+16P=48 Hours",
+          "units": [
+            {
+              "unit_number": 1,
+              "title": "Normalization & Complex Queries",
+              "content": "Nested SQL, Triggers, Views, Functional Dependencies, Minimal cover, Normal forms (1NF, 2NF, 3NF, BCNF), Multi-valued dependencies."
+            },
+            {
+              "unit_number": 2,
+              "title": "Transaction Processing & Physical Design",
+              "content": "Transactions, Serializability, Concurrency control (2-Phase Locking, Timestamp ordering), Recovery (Shadow paging, ARIES algorithm), Indexing (B-trees, B+ trees)."
+            }
+          ]
+        }
+      ],
+      "practices": [
+        "ER modeling for university and company domains",
+        "SQL schema creation with primary/foreign key constraints",
+        "Complex SQL queries with Joins, Group By, Having, and Subqueries",
+        "PL/SQL programming with cursors, procedures, functions, and triggers",
+        "Functional dependency analysis and candidate key discovery",
+        "Database indexing with B+ tree simulations"
+      ],
+      "textbooks": [
+        "Ramez Elmasri & Shamkant B. Navathe, Fundamentals of Database Systems, 7th Ed, Pearson, 2016.",
+        "Raghu Ramakrishnan & Johannes Gehrke, Database Management Systems, 3rd Ed, TMH, 2013."
+      ]
+    },
+    {
+      "id": "24CS204",
+      "name": "Object-Oriented Programming through JAVA",
+      "department": "CSE",
+      "credits": 4,
+      "ltpc": "3-0-2-4",
+      "category": "Professional core",
+      "sem": 3,
+      "description": "Java programming, JVM architecture, OOP principles (inheritance, polymorphism, abstraction, encapsulation), packages, exception handling, multithreading, Java Collections Framework, and Swings GUI development.",
+      "prerequisite_groups": [
+        {
+          "prerequisites": [
+            {
+              "course_id": "24CS101",
+              "min_grade": "D"
+            }
+          ],
+          "logic_type": "AND"
+        }
+      ],
+      "corequisites": [],
+      "credit_categories": [
+        "PROFESSIONAL_CORE",
+        "CORE",
+        "LAB"
+      ],
+      "offered_semesters": [
+        "FALL",
+        "SPRING"
+      ],
+      "difficulty_level": 3,
+      "modules": [
+        {
+          "module_number": 1,
+          "hours": "24L+0T+16P=40 Hours",
+          "units": [
+            {
+              "unit_number": 1,
+              "title": "Introduction to Java & OOP Concepts",
+              "content": "History, Byte code, JVM, Java buzzwords, Data types, Control statements, Classes, Objects, Constructors, Garbage collection, Strings, StringTokenizer."
+            },
+            {
+              "unit_number": 2,
+              "title": "Inheritance, Interfaces & Exceptions",
+              "content": "Inheritance types, Super keyword, Method overriding, Abstract classes, Interfaces, Packages, Exception Handling (try, catch, throw, throws, finally, Custom exceptions)."
+            }
+          ]
+        },
+        {
+          "module_number": 2,
+          "hours": "24L+0T+16P=40 Hours",
+          "units": [
+            {
+              "unit_number": 1,
+              "title": "Multithreading & Collection Framework",
+              "content": "Multithreading, Thread lifecycle, Thread class & Runnable interface, Synchronization, Inter-thread communication; Collections Framework (List, Set, Map, ArrayList, LinkedList, HashSet, HashMap, Iterator, Comparator)."
+            },
+            {
+              "unit_number": 2,
+              "title": "Swings GUI Programming",
+              "content": "Event Delegation Model, Event Listeners, Handling mouse and keyboard events, Swing controls (JFrame, JLabel, JTextField, JButton, JCheckBox, JRadioButton, JTable, JTabbedPane)."
+            }
+          ]
+        }
+      ],
+      "practices": [
+        "Interactive Voice Response (IVR) console simulation",
+        "Rectangle, Animal, Shape hierarchy with abstract classes and interfaces",
+        "Divisor sum calculation via AdvancedArithmetic interface",
+        "Custom InsufficientFundsException handling in Bank account system",
+        "Synchronized print-in-order multi-threading challenge",
+        "Flood Fill algorithm implementation in 2D image matrix",
+        "Word occurrence frequency counter using Java Collections HashMap",
+        "Swing Student Registration Form with input validation dialogs"
+      ],
+      "textbooks": [
+        "Herbert Schildt, Java the Complete Reference, 12th Ed, McGraw Hill, 2021.",
+        "M. T. Somashekara, D. S. Guru, Object-Oriented Programming with Java, PHI, 2017."
+      ]
+    },
+    {
+      "id": "24CS208",
+      "name": "Digital Logic Design",
+      "department": "CSE",
+      "credits": 4,
+      "ltpc": "3-0-2-4",
+      "category": "Professional core",
+      "sem": 3,
+      "description": "Number systems, Boolean algebra, Gate-level minimization (Karnaugh Maps, POS/SOP, universal gates), Combinational logic (Adders, Subtractors, Encoders, Decoders, Multiplexers), Sequential logic (Flip-Flops, Registers, Counters), and Programmable Logic Devices (PLA, PAL, RAM/ROM).",
+      "prerequisite_groups": [],
+      "corequisites": [],
+      "credit_categories": [
+        "PROFESSIONAL_CORE",
+        "CORE",
+        "LAB"
+      ],
+      "offered_semesters": [
+        "FALL",
+        "SPRING"
+      ],
+      "difficulty_level": 3,
+      "modules": [
+        {
+          "module_number": 1,
+          "hours": "24L+0T+16P=40 Hours",
+          "units": [
+            {
+              "unit_number": 1,
+              "title": "Introduction & Gate-Level Minimization",
+              "content": "Binary numbers, Base conversions, Complements, Boolean algebra theorems, SOP and POS forms, K-Maps, NAND/NOR implementation."
+            },
+            {
+              "unit_number": 2,
+              "title": "Combinational Logic Circuits",
+              "content": "Half/Full Adders, Subtractors, BCD Adder, Binary Multiplier, Magnitude Comparator, Decoders, Encoders, Multiplexers, De-Multiplexers."
+            }
+          ]
+        },
+        {
+          "module_number": 2,
+          "hours": "24L+0T+16P=40 Hours",
+          "units": [
+            {
+              "unit_number": 1,
+              "title": "Circuits, Registers and Counters",
+              "content": "Latches, Flip-Flops (SR, JK, D, T), Flip-flop conversions, Shift registers, Ripple counters, Synchronous counters."
+            },
+            {
+              "unit_number": 2,
+              "title": "Memory and Programmable Logic Devices",
+              "content": "RAM, ROM, Programmable Logic Array (PLA), Programmable Array Logic (PAL)."
+            }
+          ]
+        }
+      ],
+      "practices": [
+        "Combinational circuit design for custom arithmetic logic",
+        "Design a 4-bit parallel adder and subtractor",
+        "5-to-32 line decoder construction using 3-to-8 decoders",
+        "Design synchronous counter and decimal counter using D flip-flops",
+        "Tabulate PAL programming tables for Boolean expressions"
+      ],
+      "textbooks": [
+        "M. Morris Mano & Michael D. Ciletti, Digital Design, 5th Ed, Pearson, 2013."
+      ]
+    },
+    {
+      "id": "24CS205",
+      "name": "Front end application Development",
+      "department": "CSE",
+      "credits": 2,
+      "ltpc": "0-2-2-2",
+      "category": "Professional core",
+      "sem": 3,
+      "description": "Web technology fundamentals: HTML5 semantic tags, Canvas, CSS3 styling (Flexbox, Grid, Animations), and JavaScript (DOM manipulation, event handling, ES6 features, and client-side form validation).",
+      "prerequisite_groups": [
+        {
+          "prerequisites": [
+            {
+              "course_id": "24CS204",
+              "min_grade": "D"
+            }
+          ],
+          "logic_type": "AND"
+        }
+      ],
+      "corequisites": [],
+      "credit_categories": [
+        "PROFESSIONAL_CORE",
+        "LAB"
+      ],
+      "offered_semesters": [
+        "FALL",
+        "SPRING"
+      ],
+      "difficulty_level": 2,
+      "modules": [
+        {
+          "module_number": 1,
+          "hours": "0L+16T+16P=16 Hours",
+          "units": [
+            {
+              "unit_number": 1,
+              "title": "Web Page Designing & HTML5",
+              "content": "WWW, Web browsers/servers, HTML structured documents, Links, Tables, Forms, Frames, HTML5 Canvas, Audio/Video."
+            },
+            {
+              "unit_number": 2,
+              "title": "CSS Fundamentals",
+              "content": "CSS syntax, Selectors (ID, Class, Tags), Box model, Flexbox, Grid, Animations, Responsive layouts."
+            }
+          ]
+        },
+        {
+          "module_number": 2,
+          "hours": "0L+16T+16P=16 Hours",
+          "units": [
+            {
+              "unit_number": 1,
+              "title": "JavaScript Essentials",
+              "content": "JavaScript syntax, DOM selection and manipulation, Variables, Operators, Data types, Functions, Event handlers."
+            },
+            {
+              "unit_number": 2,
+              "title": "JavaScript Advanced & Validation",
+              "content": "Arrays, Loops, Built-in objects (Math, String, Date), Regular expressions, and Form validation."
+            }
+          ]
+        }
+      ],
+      "practices": [
+        "Multi-frame corporate portal with interactive navigation",
+        "Online book catalog page with images, pricing, and shopping cart",
+        "Student registration form with client-side regex validation for passwords and email",
+        "Interactive color palette generator using JavaScript mouse events",
+        "Math calculator widget with factorial, Fibonacci, and palindrome functions"
+      ],
+      "textbooks": [
+        "Jennifer Niederst Robbins, Learning Web Design, O'Reilly.",
+        "Jon Duckett, HTML & CSS / JavaScript & JQuery, Wiley."
+      ]
+    },
+    {
+      "id": "24CS299",
+      "name": "Design Thinking and Engineering Orientation",
+      "department": "CSE",
+      "credits": 1,
+      "ltpc": "0-0-2-1",
+      "category": "Basic Engineering",
+      "sem": 3,
+      "description": "Design thinking methodologies (Empathize, Define, Ideate, Prototype, Test), user personas, user journeys, computational thinking, and emerging engineering trends (AI ethics, IoT systems, inclusive design).",
+      "prerequisite_groups": [],
+      "corequisites": [],
+      "credit_categories": [
+        "BASIC_ENGINEERING"
+      ],
+      "offered_semesters": [
+        "FALL",
+        "SPRING"
+      ],
+      "difficulty_level": 1
+    },
+    {
+      "id": "24CS801",
+      "name": "Industry Interface Course (Modular Course)",
+      "department": "CSE",
+      "credits": 1,
+      "ltpc": "0-0-2-1",
+      "category": "Department Elective",
+      "sem": 3,
+      "description": "Industry-expert led modular training, technical seminars, software engineering best practices, and enterprise tech workflows.",
+      "prerequisite_groups": [],
+      "corequisites": [],
+      "credit_categories": [
+        "DEPARTMENT_ELECTIVE"
+      ],
+      "offered_semesters": [
+        "FALL",
+        "SPRING"
+      ],
+      "difficulty_level": 2
+    },
+    {
+      "id": "22SA201",
+      "name": "Life Skills",
+      "department": "Humanities",
+      "credits": 1,
+      "ltpc": "0-0-2-1",
+      "category": "Binary Grade",
+      "sem": 3,
+      "description": "Personal leadership, emotional intelligence, teamwork, adaptive communication, and professional workplace readiness.",
+      "prerequisite_groups": [],
+      "corequisites": [],
+      "credit_categories": [
+        "BINARY_GRADE"
+      ],
+      "offered_semesters": [
+        "FALL",
+        "SPRING"
+      ],
+      "difficulty_level": 1
+    },
+    {
+      "id": "22ST202",
+      "name": "Probability and Statistics",
+      "department": "Mathematics",
+      "credits": 4,
+      "ltpc": "3-2-0-4",
+      "category": "Basic Sciences",
+      "sem": 4,
+      "description": "Descriptive statistics, measures of central tendency, skewness, probability theory, Bayes theorem, random variables, distributions (Binomial, Poisson, Normal), correlation, regression, and hypothesis testing (large/small sample, Chi-square).",
+      "prerequisite_groups": [],
+      "corequisites": [],
+      "credit_categories": [
+        "BASIC_SCIENCES",
+        "MATH"
+      ],
+      "offered_semesters": [
+        "FALL",
+        "SPRING"
+      ],
+      "difficulty_level": 3,
+      "modules": [
+        {
+          "module_number": 1,
+          "hours": "24L+16T+0P=40 Hours",
+          "units": [
+            {
+              "unit_number": 1,
+              "title": "Descriptive Statistics",
+              "content": "Frequencies, Histograms, Ogive curves, Mean, Median, Mode, Standard deviation, Skewness, Karl Pearson\u2019s coefficient."
+            },
+            {
+              "unit_number": 2,
+              "title": "Probability and Random Variables",
+              "content": "Classical and Axiomatic probability, Addition theorem, Conditional probability, Bayes theorem, Discrete/Continuous random variables."
+            }
+          ]
+        },
+        {
+          "module_number": 2,
+          "hours": "24L+16T+0P=40 Hours",
+          "units": [
+            {
+              "unit_number": 1,
+              "title": "Regression Analysis & Distributions",
+              "content": "Pearson correlation, Regression lines, Binomial, Poisson and Normal distributions with properties."
+            },
+            {
+              "unit_number": 2,
+              "title": "Testing of Hypothesis",
+              "content": "Large sample tests (one/two means, proportions), Small sample tests (t-test, paired t-test), Chi-square test for goodness of fit and independence."
+            }
+          ]
+        }
+      ],
+      "textbooks": [
+        "Sheldon M. Ross, Introduction to Probability and Statistics for Engineers and Scientists, 3rd Ed, Academic Press.",
+        "S. C. Gupta & V. K. Kapoor, Fundamentals of Mathematical Statistics, Sultan Chand, 2012."
+      ]
+    },
+    {
+      "id": "24CS209",
+      "name": "Design and Analysis of Algorithms",
+      "department": "CSE",
+      "credits": 4,
+      "ltpc": "3-0-2-4",
+      "category": "Professional core",
+      "sem": 4,
+      "description": "Algorithm analysis, asymptotic notations (Big-O, Omega, Theta), Master theorem, Divide-and-Conquer, Greedy method (Knapsack, MST), Dynamic Programming (0/1 Knapsack, All-Pairs Shortest Path, TSP), Backtracking (N-Queens), Branch & Bound, and NP-Completeness.",
+      "prerequisite_groups": [
+        {
+          "prerequisites": [
+            {
+              "course_id": "22TP201",
+              "min_grade": "D"
+            },
+            {
+              "course_id": "24MT203",
+              "min_grade": "D"
+            }
+          ],
+          "logic_type": "AND"
+        }
+      ],
+      "corequisites": [],
+      "credit_categories": [
+        "PROFESSIONAL_CORE",
+        "CORE",
+        "LAB"
+      ],
+      "offered_semesters": [
+        "FALL",
+        "SPRING"
+      ],
+      "difficulty_level": 4,
+      "modules": [
+        {
+          "module_number": 1,
+          "hours": "24L+0T+16P=40 Hours",
+          "units": [
+            {
+              "unit_number": 1,
+              "title": "Introduction & Asymptotic Analysis",
+              "content": "Space and time complexity, Asymptotic notation (O, \u03a9, \u0398, o), Recurrence relations, Master's Theorem, Disjoint set operations."
+            },
+            {
+              "unit_number": 2,
+              "title": "Divide & Conquer and Greedy Method",
+              "content": "Binary search, Merge Sort, Quick Sort, Strassen\u2019s matrix multiplication; Greedy Method: Job sequencing with deadlines, Knapsack problem, Minimum spanning trees."
+            }
+          ]
+        },
+        {
+          "module_number": 2,
+          "hours": "24L+0T+16P=40 Hours",
+          "units": [
+            {
+              "unit_number": 1,
+              "title": "Dynamic Programming and Backtracking",
+              "content": "Optimal binary search trees, Matrix chain multiplication, 0/1 Knapsack, All pairs shortest path, Travelling Salesperson; Backtracking: N-Queens, Sum of subsets, Graph coloring."
+            },
+            {
+              "unit_number": 2,
+              "title": "Branch & Bound and NP-Completeness",
+              "content": "Branch & Bound (TSP, 0/1 Knapsack), Non-deterministic algorithms, P, NP, NP-Hard, NP-Complete, Cook\u2019s Theorem."
+            }
+          ]
+        }
+      ],
+      "practices": [
+        "Empirical time complexity comparison of Merge Sort vs Quick Sort with random inputs",
+        "Strassen\u2019s matrix multiplication implementation",
+        "Job sequencing with deadlines greedy scheduling",
+        "0/1 Knapsack problem using Dynamic Programming vs Branch & Bound",
+        "All-pairs shortest path (Floyd-Warshall)",
+        "N-Queens problem backtracking visualizer"
+      ],
+      "textbooks": [
+        "Ellis Horowitz, Sartaj Sahni, Rajasekaran, Fundamentals of Computer Algorithms, Galgotia, 2006.",
+        "Cormen, Leiserson, Rivest, Stein, Introduction to Algorithms, MIT Press, 2014."
+      ]
+    },
+    {
+      "id": "22CS207",
+      "name": "Operating Systems",
+      "department": "CSE",
+      "credits": 3,
+      "ltpc": "2-0-2-3",
+      "category": "Professional core",
+      "sem": 4,
+      "description": "Linux file system, shell programming, process management, CPU scheduling (FCFS, SJF, Round Robin), synchronization (Semaphores, Monitors), Deadlocks (Banker's algorithm), Memory management (Paging, Segmentation, Page replacement - FIFO, LRU), and Secondary storage disk scheduling.",
+      "prerequisite_groups": [
+        {
+          "prerequisites": [
+            {
+              "course_id": "24CS208",
+              "min_grade": "D"
+            }
+          ],
+          "logic_type": "AND"
+        }
+      ],
+      "corequisites": [],
+      "credit_categories": [
+        "PROFESSIONAL_CORE",
+        "CORE",
+        "LAB"
+      ],
+      "offered_semesters": [
+        "FALL",
+        "SPRING"
+      ],
+      "difficulty_level": 3,
+      "modules": [
+        {
+          "module_number": 1,
+          "hours": "16L+0T+16P=32 Hours",
+          "units": [
+            {
+              "unit_number": 1,
+              "title": "Linux File System & Process Scheduling",
+              "content": "Linux file hierarchy, permissions, filters (grep, sed, awk), Process concept, IPC, Threads, CPU scheduling algorithms (FCFS, SJF, Round Robin)."
+            },
+            {
+              "unit_number": 2,
+              "title": "Process Synchronization & Deadlocks",
+              "content": "Critical section problem, Peterson\u2019s solution, Semaphores, Monitors, Deadlock characterization, Prevention, Banker\u2019s avoidance algorithm, Detection & recovery."
+            }
+          ]
+        },
+        {
+          "module_number": 2,
+          "hours": "16L+0T+16P=32 Hours",
+          "units": [
+            {
+              "unit_number": 1,
+              "title": "Memory Management",
+              "content": "Swapping, Paging, Page table structure, Segmentation, Demand paging, Page replacement algorithms (FIFO, LRU, Optimal, Second Chance), Frame allocation."
+            },
+            {
+              "unit_number": 2,
+              "title": "Secondary Storage & File Systems",
+              "content": "Disk structure, Disk scheduling (FCFS, SSTF, SCAN), File system interface, Directory implementation, Free space management."
+            }
+          ]
+        }
+      ],
+      "practices": [
+        "Linux shell script for interactive file handling and text processing",
+        "Process creation using fork() and inter-process communication",
+        "CPU scheduling simulators for FCFS, SJF, and Round Robin",
+        "Producer-Consumer synchronization using Semaphores",
+        "Banker\u2019s algorithm deadlock avoidance simulator",
+        "Page replacement algorithms evaluation: FIFO, LRU, Optimal",
+        "Disk scheduling algorithms: FCFS, SSTF, SCAN"
+      ],
+      "textbooks": [
+        "Sumitabha Das, Unix Concepts and Applications, TMH, 2017.",
+        "Silberschatz, Galvin, Gagne, Operating System Concepts, 9th Ed, Wiley, 2013."
+      ]
+    },
+    {
+      "id": "24CS210",
+      "name": "Computer Organization",
+      "department": "CSE",
+      "credits": 3,
+      "ltpc": "2-2-0-3",
+      "category": "Professional core",
+      "sem": 4,
+      "description": "Register transfer language, computer arithmetic (Booth\u2019s multiplication, division), instruction cycles, micro-operations, CPU organization, memory hierarchy (cache mapping, associative memory), and I/O organization (DMA, interrupts).",
+      "prerequisite_groups": [
+        {
+          "prerequisites": [
+            {
+              "course_id": "24CS208",
+              "min_grade": "D"
+            }
+          ],
+          "logic_type": "AND"
+        }
+      ],
+      "corequisites": [],
+      "credit_categories": [
+        "PROFESSIONAL_CORE",
+        "CORE"
+      ],
+      "offered_semesters": [
+        "FALL",
+        "SPRING"
+      ],
+      "difficulty_level": 3,
+      "modules": [
+        {
+          "module_number": 1,
+          "hours": "16L+16T+0P=32 Hours",
+          "units": [
+            {
+              "unit_number": 1,
+              "title": "RTL, Data Representation & Computer Arithmetic",
+              "content": "Register Transfer language, Bus & memory transfers, Fixed & floating point representation, Booth's multiplication, Division algorithms."
+            },
+            {
+              "unit_number": 2,
+              "title": "Micro-operations & Basic Computer Organization",
+              "content": "Arithmetic/logic/shift micro-operations, Instruction codes, Computer registers, Instruction cycle, Memory-reference instructions."
+            }
+          ]
+        },
+        {
+          "module_number": 2,
+          "hours": "16L+16T+0P=32 Hours",
+          "units": [
+            {
+              "unit_number": 1,
+              "title": "CPU and Memory Organization",
+              "content": "General register organization, Stack organization, Instruction formats, Addressing modes, Memory hierarchy, Cache memory mapping, Virtual memory."
+            },
+            {
+              "unit_number": 2,
+              "title": "I/O Organization",
+              "content": "Peripheral devices, Asynchronous data transfer, Priority interrupts, Direct Memory Access (DMA), I/O processors."
+            }
+          ]
+        }
+      ],
+      "textbooks": [
+        "M. Morris Mano, Computer System Architecture, 3rd Ed, Pearson, 2017.",
+        "William Stallings, Computer Organization & Architecture, 11th Ed, Pearson, 2019."
+      ]
+    },
+    {
+      "id": "24CS207",
+      "name": "Full Stack Development",
+      "department": "CSE",
+      "credits": 2,
+      "ltpc": "0-2-2-2",
+      "category": "Professional core",
+      "sem": 4,
+      "description": "End-to-end MERN stack engineering: HTML5/CSS3 layouts, asynchronous JavaScript (ES6, Fetch, Promises), Node.js, Express.js RESTful APIs, MongoDB CRUD & indexing, JWT authentication, and React component architecture with Redux/Context API.",
+      "prerequisite_groups": [
+        {
+          "prerequisites": [
+            {
+              "course_id": "24CS204",
+              "min_grade": "D"
+            },
+            {
+              "course_id": "24CS205",
+              "min_grade": "D"
+            }
+          ],
+          "logic_type": "AND"
+        }
+      ],
+      "corequisites": [],
+      "credit_categories": [
+        "PROFESSIONAL_CORE",
+        "LAB"
+      ],
+      "offered_semesters": [
+        "FALL",
+        "SPRING"
+      ],
+      "difficulty_level": 3,
+      "modules": [
+        {
+          "module_number": 1,
+          "hours": "0L+16T+16P=32 Hours",
+          "units": [
+            {
+              "unit_number": 1,
+              "title": "Advanced Frontend & Styling",
+              "content": "Semantic HTML5, CSS Box Model, Flexbox, Grid, Media queries, Transitions & animations, CSS preprocessors."
+            },
+            {
+              "unit_number": 2,
+              "title": "JavaScript ES6 & Asynchronous Programming",
+              "content": "DOM events, ES6 features, Async/await, Fetch API & AJAX, Prototypes, Classes, JSON, Local/Session Storage."
+            }
+          ]
+        },
+        {
+          "module_number": 2,
+          "hours": "0L+16T+16P=32 Hours",
+          "units": [
+            {
+              "unit_number": 1,
+              "title": "MERN Stack Backend & Database",
+              "content": "Node.js fundamentals, Express.js REST APIs, MongoDB data modeling & CRUD, Indexing, Aggregations, JWT Authentication & Authorization, Error handling middleware."
+            },
+            {
+              "unit_number": 2,
+              "title": "React Frontend, State Management & Deployment",
+              "content": "React JSX, Component lifecycle, Hooks (useState, useEffect), Context API, Redux state management, Full Stack Integration, Cloud deployment (AWS / Heroku)."
+            }
+          ]
+        }
+      ],
+      "practices": [
+        "Build RESTful CRUD API with Express and MongoDB",
+        "Implement JWT-based user authentication and protected routes",
+        "Weather forecasting widget using React useEffect and external API",
+        "Blog application with React and Redux state management",
+        "Mortgage calculator React widget with live payment computation",
+        "Full Stack Book Store application integrating React frontend with Express/MongoDB backend"
+      ],
+      "textbooks": [
+        "Jennifer Robbins, Learning Web Design, O'Reilly.",
+        "Chris Aquino, Front-End Development: Big Nerd Ranch Guide."
+      ]
+    },
+    {
+      "id": "24OE201",
+      "name": "Open Elective \u2013 1 (NPTEL / MOOCs)",
+      "department": "Interdisciplinary",
+      "credits": 3,
+      "ltpc": "2-2-0-3",
+      "category": "Open Elective",
+      "sem": 4,
+      "description": "Interdisciplinary open elective course selected from accredited NPTEL / SWAYAM / Coursera portals.",
+      "prerequisite_groups": [],
+      "corequisites": [],
+      "credit_categories": [
+        "OPEN_ELECTIVE"
+      ],
+      "offered_semesters": [
+        "FALL",
+        "SPRING"
+      ],
+      "difficulty_level": 2
+    },
+    {
+      "id": "24CS201",
+      "name": "Field Projects",
+      "department": "CSE",
+      "credits": 1,
+      "ltpc": "0-0-2-1",
+      "category": "Project",
+      "sem": 4,
+      "description": "Real-world community or industry problem exploration, on-site data gathering, and technical report submission.",
+      "prerequisite_groups": [],
+      "corequisites": [],
+      "credit_categories": [
+        "PROJECT"
+      ],
+      "offered_semesters": [
+        "FALL",
+        "SPRING"
+      ],
+      "difficulty_level": 2
+    },
+    {
+      "id": "24SA201",
+      "name": "Universal Human Values (UHV)",
+      "department": "Humanities",
+      "credits": 1,
+      "ltpc": "0-0-2-1",
+      "category": "Binary Grade",
+      "sem": 4,
+      "description": "Self-exploration, harmony in human beings, family, society, nature, and universal order based on mutual fulfillment and ethics.",
+      "prerequisite_groups": [],
+      "corequisites": [],
+      "credit_categories": [
+        "BINARY_GRADE"
+      ],
+      "offered_semesters": [
+        "FALL",
+        "SPRING"
+      ],
+      "difficulty_level": 1
+    },
+    {
+      "id": "22TP301",
+      "name": "Soft Skills Laboratory",
+      "department": "Humanities",
+      "credits": 1,
+      "ltpc": "0-0-2-1",
+      "category": "Humanities",
+      "sem": 5,
+      "description": "Employability skill enhancement: personality development, SWOC analysis, Johari window, time management, resume preparation, corporate etiquette, and mock interviews.",
+      "prerequisite_groups": [],
+      "corequisites": [],
+      "credit_categories": [
+        "HUMANITIES",
+        "LAB"
+      ],
+      "offered_semesters": [
+        "FALL",
+        "SPRING"
+      ],
+      "difficulty_level": 1
+    },
+    {
+      "id": "24CS301",
+      "name": "Optimization Techniques",
+      "department": "Mathematics",
+      "credits": 3,
+      "ltpc": "2-2-0-3",
+      "category": "Basic Sciences",
+      "sem": 5,
+      "description": "Linear programming (Simplex method, Duality), Transportation problems, Single/multivariable optimization (Newton-Raphson, Bisection, Cauchy\u2019s steepest descent, L-BFGS), Stochastic optimization, and Non-convex methods.",
+      "prerequisite_groups": [
+        {
+          "prerequisites": [
+            {
+              "course_id": "22ST202",
+              "min_grade": "D"
+            },
+            {
+              "course_id": "24MT101",
+              "min_grade": "D"
+            }
+          ],
+          "logic_type": "AND"
+        }
+      ],
+      "corequisites": [],
+      "credit_categories": [
+        "BASIC_SCIENCES",
+        "MATH"
+      ],
+      "offered_semesters": [
+        "FALL",
+        "SPRING"
+      ],
+      "difficulty_level": 3,
+      "modules": [
+        {
+          "module_number": 1,
+          "hours": "12L+8T+0P=20 Hours",
+          "units": [
+            {
+              "unit_number": 1,
+              "title": "Linear Programming & Transportation",
+              "content": "Problem formulation, Simplex method, Duality; Transportation table, NW corner, Least cost, Row/Column minima methods."
+            },
+            {
+              "unit_number": 2,
+              "title": "Single & Multi-Variable Optimization",
+              "content": "Bracketing, Interval Halving, Newton-Raphson, Bisection root finding, Hooke-Jeeves pattern search, Cauchy\u2019s Steepest Descent, L-BFGS."
+            }
+          ]
+        },
+        {
+          "module_number": 2,
+          "hours": "12L+8T+0P=20 Hours",
+          "units": [
+            {
+              "unit_number": 1,
+              "title": "Stochastic Optimization",
+              "content": "Notion of regret, online-to-batch conversion, OGD, EG, OMD, Affine and convex sets, Separating hyperplanes, Log-concave functions."
+            },
+            {
+              "unit_number": 2,
+              "title": "Non-Convex Optimization",
+              "content": "Sparse recovery, Matrix completion, Relaxation methods, Projected gradient descent, Unconstrained & equality constrained problems."
+            }
+          ]
+        }
+      ],
+      "textbooks": [
+        "Kanti Swarup, Man Mohan, P. K. Gupta, Operations Research, Sultan Chand, 2005.",
+        "S. S. Rao, Engineering Optimization: Theory and Practice, 4th Ed, Wiley, 2009."
+      ]
+    },
+    {
+      "id": "24CS302",
+      "name": "Artificial Intelligence",
+      "department": "CSE",
+      "credits": 3,
+      "ltpc": "2-0-2-3",
+      "category": "Professional core",
+      "sem": 5,
+      "description": "Intelligent agents, state space search (Uninformed, Informed: A*, AO*, Min-Max, Alpha-Beta pruning), knowledge representation (Propositional & First-Order Logic, Resolution, Chaining), PDDL planning, and machine learning decision trees.",
+      "prerequisite_groups": [
+        {
+          "prerequisites": [
+            {
+              "course_id": "22ST202",
+              "min_grade": "D"
+            }
+          ],
+          "logic_type": "AND"
+        }
+      ],
+      "corequisites": [],
+      "credit_categories": [
+        "PROFESSIONAL_CORE",
+        "CORE",
+        "LAB"
+      ],
+      "offered_semesters": [
+        "FALL",
+        "SPRING"
+      ],
+      "difficulty_level": 3,
+      "modules": [
+        {
+          "module_number": 1,
+          "hours": "16L+16T+0P=32 Hours",
+          "units": [
+            {
+              "unit_number": 1,
+              "title": "Intelligent Systems & Agents",
+              "content": "AI definitions, Agent architecture, Environments, Rationality, Agent types, Problem-solving formulations."
+            },
+            {
+              "unit_number": 2,
+              "title": "Problem Solving & Search",
+              "content": "State space search, Heuristic functions, Hill climbing, Best First Search, A*, AO*, Game trees (Min-Max, Alpha-Beta pruning)."
+            }
+          ]
+        },
+        {
+          "module_number": 2,
+          "hours": "16L+16T+0P=32 Hours",
+          "units": [
+            {
+              "unit_number": 1,
+              "title": "Knowledge Representation & Planning",
+              "content": "Propositional & First-Order logic, Inference, Resolution, Forward/Backward chaining, Planning with state-space search, Partial order planning, PDDL."
+            },
+            {
+              "unit_number": 2,
+              "title": "Learning & Expert Systems",
+              "content": "Supervised/Unsupervised/RL learning, Decision Trees (ID3 algorithm), Ensemble learning, Expert system architectures."
+            }
+          ]
+        }
+      ],
+      "practices": [
+        "Classical Vacuum Cleaner state-space problem solver",
+        "Missionaries and Cannibals river crossing algorithm",
+        "Water Jug (4-gallon & 3-gallon) problem BFS/DFS implementation",
+        "Farmer, Goat, Wolf, Cabbage river crossing puzzle in PDDL",
+        "8-Puzzle sliding tile solver using A* Search algorithm",
+        "Tic-Tac-Toe Min-Max algorithm with Alpha-Beta pruning",
+        "Wumpus World knowledge-based agent simulation",
+        "Decision tree ID3 classification on benchmark dataset"
+      ],
+      "textbooks": [
+        "Stuart Russell & Peter Norvig, Artificial Intelligence: A Modern Approach, 4th Ed, Pearson, 2020."
+      ]
+    },
+    {
+      "id": "24CS303",
+      "name": "Computer Networks",
+      "department": "CSE",
+      "credits": 4,
+      "ltpc": "3-0-2-4",
+      "category": "Professional core",
+      "sem": 5,
+      "description": "Computer networking principles: OSI & TCP/IP stack, physical layer media, Data Link Layer (error detection, CSMA/CD, switched LANs), Network Layer (IP addressing, IPv4/IPv6, routing algorithms), Transport Layer (TCP, UDP, Congestion Control), and Application Layer protocols.",
+      "prerequisite_groups": [
+        {
+          "prerequisites": [
+            {
+              "course_id": "24CS204",
+              "min_grade": "D"
+            },
+            {
+              "course_id": "22CS207",
+              "min_grade": "D"
+            }
+          ],
+          "logic_type": "AND"
+        }
+      ],
+      "corequisites": [],
+      "credit_categories": [
+        "PROFESSIONAL_CORE",
+        "CORE",
+        "LAB"
+      ],
+      "offered_semesters": [
+        "FALL",
+        "SPRING"
+      ],
+      "difficulty_level": 3,
+      "modules": [
+        {
+          "module_number": 1,
+          "hours": "24L+0T+16P=40 Hours",
+          "units": [
+            {
+              "unit_number": 1,
+              "title": "Introduction to Networks & Data Link Layer",
+              "content": "Network edge/core, Packet switching, Delay, Loss, Throughput, Protocol layers; Data link layer services, Error detection/correction, Multiple access links, Switched LANs."
+            },
+            {
+              "unit_number": 2,
+              "title": "Network Hardware & Layer Services",
+              "content": "Network devices (Hubs, Switches, Routers), Ethernet 802.3, Wi-Fi 802.11, Wireshark packet capture analysis."
+            }
+          ]
+        },
+        {
+          "module_number": 2,
+          "hours": "24L+0T+16P=40 Hours",
+          "units": [
+            {
+              "unit_number": 1,
+              "title": "Network Layer",
+              "content": "Forwarding and routing, Virtual circuit & datagram networks, IP protocol, Subnetting, Routing algorithms (Link State Dijkstra, Distance Vector Bellman-Ford), Multicast routing."
+            },
+            {
+              "unit_number": 2,
+              "title": "Transport & Application Layer",
+              "content": "Multiplexing/Demultiplexing, UDP, TCP reliable data transfer, Congestion control, Web/HTTP, FTP, Email (SMTP), DNS, Socket programming in Java."
+            }
+          ]
+        }
+      ],
+      "practices": [
+        "Network cable crimping (Straight & Cross) and LAN testing",
+        "Configuration of Routers and manageable Switches in Cisco Packet Tracer",
+        "Network diagnostic commands: ping, traceroute, ipconfig, arp, nslookup",
+        "Wireshark packet sniffing for Ethernet, ARP, and HTTP frames",
+        "TCP and UDP client-server socket programming in Java",
+        "Distance Vector and Link State routing simulations in Packet Tracer"
+      ],
+      "textbooks": [
+        "Jim Kurose & Keith Ross, Computer Networking: A Top-Down Approach, 7th Ed, Pearson, 2017.",
+        "Behrouz A. Forouzan, Computer Networks, McGraw Hill, 2014."
+      ]
+    },
+    {
+      "id": "24CS305",
+      "name": "Computing Ethics",
+      "department": "CSE",
+      "credits": 2,
+      "ltpc": "1-2-0-2",
+      "category": "Humanities",
+      "sem": 5,
+      "description": "Engineering and computing ethics: sociotechnical systems, information flow, surveillance, privacy, intellectual property (FOSS vs proprietary software), cybercrime laws, and IEEE/ACM codes of professional conduct.",
+      "prerequisite_groups": [],
+      "corequisites": [],
+      "credit_categories": [
+        "HUMANITIES"
+      ],
+      "offered_semesters": [
+        "FALL",
+        "SPRING"
+      ],
+      "difficulty_level": 2
+    },
+    {
+      "id": "24EN301",
+      "name": "Professional Communication Skills",
+      "department": "Humanities",
+      "credits": 1,
+      "ltpc": "0-0-2-1",
+      "category": "Humanities",
+      "sem": 5,
+      "description": "Corporate communication, advanced business correspondence, technical presentations, negotiation strategies, and Cambridge Linguaskill B1 to C2 certification.",
+      "prerequisite_groups": [],
+      "corequisites": [],
+      "credit_categories": [
+        "HUMANITIES",
+        "LAB"
+      ],
+      "offered_semesters": [
+        "FALL",
+        "SPRING"
+      ],
+      "difficulty_level": 1
+    },
+    {
+      "id": "24TP301",
+      "name": "Quantitative Aptitude & Logical Reasoning",
+      "department": "Humanities",
+      "credits": 2,
+      "ltpc": "1-2-0-2",
+      "category": "Humanities",
+      "sem": 6,
+      "description": "Quantitative problem-solving: Number systems, percentages, ratios, profit & loss, time-speed-distance, permutations, combinations, probability, series, analogies, syllogisms, blood relations, and seating arrangements.",
+      "prerequisite_groups": [],
+      "corequisites": [],
+      "credit_categories": [
+        "HUMANITIES"
+      ],
+      "offered_semesters": [
+        "FALL",
+        "SPRING"
+      ],
+      "difficulty_level": 2,
+      "textbooks": [
+        "R. S. Aggarwal, Quantitative Aptitude for Competitive Examinations, S. Chand, 2017.",
+        "Arihant, A New Approach to Verbal & Non-Verbal Reasoning, 2021."
+      ]
+    },
+    {
+      "id": "24CS306",
+      "name": "Machine Learning",
+      "department": "CSE",
+      "credits": 4,
+      "ltpc": "2-2-2-4",
+      "category": "Professional core",
+      "sem": 6,
+      "description": "Comprehensive ML: Supervised learning, model training essentials (Bias-Variance trade-off, cross-validation, SMOTE, ROC-AUC), regression models (Ridge, LASSO), feature selection, PCA, LDA, classification (KNN, SVM, Decision Trees, Naive Bayes), ensemble methods (Random Forest, AdaBoost, Stacking), and clustering (K-Means, DBSCAN, Spectral).",
+      "prerequisite_groups": [
+        {
+          "prerequisites": [
+            {
+              "course_id": "22ST202",
+              "min_grade": "D"
+            },
+            {
+              "course_id": "24CS102",
+              "min_grade": "D"
+            },
+            {
+              "course_id": "24MT101",
+              "min_grade": "D"
+            }
+          ],
+          "logic_type": "AND"
+        }
+      ],
+      "corequisites": [],
+      "credit_categories": [
+        "PROFESSIONAL_CORE",
+        "CORE",
+        "LAB"
+      ],
+      "offered_semesters": [
+        "FALL",
+        "SPRING"
+      ],
+      "difficulty_level": 4,
+      "modules": [
+        {
+          "module_number": 1,
+          "hours": "16L+16T+16P=48 Hours",
+          "units": [
+            {
+              "unit_number": 1,
+              "title": "Introduction, Model Training & Regression",
+              "content": "Supervised/Unsupervised/RL, Bias-Variance, Cross Validation, SMOTE, Confusion Matrix, Precision/Recall, F1-score; Linear, Polynomial, Logistic, Ridge, and LASSO regression."
+            },
+            {
+              "unit_number": 2,
+              "title": "Feature Selection & Dimensionality Reduction",
+              "content": "Filter, Wrapper, Embedded methods; SVD, Matrix Factorization, Linear Discriminant Analysis (LDA), Principal Component Analysis (PCA)."
+            }
+          ]
+        },
+        {
+          "module_number": 2,
+          "hours": "16L+16T+16P=48 Hours",
+          "units": [
+            {
+              "unit_number": 1,
+              "title": "Classification & Ensemble Methods",
+              "content": "Binary/Multi-class classification, KNN, SVM, Decision Trees (ID3), Naive Bayes, Perceptron; Ensemble: Voting, Bagging (Random Forest), Boosting (AdaBoost), Stacking."
+            },
+            {
+              "unit_number": 2,
+              "title": "Clustering Algorithms",
+              "content": "Distance functions, K-Means, K-Medoids, Hierarchical clustering (single/complete linkage), DBSCAN, Graph-based & Spectral clustering."
+            }
+          ]
+        }
+      ],
+      "practices": [
+        "Dataset preprocessing: missing values, one-hot encoding, feature scaling, train-test-kfold split",
+        "House price prediction using Univariate, Multivariate, Ridge, and LASSO regression",
+        "Heart disease classification with Logistic Regression and K-fold cross validation",
+        "Handling imbalanced datasets using Random Oversampling, Undersampling, and SMOTE with KNN",
+        "Dimensionality reduction with PCA and LDA on high-dimensional data",
+        "Spam email classification using Naive Bayes classifier",
+        "SVM classification with Linear, RBF, and Polynomial kernels",
+        "Ensemble models: Random Forest and AdaBoost implementations",
+        "K-Means clustering with Elbow method for optimal K on PCA-projected data"
+      ],
+      "textbooks": [
+        "Ethem Alpaydin, Introduction to Machine Learning, 3rd Ed, MIT Press, 2014.",
+        "Peter Flach, Machine Learning: The Art and Science of Algorithms, Cambridge University Press, 2012."
+      ]
+    },
+    {
+      "id": "22CS401",
+      "name": "Cryptography and Network Security",
+      "department": "CSE",
+      "credits": 4,
+      "ltpc": "3-0-2-4",
+      "category": "Professional core",
+      "sem": 6,
+      "description": "Computer security principles, classical ciphers, symmetric ciphers (DES, AES, RC4), public key cryptography (RSA, Diffie-Hellman), cryptographic hash functions, digital signatures, Kerberos, PGP, IPsec, and SSL/TLS.",
+      "prerequisite_groups": [
+        {
+          "prerequisites": [
+            {
+              "course_id": "24CS303",
+              "min_grade": "D"
+            }
+          ],
+          "logic_type": "AND"
+        }
+      ],
+      "corequisites": [],
+      "credit_categories": [
+        "PROFESSIONAL_CORE",
+        "CORE",
+        "LAB"
+      ],
+      "offered_semesters": [
+        "FALL",
+        "SPRING"
+      ],
+      "difficulty_level": 4,
+      "modules": [
+        {
+          "module_number": 1,
+          "hours": "24L+0T+16P=40 Hours",
+          "units": [
+            {
+              "unit_number": 1,
+              "title": "Introduction & Classical Ciphers",
+              "content": "Security attacks, services, mechanisms; Substitution & Transposition ciphers (Caesar, Playfair, Hill, Rail fence)."
+            },
+            {
+              "unit_number": 2,
+              "title": "Symmetric & Asymmetric Cryptography",
+              "content": "DES, AES, Triple DES, RC4 stream cipher; Public Key Cryptography: RSA, Diffie-Hellman Key Exchange, SHA-256 hash functions, MACs, Digital Signatures."
+            }
+          ]
+        },
+        {
+          "module_number": 2,
+          "hours": "24L+0T+16P=40 Hours",
+          "units": [
+            {
+              "unit_number": 1,
+              "title": "Security Applications",
+              "content": "Kerberos, X.509 certificates, PGP, S/MIME, IP Security (IPsec architecture, AH, ESP, key management)."
+            },
+            {
+              "unit_number": 2,
+              "title": "Web & System Security",
+              "content": "SSL/TLS, HTTPS, SSH, Intruders, Intrusion Detection Systems (IDS), Malicious software, Firewalls."
+            }
+          ]
+        }
+      ],
+      "practices": [
+        "Implement Caesar, Playfair, and Hill ciphers in Python/C",
+        "Implement Simplified DES and RC4 stream cipher",
+        "RSA encryption and decryption key generation",
+        "Diffie-Hellman key exchange algorithm simulation",
+        "Configure IPsec and SSH tunnel on Linux",
+        "Network scanning and vulnerability auditing with NMAP and Wireshark"
+      ],
+      "textbooks": [
+        "William Stallings, Cryptography and Network Security, 7th Ed, Pearson, 2017."
+      ]
+    },
+    {
+      "id": "24CS307",
+      "name": "Inter Departmental Project",
+      "department": "CSE",
+      "credits": 1,
+      "ltpc": "0-0-2-1",
+      "category": "Project",
+      "sem": 6,
+      "description": "Interdisciplinary engineering design project conducted collaboratively across engineering departments.",
+      "prerequisite_groups": [],
+      "corequisites": [],
+      "credit_categories": [
+        "PROJECT"
+      ],
+      "offered_semesters": [
+        "FALL",
+        "SPRING"
+      ],
+      "difficulty_level": 3
+    },
+    {
+      "id": "24CS401",
+      "name": "Software Project Management",
+      "department": "CSE",
+      "credits": 3,
+      "ltpc": "2-2-0-3",
+      "category": "Professional core",
+      "sem": 7,
+      "description": "Software project lifecycles, Agile and Scrum management, project planning, effort estimation models (COCOMO, Function Points), risk evaluation, milestone tracking, and quality metrics.",
+      "prerequisite_groups": [],
+      "corequisites": [],
+      "credit_categories": [
+        "PROFESSIONAL_CORE",
+        "CORE"
+      ],
+      "offered_semesters": [
+        "FALL",
+        "SPRING"
+      ],
+      "difficulty_level": 3,
+      "textbooks": [
+        "Bob Hughes & Mike Cotterell, Software Project Management, 5th Ed, McGraw Hill."
+      ]
+    },
+    {
+      "id": "24CS402",
+      "name": "Parallel & Distributed Computing",
+      "department": "CSE",
+      "credits": 3,
+      "ltpc": "2-2-0-3",
+      "category": "Professional core",
+      "sem": 7,
+      "description": "Parallel architectures (SIMD, SMP, NUMA, Flynn\u2019s taxonomy), cache coherence, parallel algorithm models (Task/Data decomposition, MapReduce, MPI, OpenMP), distributed system models, synchronization, consensus, CUDA, and Apache Hadoop/Spark.",
+      "prerequisite_groups": [
+        {
+          "prerequisites": [
+            {
+              "course_id": "22CS207",
+              "min_grade": "D"
+            },
+            {
+              "course_id": "24CS303",
+              "min_grade": "D"
+            },
+            {
+              "course_id": "24CS210",
+              "min_grade": "D"
+            }
+          ],
+          "logic_type": "AND"
+        }
+      ],
+      "corequisites": [],
+      "credit_categories": [
+        "PROFESSIONAL_CORE",
+        "CORE"
+      ],
+      "offered_semesters": [
+        "FALL",
+        "SPRING"
+      ],
+      "difficulty_level": 4,
+      "modules": [
+        {
+          "module_number": 1,
+          "hours": "12L+8T+0P=20 Hours",
+          "units": [
+            {
+              "unit_number": 1,
+              "title": "Introduction to Parallel Computing",
+              "content": "Parallelism vs Concurrency, Pipeline architecture, Multi-processor, Systolic, Dataflow, Memory issues (Shared vs Distributed, NUMA, Cache Coherence, Flynn's Taxonomy)."
+            },
+            {
+              "unit_number": 2,
+              "title": "Parallel Algorithm Design Principles",
+              "content": "Task-based & Data-parallel decomposition, Load balancing, Parallel algorithm models, MapReduce, Parallel Merge Sort, Parallel Graph algorithms."
+            }
+          ]
+        },
+        {
+          "module_number": 2,
+          "hours": "12L+8T+0P=20 Hours",
+          "units": [
+            {
+              "unit_number": 1,
+              "title": "Introduction to Distributed Systems",
+              "content": "Distributed system models, Synchronous vs Asynchronous execution, Distributed Shared Memory, Consensus, Scalability."
+            },
+            {
+              "unit_number": 2,
+              "title": "Parallel & Distributed Frameworks",
+              "content": "CUDA overview, OpenMP, POSIX Threads, Apache Hadoop (HDFS), Apache Spark."
+            }
+          ]
+        }
+      ],
+      "practices": [
+        "Snooping cache coherence simulation in shared memory systems",
+        "Parallel bucket-sort using domain decomposition across p processes",
+        "Dynamic task mapping and speedup analysis",
+        "POSIX Threads multi-threaded programming in C",
+        "MPI message passing program for cluster computing",
+        "Hadoop MapReduce and Apache Spark job implementation"
+      ],
+      "textbooks": [
+        "George Coulouris et al., Distributed Systems: Concepts and Design, 5th Ed, Cambridge, 2012.",
+        "Andrew S. Tanenbaum & Maarten Van Steen, Distributed Systems: Principles and Paradigms, 3rd Ed, 2017."
+      ]
+    },
+    {
+      "id": "24CS403",
+      "name": "Privacy and Intrusion Detection",
+      "department": "CSE",
+      "credits": 3,
+      "ltpc": "2-2-0-3",
+      "category": "Professional core",
+      "sem": 7,
+      "description": "Intrusion detection and prevention architectures (HIDS, NIDS), anomaly and signature-based detection, Snort IDS rule authoring, multi-agent IDS, alert correlation, and data fusion for enterprise cyber defense.",
+      "prerequisite_groups": [
+        {
+          "prerequisites": [
+            {
+              "course_id": "22CS401",
+              "min_grade": "D"
+            }
+          ],
+          "logic_type": "AND"
+        }
+      ],
+      "corequisites": [],
+      "credit_categories": [
+        "PROFESSIONAL_CORE",
+        "CORE"
+      ],
+      "offered_semesters": [
+        "FALL",
+        "SPRING"
+      ],
+      "difficulty_level": 4,
+      "modules": [
+        {
+          "module_number": 1,
+          "hours": "16L+16T+0P=32 Hours",
+          "units": [
+            {
+              "unit_number": 1,
+              "title": "Introduction to Intrusion Detection",
+              "content": "Basic security concepts, Intrusions, Vulnerability sources, Attacks and Countermeasures, Classification of IDS."
+            },
+            {
+              "unit_number": 2,
+              "title": "IDS & IPS Technologies",
+              "content": "Host-based (HIDS), Network-based (NIDS), Misuse detection, Statistical & Machine Learning anomaly detection, Tiered architectures, Sensor deployment."
+            }
+          ]
+        },
+        {
+          "module_number": 2,
+          "hours": "16L+16T+0P=32 Hours",
+          "units": [
+            {
+              "unit_number": 1,
+              "title": "Multi-Agent IDS Architectures",
+              "content": "Agent functions, Manager component, Defending IDS/IPS, Case study on commercial and open-source systems."
+            },
+            {
+              "unit_number": 2,
+              "title": "Alert Management & Data Fusion",
+              "content": "Alert correlation techniques, Pre/Post-processing, Cooperative intrusion detection, Incident response."
+            }
+          ]
+        }
+      ],
+      "practices": [
+        "Installing and configuring Snort IDS on Linux",
+        "Writing custom Snort detection rules and triggering alerts",
+        "Eavesdropping prevention using SSH and GnuPG digital signatures",
+        "Setting up honeypots (KF Sensor) to monitor network attacks",
+        "Wireless network security audit with NetStumbler"
+      ],
+      "textbooks": [
+        "C. Endorf, E. Schultz, J. Mellander, Intrusion Detection & Prevention, McGraw-Hill, 2006.",
+        "Ali A. Ghorbani, Network Intrusion Detection and Prevention, Springer, 2010."
+      ]
+    },
+    {
+      "id": "22CS404",
+      "name": "Internship / Project Work",
+      "department": "CSE",
+      "credits": 12,
+      "ltpc": "0-02-22-12",
+      "category": "Project",
+      "sem": 8,
+      "description": "Full-semester corporate industry internship or intensive capstone research project culminating in a verified thesis and oral defense.",
+      "prerequisite_groups": [
+        {
+          "prerequisites": [
+            {
+              "course_id": "24CS401",
+              "min_grade": "D"
+            }
+          ],
+          "logic_type": "AND"
+        }
+      ],
+      "corequisites": [],
+      "credit_categories": [
+        "PROJECT",
+        "CAPSTONE"
+      ],
+      "offered_semesters": [
+        "FALL",
+        "SPRING"
+      ],
+      "difficulty_level": 5
+    },
+    {
+      "id": "22CS801",
+      "name": "Advanced Data Structures",
+      "department": "CSE",
+      "credits": 4,
+      "ltpc": "2-2-2-4",
+      "category": "Department Elective",
+      "sem": 5,
+      "description": "Splay trees, Red-Black trees (RBT), M-way search trees, Segment trees, Heaps, Mergeable heaps, Pattern matching (Boyer-Moore, KMP, Rabin-Karp), and Tries (Standard, Compressed, Suffix).",
+      "prerequisite_groups": [
+        {
+          "prerequisites": [
+            {
+              "course_id": "22TP201",
+              "min_grade": "D"
+            }
+          ],
+          "logic_type": "AND"
+        }
+      ],
+      "corequisites": [],
+      "credit_categories": [
+        "DEPARTMENT_ELECTIVE",
+        "ELECTIVE",
+        "LAB"
+      ],
+      "offered_semesters": [
+        "FALL",
+        "SPRING"
+      ],
+      "difficulty_level": 4,
+      "textbooks": [
+        "Mark Allen Weiss, Data Structures and Algorithm Analysis in C++, 2nd Ed, Pearson, 2004.",
+        "Cormen, Leiserson, Rivest, Stein, Introduction to Algorithms, PHI, 2004."
+      ]
+    },
+    {
+      "id": "22CS802",
+      "name": "Advanced JAVA Programming",
+      "department": "CSE",
+      "credits": 4,
+      "ltpc": "2-2-2-4",
+      "category": "Department Elective",
+      "sem": 5,
+      "description": "Enterprise Java web frameworks: Hibernate ORM architecture, JPA, HQL, Struts MVC, Spring framework (IOC, Dependency Injection, Spring MVC), and Spring Boot REST microservices.",
+      "prerequisite_groups": [
+        {
+          "prerequisites": [
+            {
+              "course_id": "24CS204",
+              "min_grade": "D"
+            }
+          ],
+          "logic_type": "AND"
+        }
+      ],
+      "corequisites": [],
+      "credit_categories": [
+        "DEPARTMENT_ELECTIVE",
+        "ELECTIVE",
+        "LAB"
+      ],
+      "offered_semesters": [
+        "FALL",
+        "SPRING"
+      ],
+      "difficulty_level": 4,
+      "textbooks": [
+        "James Keogh, Complete Reference J2EE, McGraw Hill, 2002.",
+        "Craig Walls, Spring in Action, 5th Ed, Manning, 2018."
+      ]
+    },
+    {
+      "id": "22CS803",
+      "name": "Computer Graphics",
+      "department": "CSE",
+      "credits": 4,
+      "ltpc": "2-2-2-4",
+      "category": "Department Elective",
+      "sem": 5,
+      "description": "Raster/random scan systems, Bresenham line algorithm, 2D/3D transformations, Line clipping (Cohen-Sutherland, Cyrus-Beck), Sutherland-Hodgeman polygon clipping, 3D viewing pipeline, and Visible surface detection (Z-buffer, A-buffer).",
+      "prerequisite_groups": [],
+      "corequisites": [],
+      "credit_categories": [
+        "DEPARTMENT_ELECTIVE",
+        "ELECTIVE",
+        "LAB"
+      ],
+      "offered_semesters": [
+        "FALL",
+        "SPRING"
+      ],
+      "difficulty_level": 3,
+      "textbooks": [
+        "Donald Hearn & M. Pauline Baker, Computer Graphics C Version, 2nd Ed, Pearson, 2014."
+      ]
+    },
+    {
+      "id": "22CS804",
+      "name": "Deep Learning",
+      "department": "CSE",
+      "credits": 4,
+      "ltpc": "3-0-2-4",
+      "category": "Department Elective",
+      "sem": 6,
+      "description": "Deep neural network architectures: Multi-layer perceptrons, Regularization (Dropout, Batch Norm), Optimizers (Adam, RMSProp), CNNs (LeNet, AlexNet, VGGNet, ResNet), Autoencoders, RNNs, and LSTMs for vision and NLP.",
+      "prerequisite_groups": [
+        {
+          "prerequisites": [
+            {
+              "course_id": "24CS306",
+              "min_grade": "D"
+            },
+            {
+              "course_id": "24CS102",
+              "min_grade": "D"
+            }
+          ],
+          "logic_type": "AND"
+        }
+      ],
+      "corequisites": [],
+      "credit_categories": [
+        "DEPARTMENT_ELECTIVE",
+        "ELECTIVE",
+        "LAB"
+      ],
+      "offered_semesters": [
+        "FALL",
+        "SPRING"
+      ],
+      "difficulty_level": 4,
+      "textbooks": [
+        "Ian Goodfellow, Yoshua Bengio, Aaron Courville, Deep Learning, MIT Press, 2016.",
+        "Charu C. Aggarwal, Neural Networks and Deep Learning, Springer, 2018."
+      ]
+    },
+    {
+      "id": "22CS805",
+      "name": "Digital Image Processing",
+      "department": "CSE",
+      "credits": 4,
+      "ltpc": "2-2-2-4",
+      "category": "Department Elective",
+      "sem": 6,
+      "description": "Digital image fundamentals, 2D Fourier Transform, Spatial/frequency filtering, Histogram equalization, Image segmentation, Image restoration (Wiener filter), Image compression (Huffman, LZW), and Morphological operations.",
+      "prerequisite_groups": [
+        {
+          "prerequisites": [
+            {
+              "course_id": "22ST202",
+              "min_grade": "D"
+            }
+          ],
+          "logic_type": "AND"
+        }
+      ],
+      "corequisites": [],
+      "credit_categories": [
+        "DEPARTMENT_ELECTIVE",
+        "ELECTIVE",
+        "LAB"
+      ],
+      "offered_semesters": [
+        "FALL",
+        "SPRING"
+      ],
+      "difficulty_level": 3,
+      "textbooks": [
+        "Rafael C. Gonzalez & Richard E. Woods, Digital Image Processing, 4th Ed, Pearson, 2018."
+      ]
+    },
+    {
+      "id": "22CS807",
+      "name": "Mobile Ad-hoc Networks",
+      "department": "CSE",
+      "credits": 4,
+      "ltpc": "3-0-2-4",
+      "category": "Department Elective",
+      "sem": 6,
+      "description": "Ad-hoc wireless networks, mobility models, MAC protocols (CSMA/CA, 802.11), Proactive/Reactive routing protocols (DSDV, AODV, DSR), Cross-layer design, and NS2 network simulations.",
+      "prerequisite_groups": [
+        {
+          "prerequisites": [
+            {
+              "course_id": "24CS303",
+              "min_grade": "D"
+            }
+          ],
+          "logic_type": "AND"
+        }
+      ],
+      "corequisites": [],
+      "credit_categories": [
+        "DEPARTMENT_ELECTIVE",
+        "ELECTIVE",
+        "LAB"
+      ],
+      "offered_semesters": [
+        "FALL",
+        "SPRING"
+      ],
+      "difficulty_level": 4,
+      "textbooks": [
+        "C. Siva Ram Murthy & B. S. Manoj, Ad hoc Wireless Networks Architecture and Protocols, Pearson, 2007."
+      ]
+    },
+    {
+      "id": "22CS809",
+      "name": "Text Mining",
+      "department": "CSE",
+      "credits": 4,
+      "ltpc": "3-0-2-4",
+      "category": "Department Elective",
+      "sem": 6,
+      "description": "Natural Language Processing: N-gram language models, Vector semantics, TF-IDF, Word2Vec, POS tagging with HMM, Named Entity Recognition (NER), Sentiment analysis, Transformers, and Machine Translation.",
+      "prerequisite_groups": [
+        {
+          "prerequisites": [
+            {
+              "course_id": "24CS306",
+              "min_grade": "D"
+            }
+          ],
+          "logic_type": "AND"
+        }
+      ],
+      "corequisites": [],
+      "credit_categories": [
+        "DEPARTMENT_ELECTIVE",
+        "ELECTIVE",
+        "LAB"
+      ],
+      "offered_semesters": [
+        "FALL",
+        "SPRING"
+      ],
+      "difficulty_level": 4,
+      "textbooks": [
+        "Daniel Jurafsky & James H. Martin, Speech and Language Processing, 3rd Ed, 2020."
+      ]
+    },
+    {
+      "id": "22CS810",
+      "name": "Numerical Algorithms",
+      "department": "Mathematics",
+      "credits": 4,
+      "ltpc": "3-2-0-4",
+      "category": "Department Elective",
+      "sem": 7,
+      "description": "Root finding (Bisection, Regula-Falsi, Newton-Raphson), Gauss-Seidel, Interpolation (Newton\u2019s difference, Lagrange), Numerical Differentiation and Integration (Trapezoidal, Simpson's 1/3 & 3/8), and Numerical ODE/PDE solutions.",
+      "prerequisite_groups": [
+        {
+          "prerequisites": [
+            {
+              "course_id": "24MT101",
+              "min_grade": "D"
+            }
+          ],
+          "logic_type": "AND"
+        }
+      ],
+      "corequisites": [],
+      "credit_categories": [
+        "DEPARTMENT_ELECTIVE",
+        "ELECTIVE",
+        "MATH"
+      ],
+      "offered_semesters": [
+        "FALL",
+        "SPRING"
+      ],
+      "difficulty_level": 3,
+      "textbooks": [
+        "S. S. Sastry, Introductory Methods of Numerical Analysis, 5th Ed, PHI, 2012."
+      ]
+    },
+    {
+      "id": "22CS811",
+      "name": "Operating System Design",
+      "department": "CSE",
+      "credits": 4,
+      "ltpc": "3-0-2-4",
+      "category": "Department Elective",
+      "sem": 7,
+      "description": "Advanced OS internals: MINIX 3 microkernel architecture, System calls, Inter-process communication, Deadlock handling, Memory manager implementation, and File system internals.",
+      "prerequisite_groups": [
+        {
+          "prerequisites": [
+            {
+              "course_id": "22CS207",
+              "min_grade": "D"
+            },
+            {
+              "course_id": "24CS210",
+              "min_grade": "D"
+            }
+          ],
+          "logic_type": "AND"
+        }
+      ],
+      "corequisites": [],
+      "credit_categories": [
+        "DEPARTMENT_ELECTIVE",
+        "ELECTIVE",
+        "LAB"
+      ],
+      "offered_semesters": [
+        "FALL",
+        "SPRING"
+      ],
+      "difficulty_level": 4,
+      "textbooks": [
+        "Andrew S. Tanenbaum & Albert S. Woodhull, The MINIX Book: Operating Systems Design and Implementation, 3rd Ed, Pearson, 2006."
+      ]
+    },
+    {
+      "id": "22CS813",
+      "name": "Simulation and Modeling",
+      "department": "CSE",
+      "credits": 4,
+      "ltpc": "3-0-2-4",
+      "category": "Department Elective",
+      "sem": 7,
+      "description": "Discrete-event simulation, Event-scheduling / time-advance algorithms, Statistical & queueing models (M/G/1), Pseudo-random number generation, Input modeling, and Output statistical validation.",
+      "prerequisite_groups": [
+        {
+          "prerequisites": [
+            {
+              "course_id": "22ST202",
+              "min_grade": "D"
+            }
+          ],
+          "logic_type": "AND"
+        }
+      ],
+      "corequisites": [],
+      "credit_categories": [
+        "DEPARTMENT_ELECTIVE",
+        "ELECTIVE",
+        "LAB"
+      ],
+      "offered_semesters": [
+        "FALL",
+        "SPRING"
+      ],
+      "difficulty_level": 4,
+      "textbooks": [
+        "Jerry Banks et al., Discrete-Event System Simulation, 5th Ed, Pearson, 2013."
+      ]
+    },
+    {
+      "id": "22CS814",
+      "name": "Digital Forensics",
+      "department": "CSE",
+      "credits": 4,
+      "ltpc": "3-0-2-4",
+      "category": "Department Elective",
+      "sem": 7,
+      "description": "Digital evidence collection, EnCase and Autopsy forensic tools, data acquisition, file recovery, email crime investigation, anti-forensics defense, and cyber laws.",
+      "prerequisite_groups": [
+        {
+          "prerequisites": [
+            {
+              "course_id": "24CY101",
+              "min_grade": "D"
+            },
+            {
+              "course_id": "22CS401",
+              "min_grade": "D"
+            }
+          ],
+          "logic_type": "AND"
+        }
+      ],
+      "corequisites": [],
+      "credit_categories": [
+        "DEPARTMENT_ELECTIVE",
+        "ELECTIVE",
+        "LAB"
+      ],
+      "offered_semesters": [
+        "FALL",
+        "SPRING"
+      ],
+      "difficulty_level": 4,
+      "textbooks": [
+        "Warren G. Kruse II, Computer Forensics: Incident Response Essentials, Addison Wesley.",
+        "Bill Nelson, Guide to Computer Forensics and Investigations, 6th Ed, Cengage."
+      ]
+    },
+    {
+      "id": "22CS815",
+      "name": "Intrusion Detection and Prevention System",
+      "department": "CSE",
+      "credits": 4,
+      "ltpc": "3-0-2-4",
+      "category": "Department Elective",
+      "sem": 7,
+      "description": "Advanced IDS/IPS technologies, HIDS/NIDS, signature vs anomaly detection, Snort rule engineering, agent-based architectures, and cooperative alert correlation.",
+      "prerequisite_groups": [
+        {
+          "prerequisites": [
+            {
+              "course_id": "22CS401",
+              "min_grade": "D"
+            }
+          ],
+          "logic_type": "AND"
+        }
+      ],
+      "corequisites": [],
+      "credit_categories": [
+        "DEPARTMENT_ELECTIVE",
+        "ELECTIVE",
+        "LAB"
+      ],
+      "offered_semesters": [
+        "FALL",
+        "SPRING"
+      ],
+      "difficulty_level": 4,
+      "textbooks": [
+        "C. Endorf, Intrusion Detection & Prevention, McGraw-Hill, 2006."
+      ]
+    },
+    {
+      "id": "22CS816",
+      "name": "Web and Database Security",
+      "department": "CSE",
+      "credits": 4,
+      "ltpc": "3-0-2-4",
+      "category": "Department Elective",
+      "sem": 7,
+      "description": "Web security landscape, HTTPS/SSL deployment, Authentication & session management, SQL Injection, XSS, CSRF, Database user roles, privileges, and data encryption.",
+      "prerequisite_groups": [
+        {
+          "prerequisites": [
+            {
+              "course_id": "22CS201",
+              "min_grade": "D"
+            },
+            {
+              "course_id": "22CS401",
+              "min_grade": "D"
+            }
+          ],
+          "logic_type": "AND"
+        }
+      ],
+      "corequisites": [],
+      "credit_categories": [
+        "DEPARTMENT_ELECTIVE",
+        "ELECTIVE",
+        "LAB"
+      ],
+      "offered_semesters": [
+        "FALL",
+        "SPRING"
+      ],
+      "difficulty_level": 4,
+      "textbooks": [
+        "Bing Liu, Web Data Mining, 2nd Ed, Springer, 2011.",
+        "Hassan A. Afyouni, Database Security and Auditing, 3rd Ed, Cengage, 2013."
+      ]
+    },
+    {
+      "id": "22CS951",
+      "name": "Advanced Graph Algorithms",
+      "department": "CSE",
+      "credits": 4,
+      "ltpc": "3-0-2-4",
+      "category": "Honours",
+      "sem": 4,
+      "description": "Spectral graph theory, convex geometry, gradient descent with Nesterov acceleration, Laplacian linear systems, matrix concentration, and graph sparsification.",
+      "prerequisite_groups": [
+        {
+          "prerequisites": [
+            {
+              "course_id": "24CS209",
+              "min_grade": "D"
+            },
+            {
+              "course_id": "24MT101",
+              "min_grade": "D"
+            }
+          ],
+          "logic_type": "AND"
+        }
+      ],
+      "corequisites": [],
+      "credit_categories": [
+        "HONOURS",
+        "ELECTIVE",
+        "LAB"
+      ],
+      "offered_semesters": [
+        "FALL",
+        "SPRING"
+      ],
+      "difficulty_level": 5,
+      "textbooks": [
+        "Stephen Boyd & Lieven Vandenberghe, Convex Optimization, Cambridge, 2004."
+      ]
+    },
+    {
+      "id": "22CS952",
+      "name": "Biometrics",
+      "department": "CSE",
+      "credits": 4,
+      "ltpc": "3-0-2-4",
+      "category": "Honours",
+      "sem": 5,
+      "description": "Biometric authentication systems: Fingerprint minutiae extraction, Viola-Jones face detection, Iris segmentation and encoding, and multi-modal biometric fusion at sensor/feature/score levels.",
+      "prerequisite_groups": [
+        {
+          "prerequisites": [
+            {
+              "course_id": "22ST202",
+              "min_grade": "D"
+            }
+          ],
+          "logic_type": "AND"
+        }
+      ],
+      "corequisites": [],
+      "credit_categories": [
+        "HONOURS",
+        "ELECTIVE",
+        "LAB"
+      ],
+      "offered_semesters": [
+        "FALL",
+        "SPRING"
+      ],
+      "difficulty_level": 4,
+      "textbooks": [
+        "Anil K. Jain, Arun A. Ross, Introduction to Biometrics, Springer, 2011."
+      ]
+    },
+    {
+      "id": "22CS953",
+      "name": "Parallel and Distributed Computing (Honours)",
+      "department": "CSE",
+      "credits": 4,
+      "ltpc": "3-2-0-4",
+      "category": "Honours",
+      "sem": 6,
+      "description": "Advanced parallel algorithms, MPI and OpenMP cluster programming, cache coherence, distributed consensus protocols, and big data computing architectures.",
+      "prerequisite_groups": [
+        {
+          "prerequisites": [
+            {
+              "course_id": "22CS207",
+              "min_grade": "D"
+            },
+            {
+              "course_id": "24CS303",
+              "min_grade": "D"
+            }
+          ],
+          "logic_type": "AND"
+        }
+      ],
+      "corequisites": [],
+      "credit_categories": [
+        "HONOURS",
+        "ELECTIVE"
+      ],
+      "offered_semesters": [
+        "FALL",
+        "SPRING"
+      ],
+      "difficulty_level": 5,
+      "textbooks": [
+        "George Coulouris, Distributed Systems: Concepts and Design, 5th Ed, Cambridge."
+      ]
+    },
+    {
+      "id": "22CS954",
+      "name": "Internet of Things",
+      "department": "CSE",
+      "credits": 4,
+      "ltpc": "3-0-2-4",
+      "category": "Honours",
+      "sem": 7,
+      "description": "IoT system architecture, Raspberry Pi and Arduino programming, sensors/actuators integration, NETCONF-YANG system management, MQTT/HTTP protocols, and cloud IoT platforms.",
+      "prerequisite_groups": [
+        {
+          "prerequisites": [
+            {
+              "course_id": "24CS303",
+              "min_grade": "D"
+            }
+          ],
+          "logic_type": "AND"
+        }
+      ],
+      "corequisites": [],
+      "credit_categories": [
+        "HONOURS",
+        "ELECTIVE",
+        "LAB"
+      ],
+      "offered_semesters": [
+        "FALL",
+        "SPRING"
+      ],
+      "difficulty_level": 4,
+      "textbooks": [
+        "Arshdeep Bahga & Vijay Madisetti, Internet of Things: A Hands-on Approach, 2015."
+      ]
+    },
+    {
+      "id": "22CS955",
+      "name": "Wireless Sensor Networks",
+      "department": "CSE",
+      "credits": 4,
+      "ltpc": "3-0-2-4",
+      "category": "Honours",
+      "sem": 7,
+      "description": "WSN architectures, energy-efficient MAC protocols, LEACH routing, localization (anchor-based/free), ZigBee 802.15.4 security, and sensor network programming.",
+      "prerequisite_groups": [
+        {
+          "prerequisites": [
+            {
+              "course_id": "24CS303",
+              "min_grade": "D"
+            }
+          ],
+          "logic_type": "AND"
+        }
+      ],
+      "corequisites": [],
+      "credit_categories": [
+        "HONOURS",
+        "ELECTIVE",
+        "LAB"
+      ],
+      "offered_semesters": [
+        "FALL",
+        "SPRING"
+      ],
+      "difficulty_level": 4,
+      "textbooks": [
+        "Waltenegus Dargie & Christian Poellabauer, Fundamentals of Wireless Sensor Networks, Wiley, 2010."
+      ]
+    },
+    {
+      "id": "22CS956",
+      "name": "Capstone Project (Honours)",
+      "department": "CSE",
+      "credits": 4,
+      "ltpc": "0-2-6-4",
+      "category": "Honours",
+      "sem": 8,
+      "description": "Specialized honours capstone research and development project in cutting-edge computing domains.",
+      "prerequisite_groups": [],
+      "corequisites": [],
+      "credit_categories": [
+        "HONOURS",
+        "PROJECT",
+        "CAPSTONE"
+      ],
+      "offered_semesters": [
+        "FALL",
+        "SPRING"
+      ],
+      "difficulty_level": 5
+    },
+    {
+      "id": "22CS901",
+      "name": "Introduction to Python Programming",
+      "department": "CSE",
+      "credits": 4,
+      "ltpc": "2-2-2-4",
+      "category": "Minors",
+      "sem": 4,
+      "description": "Python programming fundamentals for minor students: syntax, data structures, functions, OOP concepts, file handling, and introductory data science packages.",
+      "prerequisite_groups": [],
+      "corequisites": [],
+      "credit_categories": [
+        "MINORS",
+        "ELECTIVE",
+        "LAB"
+      ],
+      "offered_semesters": [
+        "FALL",
+        "SPRING"
+      ],
+      "difficulty_level": 2
+    },
+    {
+      "id": "22CS902",
+      "name": "OOPS through JAVA",
+      "department": "CSE",
+      "credits": 4,
+      "ltpc": "2-0-4-4",
+      "category": "Minors",
+      "sem": 4,
+      "description": "Object oriented programming through Java: classes, inheritance, interfaces, packages, exception handling, and GUI development for minor tracks.",
+      "prerequisite_groups": [],
+      "corequisites": [],
+      "credit_categories": [
+        "MINORS",
+        "ELECTIVE",
+        "LAB"
+      ],
+      "offered_semesters": [
+        "FALL",
+        "SPRING"
+      ],
+      "difficulty_level": 3
+    },
+    {
+      "id": "22CS903",
+      "name": "Database Management Systems (Minor)",
+      "department": "CSE",
+      "credits": 4,
+      "ltpc": "2-2-2-4",
+      "category": "Minors",
+      "sem": 5,
+      "description": "Database design, ER models, SQL queries, relational algebra, and database application integration.",
+      "prerequisite_groups": [],
+      "corequisites": [],
+      "credit_categories": [
+        "MINORS",
+        "ELECTIVE",
+        "LAB"
+      ],
+      "offered_semesters": [
+        "FALL",
+        "SPRING"
+      ],
+      "difficulty_level": 3
+    },
+    {
+      "id": "22CS904",
+      "name": "Web Technologies",
+      "department": "CSE",
+      "credits": 4,
+      "ltpc": "2-0-4-4",
+      "category": "Minors",
+      "sem": 5,
+      "description": "Full stack web development fundamentals: HTML5, CSS3, JavaScript, PHP/Node.js, and MySQL integration.",
+      "prerequisite_groups": [],
+      "corequisites": [],
+      "credit_categories": [
+        "MINORS",
+        "ELECTIVE",
+        "LAB"
+      ],
+      "offered_semesters": [
+        "FALL",
+        "SPRING"
+      ],
+      "difficulty_level": 3
+    },
+    {
+      "id": "22CS905",
+      "name": "Mobile Application Development",
+      "department": "CSE",
+      "credits": 4,
+      "ltpc": "2-0-4-4",
+      "category": "Minors",
+      "sem": 6,
+      "description": "Android application development: Activities, Intents, UI Layouts, Fragments, SQLite database, Firebase integration, and Google Play Store publishing.",
+      "prerequisite_groups": [
+        {
+          "prerequisites": [
+            {
+              "course_id": "24CS204",
+              "min_grade": "D"
+            }
+          ],
+          "logic_type": "AND"
+        }
+      ],
+      "corequisites": [],
+      "credit_categories": [
+        "MINORS",
+        "ELECTIVE",
+        "LAB"
+      ],
+      "offered_semesters": [
+        "FALL",
+        "SPRING"
+      ],
+      "difficulty_level": 3,
+      "textbooks": [
+        "John Horton, Android Programming for Beginners, 3rd Ed, 2021.",
+        "Wei-Meng Lee, Beginning Android Application Development, Wiley, 2012."
+      ]
+    },
+    {
+      "id": "22CS906",
+      "name": "Design and Analysis of Algorithms (Minor)",
+      "department": "CSE",
+      "credits": 4,
+      "ltpc": "2-2-2-4",
+      "category": "Minors",
+      "sem": 6,
+      "description": "Core algorithms for minor students: Divide-and-Conquer, Greedy algorithms, Dynamic Programming, and Graph Traversals.",
+      "prerequisite_groups": [
+        {
+          "prerequisites": [
+            {
+              "course_id": "22TP201",
+              "min_grade": "D"
+            }
+          ],
+          "logic_type": "AND"
+        }
+      ],
+      "corequisites": [],
+      "credit_categories": [
+        "MINORS",
+        "ELECTIVE",
+        "LAB"
+      ],
+      "offered_semesters": [
+        "FALL",
+        "SPRING"
+      ],
+      "difficulty_level": 3
+    },
+    {
+      "id": "22CS907",
+      "name": "Operating Systems and Shell Programming",
+      "department": "CSE",
+      "credits": 4,
+      "ltpc": "2-2-2-4",
+      "category": "Minors",
+      "sem": 7,
+      "description": "Operating system concepts, Linux shell scripting, process scheduling, and memory management.",
+      "prerequisite_groups": [],
+      "corequisites": [],
+      "credit_categories": [
+        "MINORS",
+        "ELECTIVE",
+        "LAB"
+      ],
+      "offered_semesters": [
+        "FALL",
+        "SPRING"
+      ],
+      "difficulty_level": 3
+    },
+    {
+      "id": "22CS908",
+      "name": "Computer Networks (Minor)",
+      "department": "CSE",
+      "credits": 4,
+      "ltpc": "3-0-2-4",
+      "category": "Minors",
+      "sem": 7,
+      "description": "Network layers, IP addressing, TCP/UDP protocols, and network configuration practices.",
+      "prerequisite_groups": [],
+      "corequisites": [],
+      "credit_categories": [
+        "MINORS",
+        "ELECTIVE",
+        "LAB"
+      ],
+      "offered_semesters": [
+        "FALL",
+        "SPRING"
+      ],
+      "difficulty_level": 3
+    },
+    {
+      "id": "22CS909",
+      "name": "Capstone Project (Minor)",
+      "department": "CSE",
+      "credits": 4,
+      "ltpc": "0-2-6-4",
+      "category": "Minors",
+      "sem": 8,
+      "description": "Minor specialisation capstone application development project.",
+      "prerequisite_groups": [],
+      "corequisites": [],
+      "credit_categories": [
+        "MINORS",
+        "PROJECT",
+        "CAPSTONE"
+      ],
+      "offered_semesters": [
+        "FALL",
+        "SPRING"
+      ],
+      "difficulty_level": 4
+    },
+    {
+      "id": "22CS851",
+      "name": "Database Systems (Open Elective)",
+      "department": "CSE",
+      "credits": 3,
+      "ltpc": "2-0-2-3",
+      "category": "Open Elective",
+      "sem": 4,
+      "description": "Relational databases, SQL queries, and database systems overview offered to non-computing branches.",
+      "prerequisite_groups": [],
+      "corequisites": [],
+      "credit_categories": [
+        "OPEN_ELECTIVE"
+      ],
+      "offered_semesters": [
+        "FALL",
+        "SPRING"
+      ],
+      "difficulty_level": 2
+    },
+    {
+      "id": "22CS852",
+      "name": "Mobile Application Design and Development (Open Elective)",
+      "department": "CSE",
+      "credits": 3,
+      "ltpc": "2-0-2-3",
+      "category": "Open Elective",
+      "sem": 5,
+      "description": "Mobile app UI/UX design, basic Android components, and app deployment for non-computing students.",
+      "prerequisite_groups": [],
+      "corequisites": [],
+      "credit_categories": [
+        "OPEN_ELECTIVE"
+      ],
+      "offered_semesters": [
+        "FALL",
+        "SPRING"
+      ],
+      "difficulty_level": 2
+    },
+    {
+      "id": "22CS853",
+      "name": "Java Programming (Open Elective)",
+      "department": "CSE",
+      "credits": 3,
+      "ltpc": "2-0-2-3",
+      "category": "Open Elective",
+      "sem": 5,
+      "description": "Core Java language, object-oriented concepts, and GUI applications for non-computing branches.",
+      "prerequisite_groups": [],
+      "corequisites": [],
+      "credit_categories": [
+        "OPEN_ELECTIVE"
+      ],
+      "offered_semesters": [
+        "FALL",
+        "SPRING"
+      ],
+      "difficulty_level": 2
+    },
+    {
+      "id": "22CS854",
+      "name": "Python Programming (Open Elective)",
+      "department": "CSE",
+      "credits": 3,
+      "ltpc": "2-0-2-3",
+      "category": "Open Elective",
+      "sem": 6,
+      "description": "Python scripting, data manipulation, automation, and visualization for non-computing branches.",
+      "prerequisite_groups": [],
+      "corequisites": [],
+      "credit_categories": [
+        "OPEN_ELECTIVE"
+      ],
+      "offered_semesters": [
+        "FALL",
+        "SPRING"
+      ],
+      "difficulty_level": 2
+    },
+    {
+      "id": "22CS855",
+      "name": "Design and Development of Internet Applications (Open Elective)",
+      "department": "CSE",
+      "credits": 3,
+      "ltpc": "2-0-2-3",
+      "category": "Open Elective",
+      "sem": 6,
+      "description": "Modern internet technologies, webpage creation, responsive layout design, and web hosting basics.",
+      "prerequisite_groups": [],
+      "corequisites": [],
+      "credit_categories": [
+        "OPEN_ELECTIVE"
+      ],
+      "offered_semesters": [
+        "FALL",
+        "SPRING"
+      ],
+      "difficulty_level": 2
+    }
+  ],
+  "equivalencies": [
+    {
+      "course_id": "24CS402",
+      "equivalent_course_id": "22CS953",
+      "notes": "Parallel & Distributed Computing (Core) equivalent to Honours version 22CS953"
+    },
+    {
+      "course_id": "24CS204",
+      "equivalent_course_id": "22CS902",
+      "notes": "OOP through Java (Core) equivalent to Minor track 22CS902"
+    },
+    {
+      "course_id": "22TP201",
+      "equivalent_course_id": "22CS801",
+      "notes": "Data Structures satisfies prerequisite bridge for Advanced Data Structures"
+    },
+    {
+      "course_id": "24CS102",
+      "equivalent_course_id": "22CS901",
+      "notes": "Problem Solving through Python equivalent to 22CS901"
+    },
+    {
+      "course_id": "24CS403",
+      "equivalent_course_id": "22CS815",
+      "notes": "Privacy & Intrusion Detection equivalent to IDPS 22CS815"
+    },
+    {
+      "course_id": "24CS207",
+      "equivalent_course_id": "22CS904",
+      "notes": "Full Stack Development (MERN) satisfies Web Technologies 22CS904"
+    }
+  ],
+  "chat_history": [],
+  "petitions": []
+}

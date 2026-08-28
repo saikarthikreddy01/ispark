@@ -24,9 +24,11 @@
       <div>
         <span class="eyebrow">04 &middot; Personalized guidance</span>
         <h1>Ask the advisor</h1>
-        <p>Get a direct answer grounded in your transcript, course graph, C24 catalog, and academic policy.</p>
+        <p>Ask a planning question and inspect the agents, formal verification, and cited academic evidence behind the answer.</p>
       </div>
     </div>
+
+    <div class="advisor-context" data-advisor-context aria-label="Active student advising context"></div>
 
     <section class="panel chat-panel" aria-label="Academic advisor chat">
       <div class="chat-head">
@@ -34,7 +36,7 @@
           <span class="eyebrow">⚡ Autonomous Agentic AI Advisor</span>
           <h2>Intelligent Academic Reasoning & Action Engine</h2>
         </div>
-        <span class="badge good">Multi-Agent Active</span>
+        <span class="badge good" data-agent-status>Ready for a question</span>
       </div>
 
       <div class="agent-capability-bar">
@@ -48,17 +50,17 @@
       <div class="chat-feed" data-output aria-live="polite">
         <article class="chat-message assistant">
           <strong>Academic AI Advisor</strong>
-          <p>Hello! I am your <strong>Autonomous Academic AI Advisor</strong>. I don't just answer questions—I can run conflict audits, construct degree pathways, analyze graduation bottlenecks, and find course substitutions for you in real-time.</p>
+          <p>Hello! I can check course eligibility, build a semester pathway, identify graduation bottlenecks, explain policy, compare substitutions, and prepare exceptional cases for faculty review. Every academic answer includes its verification status and available evidence.</p>
         </article>
       </div>
 
       <div class="agent-quick-actions" data-quick-actions>
         <span class="quick-title">Quick Actions:</span>
-        <button type="button" class="quick-chip" data-prompt="Audit 24CS209 and 24CS306 for Sem 1">⚡ Audit 24CS209 & 24CS306</button>
-        <button type="button" class="quick-chip" data-prompt="Generate my optimal 4-year degree pathway">🗺️ Generate Degree Pathway</button>
-        <button type="button" class="quick-chip" data-prompt="What courses are blocking my graduation?">🚨 Check My Bottlenecks</button>
-        <button type="button" class="quick-chip" data-prompt="Find approved substitutions for 24CS402">🔄 Substitutions for 24CS402</button>
-        <button type="button" class="quick-chip" data-prompt="What is the prerequisite waiver policy (§1.2)?">📜 Prerequisite Waiver Rules</button>
+        <button type="button" class="quick-chip" data-prompt="Can I take 24CS302 next semester? Check every prerequisite and cite the evidence.">⚡ Check 24CS302 eligibility</button>
+        <button type="button" class="quick-chip" data-prompt="Generate my semester-wise graduation pathway from my current academic term with a 16-credit limit.">🗺️ Generate my pathway</button>
+        <button type="button" class="quick-chip" data-prompt="Which remaining courses are bottlenecks, and how could they delay my graduation?">🚨 Explain bottleneck risk</button>
+        <button type="button" class="quick-chip" data-prompt="Find candidate substitutions for 24CS402 and explain which options need faculty approval.">🔄 Compare substitutions</button>
+        <button type="button" class="quick-chip" data-prompt="Explain the prerequisite waiver policy and prepare a faculty-review request if I need one.">📜 Review waiver policy</button>
       </div>
 
       <form class="chat-composer" data-form>
@@ -66,6 +68,7 @@
         <textarea id="advisor-question" name="question" rows="2" required placeholder="Ask a question or command (e.g., 'Audit 24CS209 for Sem 1' or 'Generate my pathway')..."></textarea>
         <button class="btn btn-primary" type="submit">Execute Action <span aria-hidden="true">&rarr;</span></button>
       </form>
+      <p class="advisor-disclaimer">Academic recommendations are advisory. Formal exceptions and substitutions remain subject to faculty approval.</p>
     </section>
   </main>
 
@@ -73,7 +76,7 @@
   <div id="toast"></div>
 
   <!-- Operational Lifecycle Configurations -->
-  <script src="portal.js?v=10"></script>
-  <script src="feature.js?v=10"></script>
+  <script src="portal.js?v=13"></script>
+  <script src="feature.js?v=11"></script>
 </body>
 </html>

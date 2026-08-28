@@ -23,16 +23,26 @@ class VerificationAgent:
             status = citation.get("source_status", "UNVERIFIED")
             evidence_statuses.append(status)
 
-        verified_sources = [s for s in evidence_statuses if s in {"VERIFIED", "VERIFIED_FROM_COURSE_STRUCTURE", "CURRICULUM_DERIVED"}]
+        authoritative_statuses = {"VERIFIED", "VERIFIED_FROM_COURSE_STRUCTURE", "VERIFIED_FROM_SUPPLIED_DOCUMENT"}
+        verified_sources = [s for s in evidence_statuses if s in authoritative_statuses]
+        curriculum_sources = [s for s in evidence_statuses if s == "CURRICULUM_DERIVED"]
         unknown_sources = [s for s in evidence_statuses if s in {"UNVERIFIED", "AUTHORITATIVE_RULE_REQUIRED"}]
+        formal_rule_count = sum(len(course.formal_prerequisite_groups) for course in self.kg.courses.values())
+        unknown_courses = [c for c in conflicts if c.get("type") == "UNKNOWN_COURSE"]
 
         decision = "ADVISORY_OK"
-        if blocking:
+        if state.get("query_type") == "out_of_scope":
+            decision = "OUT_OF_SCOPE"
+        elif unknown_courses:
+            decision = "INVALID_COURSE_REFERENCE"
+        elif blocking:
             decision = "BLOCKED_BY_FORMAL_CONSTRAINT"
         elif needs_faculty:
             decision = "FACULTY_REVIEW_REQUIRED"
         elif pathway_status and pathway_status != "VERIFIED":
             decision = "CANDIDATE_PLAN"
+        elif state.get("query_type") == "prerequisite" and formal_rule_count == 0:
+            decision = "READINESS_OK_FORMAL_RULE_UNAVAILABLE"
 
         return {
             "decision": decision,
@@ -40,8 +50,14 @@ class VerificationAgent:
             "readiness_warnings": warnings,
             "faculty_review_required": needs_faculty,
             "verified_evidence_count": len(verified_sources),
+            "curriculum_evidence_count": len(curriculum_sources),
             "unverified_evidence_count": len(unknown_sources),
-            "hard_rule_safety": "PASS" if not any(c.get("type") == "PREREQUISITE_KNOWLEDGE_GAP" and c.get("blocking") for c in conflicts) else "FAIL",
+            "formal_rule_count": formal_rule_count,
+            "hard_rule_safety": (
+                "FORMAL_RULES_UNAVAILABLE"
+                if state.get("query_type") == "prerequisite" and formal_rule_count == 0 and not blocking
+                else "PASS" if not any(c.get("type") == "PREREQUISITE_KNOWLEDGE_GAP" and c.get("blocking") for c in conflicts) else "FAIL"
+            ),
             "note": "LLM output cannot override this verification result."
         }
 

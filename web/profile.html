@@ -7,16 +7,17 @@
   <link rel="stylesheet" href="portal.css">
   <style>
     .profile-hero { margin-bottom: 24px; }
-    .semester-block { border: 1px solid var(--border); border-radius: 8px; padding: 16px; margin-bottom: 24px; background: #fff; }
+    .semester-block { border: 1px solid var(--border); border-radius: 8px; padding: 16px; margin-bottom: 24px; background: #fff; overflow-x: auto; }
     .semester-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
     .semester-header h3 { margin: 0; font-size: 16px; font-weight: 600; }
-    .subject-row { display: grid; grid-template-columns: 2fr 3fr 1fr 1fr auto; gap: 12px; margin-bottom: 12px; align-items: center; }
+    .subject-row { display: grid; grid-template-columns: 1.4fr 2.6fr .7fr .9fr .7fr 1.2fr auto; gap: 12px; margin-bottom: 12px; align-items: center; min-width: 980px; }
     .subject-row input { padding: 8px; border: 1px solid var(--border); border-radius: 4px; font-size: 14px; width: 100%; box-sizing: border-box; }
     .remove-btn { color: #ef4444; background: none; border: none; cursor: pointer; font-weight: 600; }
     .add-subject-btn { margin-top: 8px; font-size: 13px; color: var(--accent); background: none; border: none; cursor: pointer; font-weight: 500; }
     .add-semester-btn { display: block; width: 100%; padding: 12px; border: 1px dashed var(--border); border-radius: 8px; background: transparent; color: var(--accent); font-weight: 500; cursor: pointer; text-align: center; }
     .save-profile-btn { margin-top: 24px; width: auto; padding: 12px 24px; font-size: 16px; }
-    .header-labels { display: grid; grid-template-columns: 2fr 3fr 1fr 1fr auto; gap: 12px; margin-bottom: 8px; font-size: 12px; font-weight: 600; color: #64748b; }
+    .header-labels { display: grid; grid-template-columns: 1.4fr 2.6fr .7fr .9fr .7fr 1.2fr auto; gap: 12px; margin-bottom: 8px; font-size: 12px; font-weight: 600; color: #64748b; min-width: 980px; }
+    .profile-summary { margin-bottom: 24px; }
   </style>
 </head>
 <body data-page="profile">
@@ -39,12 +40,16 @@
       <p style="margin-top:10px;">Update your academic history to improve advisor accuracy. Add your completed subjects semester by semester.</p>
     </div>
 
+    <section id="academic-summary" class="grid grid-3 profile-summary" aria-label="Academic result summary"></section>
+
     <form id="profile-form">
       <div style="margin-bottom: 24px; padding: 16px; border: 1px solid var(--border); border-radius: 8px; background: #fff;">
         <h3 style="margin-top: 0; font-size: 16px; font-weight: 600; margin-bottom: 8px;">Career Goals</h3>
         <p style="font-size: 13px; color: #64748b; margin-bottom: 12px;">Enter your career aspirations (e.g., 'Data Scientist', 'Full Stack Developer') to get tailored elective recommendations in your degree pathway.</p>
         <input type="text" id="career-goals-input" placeholder="e.g. AI Engineer, Cybersecurity Analyst" style="width: 100%; padding: 10px; border: 1px solid var(--border); border-radius: 6px; font-size: 14px; box-sizing: border-box;">
       </div>
+
+      <p class="muted" style="margin-bottom:16px;">For mandatory subjects without letter grades or grade points, enter <strong>-</strong> as the grade and leave GPA empty.</p>
 
       <div id="semesters-container"></div>
       <button type="button" class="add-semester-btn" id="add-sem-btn">+ Add Semester</button>
@@ -56,7 +61,7 @@
   </main>
 
   <div id="toast"></div>
-  <script src="portal.js?v=10"></script>
+  <script src="portal.js?v=12"></script>
   <script>
     let studentId = null;
     let academicHistory = [];
@@ -79,6 +84,20 @@
       if (avatarEl) avatarEl.textContent = (student.name || 'S').charAt(0).toUpperCase();
 
       renderSemesters();
+      renderAcademicSummary();
+    }
+
+    function renderAcademicSummary() {
+      const courses = academicHistory.flatMap(semester => semester.courses || []);
+      const graded = courses.filter(course => course.grade !== '-' && course.gpa !== null && course.gpa !== undefined && course.gpa !== '' && Number.isFinite(Number(course.gpa)));
+      const gradedCredits = graded.reduce((total, course) => total + Number(course.credits || 0), 0);
+      const gradePoints = graded.reduce((total, course) => total + Number(course.credits || 0) * Number(course.gpa), 0);
+      const cgpa = gradedCredits ? (gradePoints / gradedCredits).toFixed(2) : '—';
+      document.getElementById('academic-summary').innerHTML = `
+        <div class="metric"><strong>${esc(cgpa)}</strong><span>credit-weighted CGPA / 10</span></div>
+        <div class="metric"><strong>${esc(gradedCredits)}</strong><span>graded credits</span></div>
+        <div class="metric"><strong>${esc(courses.length)}</strong><span>subjects across ${esc(academicHistory.length)} semesters</span></div>
+      `;
     }
 
     function renderSemesters() {
@@ -88,11 +107,17 @@
       academicHistory.forEach((sem, sIndex) => {
         const block = document.createElement('div');
         block.className = 'semester-block';
+
+        const semesterCourses = sem.courses || [];
+        const semesterGraded = semesterCourses.filter(course => course.grade !== '-' && course.gpa !== null && course.gpa !== undefined && course.gpa !== '' && Number.isFinite(Number(course.gpa)));
+        const semesterCredits = semesterGraded.reduce((total, course) => total + Number(course.credits || 0), 0);
+        const semesterPoints = semesterGraded.reduce((total, course) => total + Number(course.credits || 0) * Number(course.gpa), 0);
+        const semesterGpa = semesterCredits ? (semesterPoints / semesterCredits).toFixed(2) : '—';
         
         const header = document.createElement('div');
         header.className = 'semester-header';
         header.innerHTML = `
-          <h3><input type="text" value="${esc(sem.title || 'Year ' + (Math.floor(sIndex/2)+1) + ' Sem ' + ((sIndex%2)+1))}" onchange="updateSemTitle(${sIndex}, this.value)" style="border:none; font-weight:600; font-size:16px; width:200px; background:transparent;"></h3>
+          <h3><input type="text" value="${esc(sem.title || 'Year ' + (Math.floor(sIndex/2)+1) + ' Sem ' + ((sIndex%2)+1))}" onchange="updateSemTitle(${sIndex}, this.value)" style="border:none; font-weight:600; font-size:16px; width:210px; background:transparent;"> <span class="badge">SGPA ${esc(semesterGpa)} / 10</span></h3>
           <button type="button" class="remove-btn" onclick="removeSemester(${sIndex})">Remove Semester</button>
         `;
         block.appendChild(header);
@@ -100,25 +125,21 @@
         if (sem.courses && sem.courses.length > 0) {
           const labels = document.createElement('div');
           labels.className = 'header-labels';
-          labels.style.gridTemplateColumns = '2fr 3fr 1fr 1fr 1fr auto';
-          labels.innerHTML = `<div>Course Code</div><div>Course Name</div><div>Grade</div><div>GPA (0-10)</div><div>Credits</div><div></div>`;
+          labels.innerHTML = `<div>Course Code</div><div>Course Name</div><div>Grade</div><div>GP (0-10)</div><div>Credits</div><div>Month &amp; Year</div><div></div>`;
           block.appendChild(labels);
         }
 
         const coursesDiv = document.createElement('div');
-        (sem.courses || []).forEach((course, cIndex) => {
+        semesterCourses.forEach((course, cIndex) => {
           const row = document.createElement('div');
           row.className = 'subject-row';
-          row.style.gridTemplateColumns = '2fr 3fr 1fr 1fr 1fr auto';
-          
-          let displayGpa = course.gpa !== undefined && course.gpa !== null && course.gpa !== '' ? esc(course.gpa) + ' / 10' : '';
-          
           row.innerHTML = `
             <input type="text" placeholder="e.g. 24CS101" value="${esc(course.code || '')}" onchange="updateCourse(${sIndex}, ${cIndex}, 'code', this.value)" required>
             <input type="text" placeholder="e.g. Programming" value="${esc(course.name || '')}" onchange="updateCourse(${sIndex}, ${cIndex}, 'name', this.value)" required>
-            <input type="text" placeholder="e.g. A+" value="${esc(course.grade || '')}" onchange="updateCourse(${sIndex}, ${cIndex}, 'grade', this.value.trim().toUpperCase())" required>
-            <input type="number" step="0.01" min="0" max="10" placeholder="0.00-10.00" value="${esc(course.gpa || '')}" onchange="updateCourse(${sIndex}, ${cIndex}, 'gpa', this.value)" required title="Subject GPA / Grade Points (0-10)">
-            <input type="number" placeholder="Credits" value="${esc(course.credits || '')}" onchange="updateCourse(${sIndex}, ${cIndex}, 'credits', this.value)" required>
+            <input type="text" placeholder="A / S / -" value="${esc(course.grade || '')}" onchange="updateCourse(${sIndex}, ${cIndex}, 'grade', this.value.trim().toUpperCase())" required>
+            <input type="number" step="0.01" min="0" max="10" placeholder="— if ungraded" value="${esc(course.gpa ?? '')}" onchange="updateCourse(${sIndex}, ${cIndex}, 'gpa', this.value)" title="Subject GPA / Grade Points (0-10)">
+            <input type="number" min="0.5" step="0.5" placeholder="Credits" value="${esc(course.credits || '')}" onchange="updateCourse(${sIndex}, ${cIndex}, 'credits', this.value)" required>
+            <input type="text" placeholder="MAY-2026" value="${esc(course.month_year || '')}" onchange="updateCourse(${sIndex}, ${cIndex}, 'month_year', this.value.trim().toUpperCase())">
             <button type="button" class="remove-btn" onclick="removeCourse(${sIndex}, ${cIndex})">&times;</button>
           `;
           coursesDiv.appendChild(row);
@@ -137,27 +158,34 @@
     }
 
     window.updateSemTitle = (sIndex, val) => { academicHistory[sIndex].title = val; };
-    window.updateCourse = (sIndex, cIndex, field, val) => { academicHistory[sIndex].courses[cIndex][field] = val; };
+    window.updateCourse = (sIndex, cIndex, field, val) => {
+      academicHistory[sIndex].courses[cIndex][field] = val;
+      renderAcademicSummary();
+    };
     
     window.addSemester = () => {
       academicHistory.push({ title: `Year ${Math.floor(academicHistory.length/2)+1} Sem ${(academicHistory.length%2)+1}`, courses: [] });
       renderSemesters();
+      renderAcademicSummary();
     };
     
     window.removeSemester = (sIndex) => {
       academicHistory.splice(sIndex, 1);
       renderSemesters();
+      renderAcademicSummary();
     };
 
     window.addCourse = (sIndex) => {
       if (!academicHistory[sIndex].courses) academicHistory[sIndex].courses = [];
-      academicHistory[sIndex].courses.push({ code: '', name: '', grade: '', gpa: '', credits: '' });
+      academicHistory[sIndex].courses.push({ code: '', name: '', grade: '', gpa: '', credits: '', month_year: '' });
       renderSemesters();
+      renderAcademicSummary();
     };
 
     window.removeCourse = (sIndex, cIndex) => {
       academicHistory[sIndex].courses.splice(cIndex, 1);
       renderSemesters();
+      renderAcademicSummary();
     };
 
     document.getElementById('add-sem-btn').onclick = addSemester;

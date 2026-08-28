@@ -4,87 +4,98 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Academic Advisor | Sign in</title>
-  <link rel="stylesheet" href="index.css?v=20260825-2">
+  <meta name="description" content="AcadGraph AI is a decentralized Graph-RAG academic advisor for pathways, prerequisites, credits, risks, substitutions, and faculty-reviewed exceptions.">
+  <title>AcadGraph AI | Academic Advising Intelligence</title>
+  <link rel="stylesheet" href="index.css?v=20260828-1">
 </head>
 
-<body class="login-page">
-  <main class="login-shell">
-    <!-- 3D Holographic Visual Branding Section -->
-    <section class="login-visual" id="visual-section">
-      <!-- Interactive Constellation Canvas -->
-      <canvas id="visual-canvas" class="visual-canvas" aria-hidden="true"></canvas>
+<body class="landing-page">
+  <header class="landing-header" aria-label="Project navigation">
+    <a class="landing-brand" href="#top" aria-label="AcadGraph AI home">
+      <span class="brand-mark">AG</span>
+      <span><strong>AcadGraph AI</strong><small>Academic Intelligence Platform</small></span>
+    </a>
 
-      <!-- Ambient Glow Orbs -->
-      <div class="visual-glow glow-top" aria-hidden="true"></div>
-      <div class="visual-glow glow-bottom" aria-hidden="true"></div>
+    <nav class="landing-nav" aria-label="Explore the project">
+      <button type="button" class="landing-nav-btn" data-landing-target="features" aria-controls="features-panel" aria-selected="false">Features</button>
+      <button type="button" class="landing-nav-btn" data-landing-target="how-it-works" aria-controls="how-it-works-panel" aria-selected="false">How it works</button>
+      <a class="landing-nav-btn landing-login-btn" href="login.html">Login <span aria-hidden="true">&rarr;</span></a>
+    </nav>
+  </header>
 
-      <!-- Main Visual Content Container -->
-      <div class="visual-content">
-        <!-- Dynamic Hero Storytelling -->
-        <div class="visual-copy">
-          <span class="eyebrow" id="visual-eyebrow">AI-POWERED ACADEMIC INTELLIGENCE</span>
-          <h1 id="visual-heading">Plan your degree with <span class="text-glow">intelligence.</span></h1>
-          <p id="visual-text">Understand your degree dependencies, protect your graduation timeline, and move forward
-            with evidence &mdash; not guesswork.</p>
+  <main id="top" class="landing-main">
+    <section class="landing-hero" aria-labelledby="project-title">
+      <div class="hero-copy">
+        <span class="project-badge"><span aria-hidden="true"></span> Agentic Graph-RAG academic advising</span>
+        <p class="hero-kicker">College / Academic Intelligence / Graph AI</p>
+        <h1 id="project-title">Decentralized Graph-RAG <span>Academic Advisor</span></h1>
+        <p class="hero-summary">A student-specific advising system that reasons across curriculum rules, course dependencies, credits, academic history, and career goals—then verifies its recommendations before presenting them.</p>
+
+        <div class="hero-actions" aria-label="Project actions">
+          <button type="button" class="hero-primary" data-landing-target="features">Explore features <span aria-hidden="true">&rarr;</span></button>
+          <a class="hero-secondary hero-action-link" href="login.html">Student or faculty login</a>
         </div>
 
+        <dl class="hero-metrics" aria-label="Prototype highlights">
+          <div><dt>84</dt><dd>Courses mapped</dd></div>
+          <div><dt>12</dt><dd>Automated tests</dd></div>
+          <div><dt>Human</dt><dd>Exception approval</dd></div>
+        </dl>
+      </div>
+
+      <div class="hero-system" aria-label="Academic advisor agent network illustration">
+        <div class="system-glow" aria-hidden="true"></div>
+        <div class="system-card system-card-main"><span class="system-label">SUPERVISOR</span><strong>Academic Advisor</strong><small>Routes every request to the correct specialist</small></div>
+        <div class="system-card system-card-a"><span>01</span><strong>Graph-RAG</strong><small>Evidence retrieval</small></div>
+        <div class="system-card system-card-b"><span>02</span><strong>Constraints</strong><small>Rule verification</small></div>
+        <div class="system-card system-card-c"><span>03</span><strong>Pathway</strong><small>Semester planning</small></div>
+        <div class="system-card system-card-d"><span>04</span><strong>Faculty</strong><small>Human approval</small></div>
+        <svg class="system-lines" viewBox="0 0 600 500" aria-hidden="true"><path d="M300 250 L145 125 M300 250 L455 125 M300 250 L145 385 M300 250 L455 385" /></svg>
       </div>
     </section>
 
-    <!-- Interactive Authentication Form Panel -->
-    <section class="login-panel">
-      <div class="login-brand">
-        <span class="brand-mark">AA</span>
-        <span>Academic AI Advisor</span>
-      </div>
-
-      <!-- Tab Selection between Student and Faculty UI contexts -->
-      <div class="role-switch" role="tablist" aria-label="Select account type">
-        <button class="role-btn active" role="tab" aria-selected="true" data-role="student" type="button"><span aria-hidden="true">&#127891;</span> Student access</button>
-        <button class="role-btn" role="tab" aria-selected="false" data-role="faculty" type="button"><span aria-hidden="true">&#10003;</span> Faculty access</button>
-      </div>
-
-      <!-- Sign in / Create account mode selector (student only) -->
-      <div class="mode-switch" id="mode-switch">
-        <button class="mode-btn active" data-mode="login" type="button">Sign in</button>
-        <button class="mode-btn" data-mode="signup" type="button">Create account</button>
-      </div>
-
-      <div class="auth-card" id="auth-card">
-        <div class="form-intro">
-          <span class="eyebrow" id="form-eyebrow">Student workspace</span>
-          <h2 id="form-title">Sign in to continue</h2>
-        </div>
-
-        <form id="auth-form" class="stack" novalidate>
-          <div id="field-stack" class="stack"></div>
-
-          <div id="message" class="notice" role="alert" style="display:none;"></div>
-
-          <button class="btn btn-primary login-submit" type="submit">
-            <span id="submit-label">Sign in to Academic Advisor</span>
-            <span class="submit-icon" aria-hidden="true">&rarr;</span>
-          </button>
-        </form>
-      </div>
-
-      <div class="auth-switch" id="auth-switch">
-        <span id="switch-copy">Don't have an account?</span>
-        <button type="button" id="switch-btn" class="text-link">Create account</button>
-      </div>
-
-      <div class="login-foot" id="login-foot">
-        Student accounts are linked to your official C24 academic record.
+    <section class="landing-selector" aria-labelledby="explore-title">
+      <div><span class="section-eyebrow">Explore the prototype</span><h2 id="explore-title">Choose what you want to open</h2><p>Features and workflow open below. Login opens the separate secure access page.</p></div>
+      <div class="selector-actions" role="tablist" aria-label="Project information">
+        <button type="button" role="tab" data-landing-target="features" aria-controls="features-panel" aria-selected="false"><span>01</span> Features</button>
+        <button type="button" role="tab" data-landing-target="how-it-works" aria-controls="how-it-works-panel" aria-selected="false"><span>02</span> How it works</button>
+        <a class="selector-login-link" href="login.html"><span>03</span> Login <strong aria-hidden="true">&rarr;</strong></a>
       </div>
     </section>
+
+    <div id="landing-content" class="landing-content" aria-live="polite">
+      <section id="features-panel" class="landing-info-panel" data-landing-panel="features" tabindex="-1" hidden>
+        <div class="panel-heading"><span class="section-eyebrow">Core capabilities</span><h2>Everything required for an explainable academic pathway</h2><p>The prototype combines graph intelligence, deterministic validation, and human governance.</p></div>
+        <div class="feature-grid">
+          <article><span class="feature-number">01</span><h3>Knowledge graph</h3><p>Connects courses, prerequisite knowledge, credits, departments, electives, and curriculum relationships.</p></article>
+          <article><span class="feature-number">02</span><h3>Graph-RAG retrieval</h3><p>Retrieves relevant course and policy evidence with source status and traceable citations.</p></article>
+          <article><span class="feature-number">03</span><h3>Personalized pathways</h3><p>Uses the student’s completed subjects and current semester to build a candidate semester-wise plan.</p></article>
+          <article><span class="feature-number">04</span><h3>Conflict detection</h3><p>Finds completed-course conflicts, readiness gaps, unknown course codes, and sourced formal constraints.</p></article>
+          <article><span class="feature-number">05</span><h3>Risk and bottlenecks</h3><p>Highlights high-impact remaining courses and explains the factors affecting planning risk.</p></article>
+          <article><span class="feature-number">06</span><h3>Career alignment</h3><p>Matches remaining curriculum choices to AI, backend, cybersecurity, and data career skills.</p></article>
+          <article><span class="feature-number">07</span><h3>Course substitutions</h3><p>Suggests candidate alternatives while separating recommendations from approved equivalencies.</p></article>
+          <article><span class="feature-number">08</span><h3>Faculty governance</h3><p>Creates an evidence packet for waiver and substitution cases without automatically approving exceptions.</p></article>
+        </div>
+      </section>
+
+      <section id="how-it-works-panel" class="landing-info-panel" data-landing-panel="how-it-works" tabindex="-1" hidden>
+        <div class="panel-heading"><span class="section-eyebrow">Agent workflow</span><h2>From a student question to verified advice</h2><p>Every response follows a visible, source-aware reasoning pipeline.</p></div>
+        <ol class="workflow-list">
+          <li><span>01</span><div><h3>Understand the student</h3><p>The Profile Agent reads subjects, grades, 0–10 GPA values, earned credits, career goals, and current semester.</p></div><strong>PROFILE</strong></li>
+          <li><span>02</span><div><h3>Route the request</h3><p>The Supervisor identifies whether the request concerns prerequisites, pathways, risks, careers, substitutions, policies, or waivers.</p></div><strong>ROUTE</strong></li>
+          <li><span>03</span><div><h3>Retrieve graph evidence</h3><p>Graph-RAG combines curriculum relationships with relevant course descriptions and policy sections.</p></div><strong>RETRIEVE</strong></li>
+          <li><span>04</span><div><h3>Run the specialist agent</h3><p>The selected deterministic agent calculates conflicts, pathways, bottlenecks, career alignment, or substitution candidates.</p></div><strong>ANALYZE</strong></li>
+          <li><span>05</span><div><h3>Verify formal constraints</h3><p>The verification layer prevents advisory prerequisite knowledge from being presented as an official registration block.</p></div><strong>VERIFY</strong></li>
+          <li><span>06</span><div><h3>Explain, cite, or escalate</h3><p>The advisor returns traceable advice, while exceptional waiver or substitution cases are prepared for faculty review.</p></div><strong>RESPOND</strong></li>
+        </ol>
+      </section>
+
+    </div>
   </main>
 
-  <!-- Interactive 3D Graph Model Script -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-  <script src="visual.js"></script>
+  <footer class="landing-footer"><strong>AcadGraph AI</strong><span>Explainable academic intelligence with deterministic verification and human approval.</span></footer>
 
-  <script src="auth.js?v=20260825-2"></script>
+  <script src="landing.js?v=20260828-2"></script>
 </body>
 
 </html>

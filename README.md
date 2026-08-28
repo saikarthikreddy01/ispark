@@ -10,6 +10,18 @@ The prototype is built around the supplied VFSTR CSE C24/R22-aligned course-stru
 
 An LLM is never treated as the authority for whether a student may register, substitute a course, or graduate.
 
+## Student academic profile
+
+The demo profile for student `241FA04077` contains the verified academic record supplied for four completed semesters:
+
+- 35 subject records: subject code, name, credits, letter grade, grade points, and result month/year;
+- 27 graded subjects and 8 mandatory non-graded subjects;
+- 85 graded credits and a credit-weighted CGPA of `7.83 / 10`;
+- semester-wise SGPA calculated from graded subjects only;
+- support for `S` grades and `-` for subjects without grade points.
+
+The same profile structure remains editable for other students. Saving a profile recalculates CGPA, normalizes course codes and grades, and updates the completed-course set used by pathway and prerequisite checks.
+
 ## Academic-integrity model
 
 The project deliberately distinguishes two relationship types:
@@ -195,13 +207,47 @@ Install and run:
 
 ```bash
 pip install -r requirements.txt
-python -m uvicorn backend.server:app --host 0.0.0.0 --port 8000 --reload
+python -m uvicorn backend.app:app --host 0.0.0.0 --port 8000 --reload
 ```
 
 Then open:
 
 - Web app: `http://localhost:8000`
 - Swagger: `http://localhost:8000/docs`
+
+The opening page presents the **AcadGraph AI** project name and three clickable
+choices:
+
+- **Features** opens the complete prototype capability list.
+- **How it works** opens the six-stage agent and verification workflow.
+- **Login** opens the separate `login.html` authentication page.
+
+After authentication:
+
+- Student accounts open `home.html`, the personalized advising dashboard.
+- Faculty accounts open `governance.html`, the exception-review workspace.
+
+The **Degree Pathway** screen now supports configurable 14/16/18-credit loads,
+target-graduation input, credit-progress metrics, prerequisite-safe term cards,
+constraint status, and unscheduled-course warnings. The **AI Advisor** displays
+the active student context, request type, formal verification decision, detected
+academic signals, citation evidence, faculty-review requirements, and the full
+multi-agent execution trace.
+
+Run the agent regression suite:
+
+```bash
+python -m unittest discover -s tests -v
+```
+
+The suite contains 16 checks covering the agent workflow, student transcript,
+10-point GPA/grades, pathways, bottlenecks, substitutions, faculty escalation,
+citations, landing/login routing, and the enhanced advising UI.
+
+If no OpenAI or Gemini API key is configured, the deterministic Graph-RAG,
+constraint, pathway, risk, substitution, citation, and faculty-escalation
+agents still run. The API reports `workflow_mode` so the UI does not claim
+LangGraph execution when the deterministic fallback is active.
 
 ## Docker
 

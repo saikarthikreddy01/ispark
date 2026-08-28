@@ -212,41 +212,63 @@ def update_student_profile(student_id: str, request: StudentProfileUpdateRequest
     total_credits = 0
     completed_courses = []
     
-    ALLOWED_GRADES = {"O", "A+", "A", "B+", "B", "C", "P", "F"}
+    ALLOWED_GRADES = {"O", "S", "A+", "A", "B+", "B", "C", "P", "F", "-"}
+    NON_GRADED_GRADES = {"-"}
     
     for semester in request.academic_history:
         for course in semester.get("courses", []):
+            code = str(course.get("code") or course.get("course_id") or "").strip().upper()
+            name = str(course.get("name") or "").strip()
+            raw_grade = str(course.get("grade") or "").strip().upper()
+
+            if not code or not name:
+                raise HTTPException(status_code=400, detail="Every subject requires a code and name")
+            if not raw_grade:
+                raise HTTPException(status_code=400, detail="Grade is required and cannot be empty")
+            if raw_grade not in ALLOWED_GRADES:
+                raise HTTPException(
+                    status_code=400,
+                    detail=f"Invalid grade: {raw_grade}. Allowed: O, S, A+, A, B+, B, C, P, F, -"
+                )
+
             try:
                 credits = float(course.get("credits", 0))
-                gpa = float(course.get("gpa", 0))
-                
-                # Validation: Reject <0 or >10
+            except (TypeError, ValueError):
+                raise HTTPException(status_code=400, detail=f"Invalid credit value for {code}")
+            if credits <= 0:
+                raise HTTPException(status_code=400, detail=f"Credits must be positive for {code}")
+
+            if raw_grade in NON_GRADED_GRADES:
+                gpa = None
+            else:
+                raw_gpa = course.get("gpa")
+                if raw_gpa in (None, "", "-"):
+                    raise HTTPException(status_code=400, detail=f"Grade points are required for {code}")
+                try:
+                    gpa = float(raw_gpa)
+                except (TypeError, ValueError):
+                    raise HTTPException(status_code=400, detail=f"Invalid GPA for {code}")
                 if gpa < 0 or gpa > 10:
                     raise HTTPException(status_code=400, detail="GPA must be between 0.0 and 10.0")
-                
-                # Validation: Grade required, non-empty, allowed values
-                raw_grade = course.get("grade", "")
-                if not raw_grade or not raw_grade.strip():
-                    raise HTTPException(status_code=400, detail="Grade is required and cannot be empty")
-                
-                grade = raw_grade.strip().upper()
-                if grade not in ALLOWED_GRADES:
-                    raise HTTPException(status_code=400, detail=f"Invalid grade: {grade}. Allowed: O, A+, A, B+, B, C, P, F")
-                
-                course["grade"] = grade # Trimmed and uppercased
-                
-                total_credits += int(credits)
+                total_credits += credits
                 total_points += credits * gpa
-                if course.get("code"):
-                    completed_courses.append(course.get("code"))
-            except ValueError:
-                continue
+
+            course["code"] = code
+            course["name"] = name
+            course["grade"] = raw_grade
+            course["gpa"] = round(gpa, 2) if gpa is not None else None
+            course["credits"] = int(credits) if credits.is_integer() else credits
+            course["month_year"] = str(course.get("month_year") or "").strip().upper()
+
+            if raw_grade != "F" and code not in completed_courses:
+                completed_courses.append(code)
                 
     new_gpa = round(total_points / total_credits, 2) if total_credits > 0 else student.get("gpa", 0)
     
     update_data = {
         "academic_history": request.academic_history,
         "gpa": new_gpa,
+        "gpa_scale": 10,
         "completed": completed_courses
     }
     
@@ -399,19 +421,39 @@ def advisor_chat(req: ChatRequest):
         result = _advisor_instance.chat_sync(req.question, student=student)
         
         reply = result.get("response", "I could not generate a response.")
-        citations = result.get("citations", [])
+        citation_details = result.get("citations", []) or []
+        citations = [
+            f"{c.get('reference', 'Academic source')} · {c.get('source_status', 'UNVERIFIED')}"
+            if isinstance(c, dict) else str(c)
+            for c in citation_details
+        ]
         tool = result.get("query_type", "general")
         
         # Log to DB
         db_manager.save_chat_log(
             req.student_id, req.question, reply, 
-            [c.get("reference") if isinstance(c, dict) else c for c in citations]
+            citations
         )
 
         return {
             "reply": reply,
             "citations": citations,
-            "tool_executed": tool
+            "citation_details": citation_details,
+            "citation_quality": result.get("citation_quality"),
+            "conflicts": result.get("conflicts", []),
+            "pathway": result.get("pathway"),
+            "risk": result.get("risk"),
+            "career_alignment": result.get("career_alignment"),
+            "verification": result.get("verification"),
+            "faculty_packet": result.get("faculty_packet"),
+            "needs_faculty_approval": result.get("needs_faculty_approval", False),
+            "substitutions": result.get("substitutions", []),
+            "query_type": tool,
+            "source_plan": result.get("source_plan"),
+            "agent_trace": result.get("agent_trace", []),
+            "errors": result.get("errors", []),
+            "workflow_mode": result.get("workflow_mode"),
+            "tool_executed": result.get("workflow_mode", tool),
         }
     except Exception as e:
         print(f"[ERROR] Graph-RAG failure: {e}")
@@ -558,14 +600,37 @@ def generate_degree_pathway(req: PathwayGenerateRequest):
     student["planned"] = all_planned
     db_manager.create_student(student)
 
+    completed_credits = sum(
+        int(course_map[cid].get("credits", 0) or 0)
+        for cid in completed
+        if cid in course_map
+    )
+    degree_credits_required = int(req_file.get("total_credits_required", 160) or 160)
+    planned_credits = sum(s["total_credits"] for s in semesters)
+    progress_percent = min(
+        100,
+        round((completed_credits / degree_credits_required) * 100)
+    ) if degree_credits_required else 0
+    plan_complete = len(to_schedule) == 0
+
     return {
-        "success": len(to_schedule) == 0,
+        "success": plan_complete,
         "student_id": student["id"],
         "pathway": semesters,
         "total_semesters": len(semesters),
-        "total_planned_credits": sum(s["total_credits"] for s in semesters),
+        "total_planned_credits": planned_credits,
+        "completed_credits": completed_credits,
+        "degree_credits_required": degree_credits_required,
+        "degree_progress_percent": progress_percent,
+        "projected_credits": completed_credits + planned_credits,
         "target_graduation": req.target_graduation,
-        "unscheduled_courses": to_schedule
+        "unscheduled_courses": to_schedule,
+        "plan_status": "VERIFIED_CANDIDATE" if plan_complete else "REVIEW_REQUIRED",
+        "constraints_checked": [
+            "prerequisite sequence",
+            "semester offering",
+            f"maximum {req.max_credits_per_semester}-credit load",
+        ],
     }
 
 # --- 5. FORMAL CONSTRAINT CONFLICT AUDITOR ---
@@ -655,13 +720,13 @@ def verify_schedule_constraints(req: AuditRequest):
                     achieved_grade = None
                     for sem in student.get("academic_history", []):
                         for c_hist in sem.get("courses", []):
-                            if c_hist.get("course_id") == pid:
+                            if (c_hist.get("course_id") or c_hist.get("code")) == pid:
                                 achieved_grade = c_hist.get("grade")
                                 break
                     
                     if achieved_grade and min_g:
                         # Simple grade comparison (A, B, C, D, E, F)
-                        grade_rank = {"O": 10, "S": 9, "A": 8, "B": 7, "C": 6, "D": 5, "E": 4, "F": 0, "P": 5}
+                        grade_rank = {"O": 10, "S": 9, "A+": 8.5, "A": 8, "B+": 7.5, "B": 7, "C": 6, "D": 5, "E": 4, "P": 5, "F": 0}
                         if grade_rank.get(achieved_grade, 0) >= grade_rank.get(min_g, 0):
                             group_satisfied = True
                             break

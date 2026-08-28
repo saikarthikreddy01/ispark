@@ -17,7 +17,8 @@ class CitationAgent:
         quality = {
             "total": len(cleaned),
             "curriculum_derived": sum(1 for c in cleaned if c.get("source_status") == "CURRICULUM_DERIVED"),
-            "verified": sum(1 for c in cleaned if c.get("source_status") in {"VERIFIED", "VERIFIED_FROM_COURSE_STRUCTURE"}),
+            "verified": sum(1 for c in cleaned if c.get("source_status") in {"VERIFIED", "VERIFIED_FROM_COURSE_STRUCTURE", "VERIFIED_FROM_SUPPLIED_DOCUMENT"}),
             "unverified": sum(1 for c in cleaned if c.get("source_status") in {"UNVERIFIED", "AUTHORITATIVE_RULE_REQUIRED"}),
+            "other": sum(1 for c in cleaned if c.get("source_status") not in {"CURRICULUM_DERIVED", "VERIFIED", "VERIFIED_FROM_COURSE_STRUCTURE", "VERIFIED_FROM_SUPPLIED_DOCUMENT", "UNVERIFIED", "AUTHORITATIVE_RULE_REQUIRED"}),
         }
         return {"citations": cleaned, "citation_quality": quality}

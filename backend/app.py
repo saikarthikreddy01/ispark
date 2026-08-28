@@ -90,15 +90,21 @@ def advisor_chat(req: ChatRequest):
         "reply": reply,
         "citations": citation_labels,
         "citation_details": citation_details,
+        "citation_quality": result.get("citation_quality"),
         "conflicts": result.get("conflicts", []),
         "pathway": result.get("pathway"),
         "risk": result.get("risk"),
         "career_alignment": result.get("career_alignment"),
         "verification": result.get("verification"),
         "faculty_packet": result.get("faculty_packet"),
+        "needs_faculty_approval": result.get("needs_faculty_approval", False),
+        "substitutions": result.get("substitutions", []),
+        "query_type": result.get("query_type"),
         "source_plan": result.get("source_plan"),
         "agent_trace": result.get("agent_trace", []),
-        "tool_executed": "LangGraph academic-advisor workflow",
+        "errors": result.get("errors", []),
+        "workflow_mode": result.get("workflow_mode"),
+        "tool_executed": result.get("workflow_mode", "ACADEMIC_ADVISOR"),
     }
 
 

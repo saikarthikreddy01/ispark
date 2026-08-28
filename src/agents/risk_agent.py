@@ -12,6 +12,16 @@ class RiskAgent:
 
     def _completed_ids(self, student) -> set[str]:
         if isinstance(student, dict):
+            history = student.get("academic_history", []) or []
+            from_history = set()
+            for semester in history:
+                for item in semester.get("courses", []) if isinstance(semester, dict) else []:
+                    cid = item.get("course_id") or item.get("code") or item.get("id")
+                    grade = str(item.get("grade", "A")).strip().upper()
+                    if cid and grade not in {"F", "W", "I"}:
+                        from_history.add(cid)
+            if from_history:
+                return from_history
             raw = student.get("completed", student.get("completed_courses", []))
             ids = set()
             for item in raw:
