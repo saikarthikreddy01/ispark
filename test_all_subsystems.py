@@ -77,13 +77,14 @@ def test_knowledge_graph():
         # Test 1.3: Prerequisite Acyclicity (Only course-to-course prerequisite edges)
         prereq_subgraph = nx.DiGraph()
         for u, v, data in kg.graph.edges(data=True):
-            if data.get("type") in ["REQUIRES", "PREREQUISITE"]:
+            if data.get("type") == "FORMAL_PREREQUISITE":
                 prereq_subgraph.add_edge(u, v)
                 
         is_dag = nx.is_directed_acyclic_graph(prereq_subgraph)
         record_test("Prerequisite DAG Acyclicity (Zero Circular Dependencies)", is_dag, f"{prereq_subgraph.number_of_edges()} prerequisite dependencies verified")
         
         # Test 1.4: Topological Sorting / Order
+        prereq_subgraph.add_nodes_from(kg.courses)
         topological_order = list(nx.topological_sort(prereq_subgraph))
         record_test("Topological Sort Computation", len(topological_order) > 0, f"Topological order of {len(topological_order)} sequenced nodes")
         

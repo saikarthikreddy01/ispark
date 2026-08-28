@@ -86,11 +86,13 @@ class ScheduleAnalyzer:
             "remaining_required_courses": remaining,
             "remaining_required_course_credits": remaining_credits,
             "earliest_candidate_semesters": earliest_semesters,
+            "semesters_remaining": earliest_semesters,
             "formal_dependency_floor": dependency_floor,
             "credit_packing_floor": credit_packing_floor,
             "bottleneck_courses": bottlenecks,
             "credit_target_status": credit_target_status,
             "can_graduate_on_time": None,
+            "risk_score": None,
             "reason": (
                 "A yes/no on-time graduation claim is withheld because the supplied source set does not verify all graduation, offering, and credit-load rules."
             ),

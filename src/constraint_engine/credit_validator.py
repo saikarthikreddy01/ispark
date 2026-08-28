@@ -56,11 +56,18 @@ class CreditValidator:
         )
 
     def is_overload_semester(self, credit_count: int, student=None) -> bool:
-        """Only enforce a load cap when a verified policy exists."""
+        """Check a verified cap or a student's own planning limit.
+
+        A student-specific limit is advisory and does not upgrade an
+        unverified institutional policy into an official rule.
+        """
         policy = self.degree_req.get("semester_credit_policy", {})
-        if policy.get("status") != "VERIFIED":
-            return False
-        limit = policy.get("max_credits")
+        limit = policy.get("max_credits") if policy.get("status") == "VERIFIED" else None
+        if limit is None and student is not None:
+            if isinstance(student, dict):
+                limit = student.get("max_credits_per_semester")
+            else:
+                limit = getattr(student, "max_credits_per_semester", None)
         return isinstance(limit, int) and credit_count > limit
 
     def get_remaining_requirements(self, completed_ids: set[str]) -> dict:
