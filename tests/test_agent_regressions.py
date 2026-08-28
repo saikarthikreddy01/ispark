@@ -74,6 +74,23 @@ class AcademicAdvisorRegressionTests(unittest.TestCase):
         self.assertEqual(result["verification"]["decision"], "OUT_OF_SCOPE")
         self.assertEqual(result["citations"], [])
 
+    def test_normal_greeting_gets_a_conversational_reply(self):
+        result = self.advisor.chat_sync("Hello, how are you?", self.student)
+        self.assertEqual(result["query_type"], "conversation")
+        self.assertEqual(result["verification"]["decision"], "CONVERSATIONAL_RESPONSE")
+        self.assertIn("ready to help", result["response"].lower())
+        self.assertEqual(result["citations"], [])
+
+    def test_capability_question_gets_a_helpful_reply(self):
+        result = self.advisor.chat_sync("What can you do?", self.student)
+        self.assertEqual(result["query_type"], "conversation")
+        self.assertIn("degree pathway", result["response"].lower())
+
+    def test_vague_study_question_routes_to_pathway(self):
+        result = self.advisor.chat_sync("What should I study next?", self.student)
+        self.assertEqual(result["query_type"], "pathway")
+        self.assertIsNotNone(result["pathway"])
+
     def test_policy_citations_preserve_verified_status(self):
         result = self.advisor.chat_sync("Can I take 24CS302 Artificial Intelligence?", self.student)
         statuses = {citation["source_status"] for citation in result["citations"]}

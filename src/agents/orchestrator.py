@@ -115,7 +115,20 @@ class AcademicAdvisor:
             return "policy"
         if any(k in q for k in ["prereq", "prerequisite", "require", "eligible", "can i take", "enroll", "register"]):
             return "prerequisite"
-        academic_terms = ["academic", "course", "subject", "credit", "semester", "grade", "gpa", "cgpa", "degree", "curriculum", "faculty", "college"]
+        if any(k in q for k in ["what should i study", "what should i take next", "what do i study next", "next course", "next subject"]):
+            return "pathway"
+        conversation_terms = [
+            "hello", "hi", "hey", "good morning", "good afternoon", "good evening",
+            "how are you", "thank you", "thanks", "who are you", "what can you do",
+            "help me", "can you help", "how can you help",
+        ]
+        if any(term in q for term in conversation_terms):
+            return "conversation"
+        academic_terms = [
+            "academic", "course", "class", "subject", "study", "credit", "semester",
+            "grade", "marks", "result", "gpa", "cgpa", "degree", "curriculum",
+            "faculty", "college",
+        ]
         if not any(k in q for k in academic_terms):
             return "out_of_scope"
         return "general"
@@ -248,7 +261,8 @@ class AcademicAdvisor:
         graph.add_edge("source_router", "retrieve")
         graph.add_conditional_edges("retrieve", self._route_after_retrieval, {
             "prerequisite": "conflicts", "pathway": "pathway", "risk": "risk",
-            "substitution": "substitution", "career": "career", "policy": "verify", "general": "conflicts", "out_of_scope": "verify",
+            "substitution": "substitution", "career": "career", "policy": "verify", "general": "conflicts",
+            "conversation": "verify", "out_of_scope": "verify",
             "waiver": "waiver",
         })
         graph.add_edge("pathway", "risk")
@@ -273,6 +287,9 @@ class AcademicAdvisor:
         )
 
     def _synthesize(self, state: AdvisorState) -> str:
+        if state.get("query_type") == "conversation":
+            return self._conversational_response(state)
+
         verification = state.get("verification") or {}
         evidence = state.get("retrieved_context", "")
         prompt = f"""You are only the explanation layer of an agentic academic advising system.
@@ -318,11 +335,50 @@ Answer directly. Clearly label FORMAL BLOCK, READINESS WARNING, ADVISORY RECOMME
                 pass
         return self._deterministic_response(state)
 
+    def _conversational_response(self, state: AdvisorState) -> str:
+        """Reply naturally to common chat without inventing academic rules."""
+        query = " ".join(str(state.get("query", "")).lower().split())
+        profile = state.get("student_profile") or {}
+        full_name = str(profile.get("name") or "").strip()
+        first_name = full_name.split()[0] if full_name else "there"
+
+        if "thank" in query:
+            return (
+                f"You’re welcome, {first_name}! Ask me anytime about your subjects, grades, "
+                "prerequisites, degree pathway, graduation risk, or career goal."
+            )
+        if "how are you" in query:
+            return (
+                f"I’m ready to help, {first_name}. You can type normally—for example, "
+                "‘What should I study next?’, ‘Explain my grades’, or ‘Can I take 24CS302?’"
+            )
+        if "who are you" in query:
+            return (
+                "I’m AcadGraph AI, your academic advising assistant. I use your student profile, "
+                "the course graph, curriculum evidence, and formal constraint checks to give "
+                "personalized guidance."
+            )
+        if any(term in query for term in ["what can you do", "help me", "can you help", "how can you help"]):
+            return (
+                "Yes—I can explain your grades, check prerequisites, generate a semester-wise "
+                "degree pathway, identify bottlenecks and graduation risk, recommend candidate "
+                "substitutions, and prepare exceptional cases for faculty review. Just type your "
+                "question in normal language."
+            )
+        return (
+            f"Hello, {first_name}! I’m ready to help with your academic planning. You can type a "
+            "normal question such as ‘What should I study next?’ or ‘Explain my current grades.’"
+        )
+
     def _deterministic_response(self, state: AdvisorState) -> str:
         lines = ["### Academic advising result"]
         verification = state.get("verification") or {}
         if verification.get("decision") == "OUT_OF_SCOPE":
-            return "I can help with curriculum courses, prerequisites, credits, semester pathways, graduation risks, substitutions, career alignment, and faculty-review requests."
+            return (
+                "I’m focused on academic advising, so I may not be the right assistant for that topic. "
+                "You can ask me in normal language about your subjects, grades, prerequisites, credits, "
+                "semester pathway, graduation risk, substitutions, or career plan."
+            )
         lines.append(f"\n**Verification:** {verification.get('decision', 'ADVISORY_OK')}")
         blocking = verification.get("blocking_conflicts", [])
         warnings = verification.get("readiness_warnings", [])
