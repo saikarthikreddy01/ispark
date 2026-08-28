@@ -207,16 +207,34 @@ def update_student_profile(student_id: str, request: StudentProfileUpdateRequest
     if not student:
         raise HTTPException(status_code=404, detail="Student not found")
     
-    # Calculate GPA and completed credits based on academic history
+    # Validation variables
     total_points = 0.0
     total_credits = 0
     completed_courses = []
+    
+    ALLOWED_GRADES = {"O", "A+", "A", "B+", "B", "C", "P", "F"}
     
     for semester in request.academic_history:
         for course in semester.get("courses", []):
             try:
                 credits = float(course.get("credits", 0))
                 gpa = float(course.get("gpa", 0))
+                
+                # Validation: Reject <0 or >10
+                if gpa < 0 or gpa > 10:
+                    raise HTTPException(status_code=400, detail="GPA must be between 0.0 and 10.0")
+                
+                # Validation: Grade required, non-empty, allowed values
+                raw_grade = course.get("grade", "")
+                if not raw_grade or not raw_grade.strip():
+                    raise HTTPException(status_code=400, detail="Grade is required and cannot be empty")
+                
+                grade = raw_grade.strip().upper()
+                if grade not in ALLOWED_GRADES:
+                    raise HTTPException(status_code=400, detail=f"Invalid grade: {grade}. Allowed: O, A+, A, B+, B, C, P, F")
+                
+                course["grade"] = grade # Trimmed and uppercased
+                
                 total_credits += int(credits)
                 total_points += credits * gpa
                 if course.get("code"):
@@ -234,7 +252,7 @@ def update_student_profile(student_id: str, request: StudentProfileUpdateRequest
     
     if request.career_goals is not None:
         update_data["career_goals"] = request.career_goals
-    
+        
     updated = db_manager.update_student(student_id, update_data)
     if not updated:
         raise HTTPException(status_code=500, detail="Failed to update profile")

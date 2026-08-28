@@ -132,7 +132,8 @@ The deterministic constraint engine checks:
 - corequisites;
 - semester availability metadata;
 - prerequisite-knowledge/readiness gaps as warnings;
-- source-aware credit requirements.
+- source-aware credit requirements;
+- **Subject GPA must use a 0.00–10.00 scale and a valid Grade (O, A+, A, B+, B, C, P, F) is required.**
 
 If an official credit minimum or semester cap is not verified by the currently loaded source set, the engine does not fabricate a blocking rule.
 
