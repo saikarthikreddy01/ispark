@@ -5,17 +5,9 @@ class CitationAgent:
     """Deduplicate citations and expose evidence quality for final synthesis."""
 
     def process(self, state: AdvisorState) -> AdvisorState:
-        # Greetings and unrelated chat require no academic evidence. Suppressing
-        # lexical retrieval results here prevents a friendly reply from showing
-        # an unrelated curriculum citation.
-        source_citations = (
-            []
-            if state.get("query_type") in {"conversation", "out_of_scope"}
-            else state.get("citations", [])
-        )
         seen = set()
         cleaned = []
-        for cite in source_citations:
+        for cite in state.get("citations", []):
             key = (cite.get("reference"), cite.get("source_status"), cite.get("content"))
             if key in seen:
                 continue

@@ -247,24 +247,140 @@ async function pathway(student) {
   if (form?.elements.target_graduation) form.elements.target_graduation.value = student?.expected_grad || 'May 2028';
 
   async function generatePlan() {
+    const startSemester = form?.elements.start_semester?.value || 'AUTO';
+    const electiveTrack = form?.elements.elective_track?.value || 'GENERAL';
+    const pacingStrategy = form?.elements.pacing_strategy?.value || 'BALANCED';
     const maxCredits = Number(form?.elements.max_credits?.value || 16);
     const targetGraduation = form?.elements.target_graduation?.value.trim() || student?.expected_grad || 'May 2028';
     const submit = form?.querySelector('button[type="submit"]');
     if (submit) submit.disabled = true;
-    if (out) out.innerHTML = '<div class="empty pathway-loading">Building the prerequisite-safe semester sequence&hellip;</div>';
+    if (out) out.innerHTML = '<div class="empty pathway-loading">Building the semester-aware, prerequisite-safe degree pathway&hellip;</div>';
     if (planStatus) planStatus.innerHTML = '';
 
     try {
-      const data = await api('/api/pathway/generate', { method:'POST', body:JSON.stringify({ student_id:studentId, max_credits_per_semester:maxCredits, target_graduation:targetGraduation }) });
+      const data = await api('/api/pathway/generate', {
+        method: 'POST',
+        body: JSON.stringify({
+          student_id: studentId,
+          max_credits_per_semester: maxCredits,
+          target_graduation: targetGraduation,
+          start_semester: startSemester,
+          elective_track: electiveTrack,
+          pacing_strategy: pacingStrategy
+        })
+      });
+
       const progress = Number(data.degree_progress_percent || 0);
-      if (summaryNode) summaryNode.innerHTML = `<div class="grid grid-3 pathway-metrics"><div class="metric"><strong>${esc(progress)}%</strong><span>degree credits completed</span></div><div class="metric"><strong>${esc(data.total_planned_credits || 0)}</strong><span>remaining planned credits</span></div><div class="metric"><strong>${esc(data.total_semesters || 0)}</strong><span>future terms generated</span></div></div><div class="degree-progress"><span style="width:${Math.min(100, Math.max(0, progress))}%"></span></div><p class="pathway-credit-label">${esc(data.completed_credits || 0)} of ${esc(data.degree_credits_required || 160)} required credits completed · projected ${esc(data.projected_credits || 0)} credits after this plan</p>`;
+      const catBreakdown = Array.isArray(data.category_breakdown) ? data.category_breakdown : [];
+      const workload = data.workload_overview || {};
+
+      if (summaryNode) {
+        summaryNode.innerHTML = `
+          <div class="grid grid-3 pathway-metrics">
+            <div class="metric">
+              <strong>${esc(progress)}%</strong>
+              <span>degree completion (${esc(data.completed_credits || 0)}/${esc(data.degree_credits_required || 160)} CR)</span>
+            </div>
+            <div class="metric">
+              <strong>${esc(data.total_planned_credits || 0)} CR</strong>
+              <span>planned across ${esc(data.total_semesters || 0)} terms (~${esc(data.average_credits_per_term || 0)} CR/term)</span>
+            </div>
+            <div class="metric">
+              <strong>${esc(data.timeline_feasibility === 'ON_TRACK' ? '🎯 On Track' : data.timeline_feasibility === 'ACCELERATED' ? '⚡ Fast-Track' : '📋 Extension Review')}</strong>
+              <span>graduation timeline status (Target: ${esc(data.target_graduation)})</span>
+            </div>
+          </div>
+          <div class="degree-progress"><span style="width:${Math.min(100, Math.max(0, progress))}%"></span></div>
+          <p class="pathway-credit-label">${esc(data.completed_credits || 0)} of ${esc(data.degree_credits_required || 160)} required credits completed &middot; projected ${esc(data.projected_credits || 0)} credits &middot; ${esc(workload.theory_practical_ratio || '')} &middot; ${esc(workload.bottlenecks_cleared_count || 0)} key gateway courses scheduled</p>
+
+          ${catBreakdown.length ? `
+            <div class="panel pathway-categories-panel">
+              <header class="pathway-categories-head">
+                <div>
+                  <span class="eyebrow">Degree Requirements Audit</span>
+                  <h3 style="margin: 2px 0 0; font-size: 16px;">Curriculum Category Fulfillment</h3>
+                </div>
+                <span class="badge good">${catBreakdown.filter(c => c.status === 'Fulfilled').length} of ${catBreakdown.length} Categories Satisfied</span>
+              </header>
+              <div class="pathway-category-grid">
+                ${catBreakdown.map(cat => `
+                  <div class="pathway-category-card">
+                    <div class="pathway-category-meta">
+                      <strong>${esc(cat.category_name)}</strong>
+                      <span class="badge ${cat.status === 'Fulfilled' ? 'good' : 'muted'}">${esc(cat.status)}</span>
+                    </div>
+                    <div class="pathway-mini-progress"><span style="width:${Math.min(100, Math.max(0, cat.fulfillment_percent))}%"></span></div>
+                    <div class="pathway-category-sub">
+                      <span>${esc(cat.total_credits)} / ${esc(cat.required_credits)} CR (${esc(cat.fulfillment_percent)}%)</span>
+                      <small>${esc(cat.completed_credits)} completed + ${esc(cat.planned_credits)} planned</small>
+                    </div>
+                  </div>
+                `).join('')}
+              </div>
+            </div>
+          ` : ''}
+        `;
+      }
 
       const unscheduled = Array.isArray(data.unscheduled_courses) ? data.unscheduled_courses : [];
       const constraints = Array.isArray(data.constraints_checked) ? data.constraints_checked : [];
-      if (planStatus) planStatus.innerHTML = `<div class="notice ${data.success ? 'good' : ''}"><strong>${data.success ? 'Verified candidate pathway' : 'Faculty or advisor review required'}</strong><span>Target: ${esc(data.target_graduation)} · ${esc(maxCredits)}-credit semester limit</span><div class="constraint-tags">${constraints.map(item => `<span>${esc(item)}</span>`).join('')}</div>${unscheduled.length ? `<p><strong>Unscheduled:</strong> ${unscheduled.map(esc).join(', ')}</p>` : '<p>All catalog courses selected for this candidate plan were scheduled.</p>'}</div>`;
+      if (planStatus) {
+        planStatus.innerHTML = `
+          <div class="notice ${data.success ? 'good' : ''}">
+            <strong>${data.success ? '✓ Verified Candidate Academic Pathway' : 'Faculty or Advisor Review Required'}</strong>
+            <span>Active Sequence: Starting ${esc(data.start_semester)} &middot; Target ${esc(data.target_graduation)} &middot; ${esc(maxCredits)}-CR Term Limit &middot; Track: ${esc(data.elective_track || 'General')}</span>
+            <div class="constraint-tags">${constraints.map(item => `<span>${esc(item)}</span>`).join('')}</div>
+            ${unscheduled.length ? `<p><strong>Unscheduled:</strong> ${unscheduled.map(esc).join(', ')}</p>` : '<p>All required and selected catalog courses for this graduation pathway were successfully sequenced.</p>'}
+          </div>
+        `;
+      }
 
       const terms = Array.isArray(data.pathway) ? data.pathway : [];
-      if (out) out.innerHTML = terms.length ? `<div class="pathway-timeline">${terms.map((term, index) => `<article class="panel pathway-term"><div class="pathway-term-index"><span>${String(index + 1).padStart(2, '0')}</span><i></i></div><div class="pathway-term-body"><header><div><span class="eyebrow">${esc(term.name)}</span><h3>${esc(term.total_credits)} credits</h3></div><span class="badge ${Number(term.total_credits) > maxCredits ? 'danger' : 'good'}">${esc(term.status || 'Planned')}</span></header><div class="pathway-course-list">${(term.courses || []).map(course => `<div class="pathway-course"><div><span class="code">${esc(course.id)}</span><strong>${esc(course.name)}</strong><small>${coursePrereqs(course).length ? `After: ${coursePrereqs(course).map(esc).join(', ')}` : 'No blocking prerequisite listed'}</small></div><span>${esc(course.credits || 0)} CR</span></div>`).join('') || '<div class="empty">No eligible courses in this term.</div>'}</div></div></article>`).join('')}</div>` : '<div class="notice">No pathway could be generated. Review the unscheduled courses and prerequisite data.</div>';
+      if (out) {
+        out.innerHTML = terms.length ? `
+          <div class="pathway-timeline">
+            ${terms.map((term, index) => `
+              <article class="panel pathway-term">
+                <div class="pathway-term-index">
+                  <span>${String(index + 1).padStart(2, '0')}</span>
+                  <i></i>
+                </div>
+                <div class="pathway-term-body">
+                  <header>
+                    <div>
+                      <span class="eyebrow">${esc(term.academic_term || term.name)} &bull; ${esc(term.name)}</span>
+                      <h3>${esc(term.total_credits)} credits</h3>
+                    </div>
+                    <div class="pathway-term-badges">
+                      <span class="chip-metric">${esc(term.theory_credits || 0)} CR Theory</span>
+                      <span class="chip-metric">${esc(term.practical_credits || 0)} CR Lab</span>
+                      <span class="chip-metric diff-chip">Diff: ${esc(term.difficulty_score || '2.5')}/4.0</span>
+                      <span class="badge ${term.workload_intensity === 'Intensive' ? 'danger' : term.workload_intensity === 'Light' ? 'muted' : 'good'}">${esc(term.workload_intensity || 'Balanced')}</span>
+                    </div>
+                  </header>
+                  <div class="pathway-course-list">
+                    ${(term.courses || []).map(course => `
+                      <div class="pathway-course ${course.is_track_match ? 'track-matched' : ''}">
+                        <div>
+                          <div class="pathway-course-top">
+                            <span class="code">${esc(course.id)}</span>
+                            <span class="cat-tag">${esc(course.category || 'Core')}</span>
+                            ${course.is_track_match ? '<span class="track-tag">Track Focus</span>' : ''}
+                            ${course.is_bottleneck ? '<span class="bottleneck-tag">Gateway Course</span>' : ''}
+                          </div>
+                          <strong>${esc(course.name)}</strong>
+                          <small class="ltpc-info">${esc(course.ltpc ? `L-T-P-C: ${course.ltpc}` : `${course.credits} Credits`)} &middot; ${coursePrereqs(course).length ? `After: ${coursePrereqs(course).map(esc).join(', ')}` : 'No blocking prerequisite'}</small>
+                        </div>
+                        <span class="cr-badge">${esc(course.credits || 0)} CR</span>
+                      </div>
+                    `).join('') || '<div class="empty">No eligible courses in this term.</div>'}
+                  </div>
+                </div>
+              </article>
+            `).join('')}
+          </div>
+        ` : '<div class="notice">No pathway could be generated. Review the unscheduled courses and prerequisite data.</div>';
+      }
     } catch (error) {
       if (out) out.innerHTML = `<div class="notice">${esc(error.message)}</div>`;
       if (planStatus) planStatus.innerHTML = '<div class="notice">The pathway could not be generated. Confirm that the FastAPI server and student record are available.</div>';

@@ -70,7 +70,10 @@ class AuditRequest(BaseModel):
 class PathwayGenerateRequest(BaseModel):
     student_id: str
     max_credits_per_semester: Optional[int] = 16
-    target_graduation: Optional[str] = "Spring 2027"
+    target_graduation: Optional[str] = "May 2028"
+    start_semester: Optional[str] = "AUTO"
+    elective_track: Optional[str] = "GENERAL"
+    pacing_strategy: Optional[str] = "BALANCED"
 
 class SubstitutionApplyRequest(BaseModel):
     student_id: str
@@ -474,7 +477,8 @@ def get_chat_history(student_id: str):
 def generate_degree_pathway(req: PathwayGenerateRequest):
     """
     Computes optimal multi-semester degree sequencing using Topological Sorting DAG.
-    Considers completed courses, prerequisites, term offerings (Fall/Spring), and max credit caps.
+    Considers completed courses, prerequisites, term offerings (Fall/Spring), starting semester,
+    elective track preferences, and max credit caps.
     """
     student = db_manager.get_student_by_id(req.student_id)
     if not student:
@@ -491,18 +495,66 @@ def generate_degree_pathway(req: PathwayGenerateRequest):
     for sem in req_file.get("semesters_structure", []):
         structure_required.extend(sem.get("courses", []))
     
-    required_ids = structure_required
+    required_ids = structure_required if structure_required else req_file.get("required_courses", [])
     
-    # Remaining uncompleted courses
+    # Remaining uncompleted required courses
     remaining = [cid for cid in required_ids if cid not in completed and cid in course_map]
 
-    # Additional electives if needed
-    all_electives = [c["id"] for c in courses if "ELECTIVE" in c.get("credit_categories", []) or c.get("category") == "Elective"]
+    # Categorize courses & identify tracks
+    def parse_ltpc(ltpc_str, cr_val):
+        try:
+            parts = str(ltpc_str or "").split("-")
+            if len(parts) >= 4:
+                l, t, p, c = int(parts[0]), int(parts[1]), int(parts[2]), int(parts[3])
+                th = l + t
+                pr = p // 2 if p > 0 else 0
+                if th + pr != c and c > 0:
+                    th = max(0, c - pr)
+                return th, pr
+        except Exception:
+            pass
+        cr = int(cr_val or 3)
+        return max(1, cr - 1), max(0, cr - max(1, cr - 1))
+
+    # Track classification helper
+    track_keywords = {
+        "AI_ML": ["artificial intelligence", "machine learning", "deep learning", "nlp", "computer vision", "neural", "soft computing", "ai", "ml", "24cs302", "22cs804", "24cs306"],
+        "DATA_SCIENCE": ["data analytics", "big data", "data mining", "data science", "statistics", "business intelligence", "visualization", "predictive"],
+        "CLOUD_SYSTEMS": ["cloud computing", "distributed", "web technologies", "devops", "microservices", "full stack", "operating systems", "architecture", "networks"],
+        "CYBERSECURITY": ["information security", "cryptography", "network security", "ethical hacking", "cyber", "forensics", "secure coding"],
+    }
+    chosen_track = (req.elective_track or "GENERAL").upper().replace(" ", "_")
+
+    def course_matches_track(cid, c_obj):
+        if chosen_track == "GENERAL" or chosen_track not in track_keywords:
+            return False
+        keywords = track_keywords[chosen_track]
+        text = f"{cid} {c_obj.get('name', '')} {c_obj.get('description', '')} {c_obj.get('category', '')}".lower()
+        return any(k in text for k in keywords)
+
+    # Add elective options based on track preference
+    all_electives = [c["id"] for c in courses if "ELECTIVE" in c.get("credit_categories", []) or "Elective" in c.get("category", "")]
+    # Sort electives so track-matching electives come first
+    all_electives.sort(key=lambda el: 0 if course_matches_track(el, course_map[el]) else 1)
+
     for el in all_electives:
-        if el not in completed and el not in remaining and len(remaining) < 14:
+        if el not in completed and el not in remaining and len(remaining) < 16:
             remaining.append(el)
 
-    # Topological Sort by prerequisite depth
+    # Identify bottleneck courses (>= 2 dependents)
+    blocking_counts = {c["id"]: 0 for c in courses}
+    for c in courses:
+        prereqs = []
+        for g in c.get("prerequisite_groups", []):
+            for p in g.get("prerequisites", []):
+                prereqs.append(p.get("course_id"))
+        if not prereqs and "prereqs" in c:
+            prereqs = c["prereqs"]
+        for p in prereqs:
+            if p in blocking_counts:
+                blocking_counts[p] += 1
+
+    # Topological Sort by prerequisite depth and track priority
     def get_prereq_depth(cid, visited=None):
         if visited is None:
             visited = set()
@@ -520,34 +572,87 @@ def generate_degree_pathway(req: PathwayGenerateRequest):
             return 0
         return 1 + max([get_prereq_depth(p, visited.copy()) for p in prereqs if p in course_map], default=0)
 
-    # Sort remaining courses by topological dependency level
-    remaining.sort(key=lambda cid: (get_prereq_depth(cid), course_map[cid].get("difficulty_level", 2)))
+    # Sort remaining courses by topological level, track priority boost, semester order, and difficulty
+    def sort_key(cid):
+        c = course_map[cid]
+        depth = get_prereq_depth(cid)
+        track_boost = 0 if course_matches_track(cid, c) else 1
+        sem_pref = c.get("sem", 99) or 99
+        diff = c.get("difficulty_level", 2)
+        bottleneck_pri = -blocking_counts.get(cid, 0)
+        return (depth, track_boost, sem_pref, bottleneck_pri, diff)
+
+    remaining.sort(key=sort_key)
+
+    # Academic term sequence definition (Terms 1 to 8)
+    academic_term_sequence = [
+        ("I Year I Semester", "FALL", 1, 1, 2024),
+        ("I Year II Semester", "SPRING", 1, 2, 2025),
+        ("II Year I Semester", "FALL", 2, 3, 2025),
+        ("II Year II Semester", "SPRING", 2, 4, 2026),
+        ("III Year I Semester", "FALL", 3, 5, 2026),
+        ("III Year II Semester", "SPRING", 3, 6, 2027),
+        ("IV Year I Semester", "FALL", 4, 7, 2027),
+        ("IV Year II Semester", "SPRING", 4, 8, 2028),
+    ]
+
+    def get_term_index(term_str: str) -> int:
+        text = str(term_str or "").strip().upper()
+        if not text or text == "AUTO":
+            return 4  # Default to III-1 for third-year students
+        if "IV YEAR" in text or "4TH YEAR" in text or "YEAR 4" in text or "YEAR-4" in text or "4-1" in text or "4-2" in text:
+            if "II SEM" in text or "2ND SEM" in text or "SEM 2" in text or "4-2" in text or "SEM 8" in text or "SPRING" in text:
+                return 7
+            return 6
+        if "III YEAR" in text or "3RD YEAR" in text or "YEAR 3" in text or "YEAR-3" in text or "3-1" in text or "3-2" in text:
+            if "II SEM" in text or "2ND SEM" in text or "SEM 2" in text or "3-2" in text or "SEM 6" in text:
+                return 5
+            return 4
+        if "II YEAR" in text or "2ND YEAR" in text or "YEAR 2" in text or "YEAR-2" in text or "2-1" in text or "2-2" in text:
+            if "II SEM" in text or "2ND SEM" in text or "SEM 2" in text or "2-2" in text or "SEM 4" in text:
+                return 3
+            return 2
+        if "I YEAR" in text or "1ST YEAR" in text or "YEAR 1" in text or "YEAR-1" in text or "1-1" in text or "1-2" in text:
+            if "II SEM" in text or "2ND SEM" in text or "SEM 2" in text or "1-2" in text or "SEM 2" in text:
+                return 1
+            return 0
+        return 4
+
+    req_start = (req.start_semester or "AUTO").strip()
+    if req_start.upper() != "AUTO":
+        start_seq_idx = get_term_index(req_start)
+    else:
+        curr_sem = str(student.get("current_semester", "")).strip()
+        start_seq_idx = get_term_index(curr_sem)
+
+    # Pacing adjustment
+    effective_max_credits = req.max_credits_per_semester or 16
+    if req.pacing_strategy == "ACCELERATED":
+        effective_max_credits = max(effective_max_credits, 18)
+    elif req.pacing_strategy == "RELAXED":
+        effective_max_credits = min(effective_max_credits, 15)
 
     # Schedule across remaining semesters dynamically
     semesters = []
     current_pool = set(completed)
     to_schedule = list(remaining)
     
-    import datetime
-    current_year = datetime.datetime.now().year
-    current_month = datetime.datetime.now().month
-    
-    # Start next available major semester
-    start_season = "FALL" if current_month >= 6 else "SPRING"
-    start_year = current_year if current_month >= 6 else current_year
-    
     sem_idx = 0
-    max_semesters = 12
+    max_semesters = 10
+    total_bottlenecks_cleared = []
     
     while to_schedule and sem_idx < max_semesters:
-        if start_season == "FALL":
-            sem_season = "FALL" if sem_idx % 2 == 0 else "SPRING"
-            sem_year = start_year + (sem_idx // 2) if sem_season == "FALL" else start_year + (sem_idx // 2) + 1
+        term_pointer = (start_seq_idx + sem_idx)
+        if term_pointer < len(academic_term_sequence):
+            term_name, sem_season, term_year_num, sem_num, cal_year = academic_term_sequence[term_pointer]
         else:
-            sem_season = "SPRING" if sem_idx % 2 == 0 else "FALL"
-            sem_year = start_year + (sem_idx // 2) if sem_season == "SPRING" else start_year + (sem_idx // 2)
+            ext_year = 4 + (term_pointer - 7 + 1) // 2
+            sem_season = "FALL" if term_pointer % 2 == 0 else "SPRING"
+            term_name = f"Extended Term {term_pointer + 1} ({sem_season.capitalize()})"
+            cal_year = 2028 + (term_pointer - 7) // 2
 
-        s_name = f"{sem_season.capitalize()} {sem_year}"
+        cal_name = f"{sem_season.capitalize()} {cal_year}"
+        
         sem_courses = []
         sem_credits = 0
 
@@ -573,24 +678,57 @@ def generate_degree_pathway(req: PathwayGenerateRequest):
         # Pick up to credit limit
         for cid in eligible_this_sem:
             cr = course_map[cid].get("credits", 3)
-            if sem_credits + cr <= req.max_credits_per_semester:
+            if sem_credits + cr <= effective_max_credits:
                 sem_courses.append(cid)
                 sem_credits += cr
                 to_schedule.remove(cid)
 
-        # If no courses could be scheduled this semester, we might be stuck in a prerequisite deadlock, but we shouldn't infinite loop. 
-        # Actually, advancing the semester season might unlock spring-only or fall-only courses, so we let it continue until max_semesters.
-        
         # Update current_pool with courses completed in this scheduled semester
         current_pool.update(sem_courses)
 
         if sem_courses:
+            term_course_objs = []
+            term_theory = 0
+            term_practical = 0
+            term_diff_sum = 0
+            term_cleared_bn = []
+
+            for cid in sem_courses:
+                c_obj = dict(course_map[cid])
+                cr = int(c_obj.get("credits", 3) or 3)
+                th, pr = parse_ltpc(c_obj.get("ltpc"), cr)
+                c_obj["theory_credits"] = th
+                c_obj["practical_credits"] = pr
+                c_obj["is_bottleneck"] = blocking_counts.get(cid, 0) >= 2
+                c_obj["is_track_match"] = course_matches_track(cid, c_obj)
+                
+                term_theory += th
+                term_practical += pr
+                term_diff_sum += c_obj.get("difficulty_level", 2)
+                if c_obj["is_bottleneck"]:
+                    term_cleared_bn.append(cid)
+                    total_bottlenecks_cleared.append(cid)
+                term_course_objs.append(c_obj)
+
+            avg_diff = round(term_diff_sum / max(1, len(sem_courses)), 1)
+            workload_tag = "Balanced"
+            if sem_credits >= 18 or avg_diff >= 3.2:
+                workload_tag = "Intensive"
+            elif sem_credits <= 13:
+                workload_tag = "Light"
+
             semesters.append({
                 "semester_index": sem_idx + 1,
-                "name": s_name,
+                "name": cal_name,
+                "academic_term": term_name,
                 "season": sem_season,
-                "courses": [course_map[cid] for cid in sem_courses if cid in course_map],
+                "courses": term_course_objs,
                 "total_credits": sem_credits,
+                "theory_credits": term_theory,
+                "practical_credits": term_practical,
+                "difficulty_score": avg_diff,
+                "workload_intensity": workload_tag,
+                "bottlenecks_cleared": term_cleared_bn,
                 "status": "Optimal"
             })
         sem_idx += 1
@@ -613,6 +751,84 @@ def generate_degree_pathway(req: PathwayGenerateRequest):
     ) if degree_credits_required else 0
     plan_complete = len(to_schedule) == 0
 
+    # Calculate Category Breakdown Progress
+    cat_defs = {
+        "PROFESSIONAL_CORE": {"name": "Professional Core (PCC)", "min": 55, "completed": 0, "planned": 0},
+        "BASIC_SCIENCES": {"name": "Basic Sciences & Math (BSC)", "min": 20, "completed": 0, "planned": 0},
+        "BASIC_ENGINEERING": {"name": "Engineering Sciences (ESC)", "min": 15, "completed": 0, "planned": 0},
+        "DEPARTMENT_ELECTIVE": {"name": "Professional Electives (PEC)", "min": 18, "completed": 0, "planned": 0},
+        "OPEN_ELECTIVE": {"name": "Open Electives (OEC)", "min": 12, "completed": 0, "planned": 0},
+        "HUMANITIES": {"name": "Humanities & Management (HSMC)", "min": 10, "completed": 0, "planned": 0},
+        "PROJECT": {"name": "Projects & Internships (PRJ)", "min": 30, "completed": 0, "planned": 0},
+    }
+
+    def categorize_course(cid):
+        c = course_map.get(cid, {})
+        cat = str(c.get("category", "")).upper()
+        ccats = [str(x).upper() for x in c.get("credit_categories", [])]
+        name = str(c.get("name", "")).upper()
+        
+        if "PROJECT" in cat or "INTERNSHIP" in cat or "PROJECT" in name or "SOCIO-CENTRIC" in name or "24CS299" in cid or "22CS404" in cid or "24CS403" in cid:
+            return "PROJECT"
+        if "OPEN ELECTIVE" in cat or "OPEN_ELECTIVE" in ccats:
+            return "OPEN_ELECTIVE"
+        if "DEPARTMENT ELECTIVE" in cat or "PROFESSIONAL ELECTIVE" in cat or "ELECTIVE" in ccats:
+            return "DEPARTMENT_ELECTIVE"
+        if "MATHEMATICS" in cat or "PHYSICS" in cat or "CHEMISTRY" in cat or "BASIC SCIENCES" in cat or "BSC" in ccats or cid.startswith("24MT") or cid.startswith("24PY") or cid.startswith("24CY"):
+            return "BASIC_SCIENCES"
+        if "BASIC ENGINEERING" in cat or "ESC" in ccats or cid.startswith("24EE") or cid.startswith("24ME") or cid.startswith("24CT"):
+            return "BASIC_ENGINEERING"
+        if "HUMANITIES" in cat or "MANAGEMENT" in cat or "ENGLISH" in cat or "HSMC" in ccats or cid.startswith("24MS") or cid.startswith("24EN") or cid.startswith("22TP") or cid.startswith("24TP") or cid.startswith("24SS") or cid.startswith("24SA"):
+            return "HUMANITIES"
+        return "PROFESSIONAL_CORE"
+
+    for cid in completed:
+        if cid in course_map:
+            k = categorize_course(cid)
+            cr = int(course_map[cid].get("credits", 0) or 0)
+            if k in cat_defs:
+                cat_defs[k]["completed"] += cr
+
+    for cid in all_planned:
+        if cid in course_map:
+            k = categorize_course(cid)
+            cr = int(course_map[cid].get("credits", 0) or 0)
+            if k in cat_defs:
+                cat_defs[k]["planned"] += cr
+
+    category_breakdown = []
+    for k, v in cat_defs.items():
+        total_cr = v["completed"] + v["planned"]
+        req_cr = v["min"]
+        pct = min(100, round((total_cr / max(1, req_cr)) * 100))
+        category_breakdown.append({
+            "category_key": k,
+            "category_name": v["name"],
+            "completed_credits": v["completed"],
+            "planned_credits": v["planned"],
+            "total_credits": total_cr,
+            "required_credits": req_cr,
+            "fulfillment_percent": pct,
+            "status": "Fulfilled" if total_cr >= req_cr else "In Progress"
+        })
+
+    # Overall timeline feasibility
+    target_terms_count = 4 # default to 4 future terms for 3rd year student
+    avg_credits_term = round(planned_credits / max(1, len(semesters)), 1)
+    velocity_needed = round((degree_credits_required - completed_credits) / max(1, target_terms_count), 1)
+    
+    feasibility = "ON_TRACK"
+    if len(semesters) > target_terms_count:
+        feasibility = "REVIEW_REQUIRED"
+    elif len(semesters) < target_terms_count:
+        feasibility = "ACCELERATED"
+
+    # Total theory vs practical planned
+    total_planned_th = sum(s["theory_credits"] for s in semesters)
+    total_planned_pr = sum(s["practical_credits"] for s in semesters)
+
+    start_term_label = academic_term_sequence[start_seq_idx][0] if start_seq_idx < len(academic_term_sequence) else req_start
+
     return {
         "success": plan_complete,
         "student_id": student["id"],
@@ -623,13 +839,29 @@ def generate_degree_pathway(req: PathwayGenerateRequest):
         "degree_credits_required": degree_credits_required,
         "degree_progress_percent": progress_percent,
         "projected_credits": completed_credits + planned_credits,
+        "average_credits_per_term": avg_credits_term,
+        "credit_velocity_required": velocity_needed,
+        "timeline_feasibility": feasibility,
+        "start_semester": start_term_label,
         "target_graduation": req.target_graduation,
+        "elective_track": req.elective_track or "GENERAL",
+        "pacing_strategy": req.pacing_strategy or "BALANCED",
+        "category_breakdown": category_breakdown,
+        "workload_overview": {
+            "total_theory_credits": total_planned_th,
+            "total_practical_credits": total_planned_pr,
+            "theory_practical_ratio": f"{round((total_planned_th / max(1, total_planned_th + total_planned_pr)) * 100)}% Theory · {round((total_planned_pr / max(1, total_planned_th + total_planned_pr)) * 100)}% Practical",
+            "bottlenecks_cleared_count": len(total_bottlenecks_cleared),
+            "bottlenecks_cleared": list(set(total_bottlenecks_cleared))
+        },
         "unscheduled_courses": to_schedule,
         "plan_status": "VERIFIED_CANDIDATE" if plan_complete else "REVIEW_REQUIRED",
         "constraints_checked": [
             "prerequisite sequence",
             "semester offering",
-            f"maximum {req.max_credits_per_semester}-credit load",
+            f"maximum {effective_max_credits}-credit load",
+            f"start term: {start_term_label}",
+            f"elective track: {req.elective_track or 'General'}",
         ],
     }
 

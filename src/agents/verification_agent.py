@@ -31,9 +31,7 @@ class VerificationAgent:
         unknown_courses = [c for c in conflicts if c.get("type") == "UNKNOWN_COURSE"]
 
         decision = "ADVISORY_OK"
-        if state.get("query_type") == "conversation":
-            decision = "CONVERSATIONAL_RESPONSE"
-        elif state.get("query_type") == "out_of_scope":
+        if state.get("query_type") == "out_of_scope":
             decision = "OUT_OF_SCOPE"
         elif unknown_courses:
             decision = "INVALID_COURSE_REFERENCE"
