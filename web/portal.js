@@ -44,7 +44,12 @@ function isFacultySession() {
   return localStorage.getItem('academic_advisor_faculty_session') === 'active';
 }
 
+let isLoggingOut = false;
+
 function signOut() {
+  if (isLoggingOut) return;
+  isLoggingOut = true;
+
   try {
     localStorage.removeItem('academic_advisor_permanent_active_user_v3');
     localStorage.removeItem('academic_advisor_faculty_session');
@@ -54,12 +59,27 @@ function signOut() {
   } catch (e) {
     console.warn('Storage clear error:', e);
   }
+
   try {
-    fetch(API + '/api/auth/logout', { method: 'POST' }).catch(function() {});
+    fetch(API + '/api/auth/logout', { method: 'POST', cache: 'no-store' }).catch(function() {});
   } catch (e) {}
-  window.location.href = 'index.html';
+
+  window.location.replace('index.html?logout=' + Date.now());
 }
 window.signOut = signOut;
+
+// Back-Forward Cache (bfcache) guard: prevents restored cached pages from appearing logged in after sign-out
+window.addEventListener('pageshow', function(event) {
+  const isLoginPage = window.location.pathname.endsWith('index.html') || window.location.pathname === '/';
+  if (isLoginPage) return;
+
+  const studentId = localStorage.getItem('academic_advisor_permanent_active_user_v3');
+  const isFaculty = localStorage.getItem('academic_advisor_faculty_session') === 'active';
+
+  if (!studentId && !isFaculty) {
+    window.location.replace('index.html?unauthorized=' + Date.now());
+  }
+});
 
 function toast(message) {
   const node = document.getElementById('toast');
@@ -84,9 +104,15 @@ function nav(active, faculty) {
 
 async function initShell(active) {
   const student = await currentStudent();
-  if (!student) { location.href = 'index.html'; return null; }
+  if (!student) {
+    window.location.replace('index.html?unauthorized=' + Date.now());
+    return null;
+  }
   const faculty = isFacultySession();
-  if (faculty && active !== 'governance') { location.href = 'governance.html'; return null; }
+  if (faculty && active !== 'governance') {
+    window.location.replace('governance.html');
+    return null;
+  }
   const appbar = document.querySelector('.appbar');
   if (appbar && !appbar.querySelector('.brand')) {
     appbar.insertAdjacentHTML('afterbegin', `<a class="brand" href="${faculty ? 'governance.html' : 'home.html'}"><span class="brand-mark">AA</span><span>Academic Advisor</span></a>`);
@@ -99,16 +125,14 @@ async function initShell(active) {
     const displayId = student.id || 'Faculty';
     const profileHref = faculty ? 'governance.html' : 'profile.html';
 
-    // Build profile link via DOM with attributes and handlers
+    // Build profile link via DOM
     const profileLink = document.createElement('a');
     profileLink.href = profileHref;
     profileLink.className = 'profile-icon-btn';
-    profileLink.setAttribute('data-action', 'profile');
     profileLink.title = 'My Profile';
-    profileLink.style.cssText = 'display:inline-flex;align-items:center;gap:8px;text-decoration:none;border:1px solid var(--line,#e2e8f0);border-radius:8px;padding:5px 12px;font-size:13px;color:inherit;background:transparent;cursor:pointer;position:relative;z-index:9999;pointer-events:auto;';
+    profileLink.style.cssText = 'display:inline-flex;align-items:center;gap:8px;text-decoration:none;border:1px solid var(--line,#e2e8f0);border-radius:8px;padding:5px 12px;font-size:13px;color:inherit;background:transparent;cursor:pointer;position:relative;z-index:9999;';
     profileLink.onclick = function(e) {
       e.preventDefault();
-      e.stopPropagation();
       window.location.href = profileHref;
     };
 
@@ -128,16 +152,14 @@ async function initShell(active) {
     profileLink.appendChild(nameSpan);
     profileLink.appendChild(idSpan);
 
-    // Build sign out button with attributes and handlers
+    // Build sign out button
     const signOutBtn = document.createElement('button');
     signOutBtn.className = 'btn';
     signOutBtn.type = 'button';
-    signOutBtn.setAttribute('data-action', 'signout');
     signOutBtn.textContent = 'Sign out';
-    signOutBtn.style.cssText = 'cursor:pointer;position:relative;z-index:9999;pointer-events:auto;';
+    signOutBtn.style.cssText = 'cursor:pointer;position:relative;z-index:9999;';
     signOutBtn.onclick = function(e) {
       e.preventDefault();
-      e.stopPropagation();
       signOut();
     };
 
@@ -151,28 +173,6 @@ async function initShell(active) {
   }
   return student;
 }
-
-// Global click event delegation to guarantee clicks on Profile and Sign out always work
-document.addEventListener('click', function(e) {
-  const target = e.target;
-  if (!target) return;
-  // Sign Out click detection
-  const signoutElem = target.closest('[data-action="signout"]') || (target.tagName === 'BUTTON' && target.textContent.trim() === 'Sign out');
-  if (signoutElem) {
-    e.preventDefault();
-    e.stopPropagation();
-    signOut();
-    return;
-  }
-  // Profile click detection
-  const profileElem = target.closest('[data-action="profile"]') || target.closest('.profile-icon-btn') || target.closest('a[title="My Profile"]');
-  if (profileElem) {
-    e.preventDefault();
-    e.stopPropagation();
-    window.location.href = 'profile.html';
-    return;
-  }
-}, true);
 
 function coursePrereqs(course) {
   return course.prereqs || (course.prerequisite_groups || []).flatMap(group => (group.prerequisites || []).map(item => item.course_id));
