@@ -26,22 +26,21 @@ function isFacultySession() {
 }
 
 function signOut() {
-  if (signingOut) return;
-  signingOut = true;
-  try {
-    api('/api/auth/logout', { method: 'POST' }).catch(function () {});
-  } catch (e) {
-    console.warn('Backend logout call skipped:', e);
-  }
+  // Clear all session data immediately — do NOT block on backend call
   try {
     localStorage.removeItem('academic_advisor_permanent_active_user_v3');
     localStorage.removeItem('academic_advisor_faculty_session');
     localStorage.clear();
     sessionStorage.clear();
   } catch (e) {
-    console.error('Sign out cleanup error:', e);
+    console.warn('Storage clear error:', e);
   }
-  window.location.replace('index.html');
+  // Fire-and-forget backend logout (no await, no blocking)
+  try {
+    fetch(API + '/api/auth/logout', { method: 'POST' }).catch(function() {});
+  } catch (e) {}
+  // Hard redirect to login page using absolute path
+  window.location.href = window.location.origin + '/index.html';
 }
 window.signOut = signOut;
 
