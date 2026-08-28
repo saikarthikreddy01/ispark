@@ -26,7 +26,7 @@ app = FastAPI(
 # CORS Middleware
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=["http://localhost:8000", "http://127.0.0.1:8000", "http://localhost:5500", "http://127.0.0.1:5500", "http://localhost:3000"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -187,13 +187,17 @@ def health_check():
 
 @app.get("/api/students")
 def get_students():
-    return db_manager.get_all_students()
+    students = db_manager.get_all_students()
+    for s in students:
+        s.pop("password", None)
+    return students
 
 @app.get("/api/student/{student_id}")
 def get_student(student_id: str):
     student = db_manager.get_student_by_id(student_id)
     if not student:
         raise HTTPException(status_code=404, detail="Student not found")
+    student.pop("password", None)
     return student
 
 @app.put("/api/student/{student_id}/profile")
@@ -304,10 +308,10 @@ def login(req: LoginRequest):
         raise HTTPException(status_code=401, detail=f"Student ID '{regno}' not found. Please click 'Sign Up' to create your account.")
     
     stored_pwd = student.get("password")
-    if stored_pwd and req.password:
-        valid_passwords = [stored_pwd, "password", "password123", regno, regno.lower()]
-        if req.password not in valid_passwords:
-            raise HTTPException(status_code=401, detail=f"Incorrect password for {regno}. (Hint: use '{stored_pwd}' or 'password123')")
+    if stored_pwd and req.password != stored_pwd:
+        raise HTTPException(status_code=401, detail="Incorrect password.")
+
+    student.pop("password", None)
 
     return {
         "success": True,
@@ -345,14 +349,9 @@ def signup(req: SignUpRequest):
 @app.get("/api/gemini/status")
 def get_gemini_status():
     api_key = os.getenv("GEMINI_API_KEY", "")
-    masked = f"{api_key[:8]}...{api_key[-6:]}" if len(api_key) > 14 else "Not configured"
     return {
         "status": "connected" if api_key else "disconnected",
         "model": "gemini-3.6-flash",
-        "name": "Gemini API Key",
-        "project_name": "projects/882038538915",
-        "project_number": "882038538915",
-        "api_key_masked": masked,
         "mode": "real_time_graph_rag",
         "live_interaction": True
     }
@@ -456,17 +455,31 @@ def generate_degree_pathway(req: PathwayGenerateRequest):
     # Sort remaining courses by topological dependency level
     remaining.sort(key=lambda cid: (get_prereq_depth(cid), course_map[cid].get("difficulty_level", 2)))
 
-    # Schedule across remaining semesters
+    # Schedule across remaining semesters dynamically
     semesters = []
     current_pool = set(completed)
     to_schedule = list(remaining)
-    sem_names = ["Fall 2026", "Spring 2027", "Fall 2027", "Spring 2028"]
+    
+    import datetime
+    current_year = datetime.datetime.now().year
+    current_month = datetime.datetime.now().month
+    
+    # Start next available major semester
+    start_season = "FALL" if current_month >= 6 else "SPRING"
+    start_year = current_year if current_month >= 6 else current_year
+    
+    sem_idx = 0
+    max_semesters = 12
+    
+    while to_schedule and sem_idx < max_semesters:
+        if start_season == "FALL":
+            sem_season = "FALL" if sem_idx % 2 == 0 else "SPRING"
+            sem_year = start_year + (sem_idx // 2) if sem_season == "FALL" else start_year + (sem_idx // 2) + 1
+        else:
+            sem_season = "SPRING" if sem_idx % 2 == 0 else "FALL"
+            sem_year = start_year + (sem_idx // 2) if sem_season == "SPRING" else start_year + (sem_idx // 2)
 
-    for idx, s_name in enumerate(sem_names):
-        if not to_schedule:
-            break
-        
-        sem_season = "FALL" if "Fall" in s_name else "SPRING"
+        s_name = f"{sem_season.capitalize()} {sem_year}"
         sem_courses = []
         sem_credits = 0
 
@@ -497,17 +510,22 @@ def generate_degree_pathway(req: PathwayGenerateRequest):
                 sem_credits += cr
                 to_schedule.remove(cid)
 
+        # If no courses could be scheduled this semester, we might be stuck in a prerequisite deadlock, but we shouldn't infinite loop. 
+        # Actually, advancing the semester season might unlock spring-only or fall-only courses, so we let it continue until max_semesters.
+        
         # Update current_pool with courses completed in this scheduled semester
         current_pool.update(sem_courses)
 
-        semesters.append({
-            "semester_index": idx + 1,
-            "name": s_name,
-            "season": sem_season,
-            "courses": [course_map[cid] for cid in sem_courses if cid in course_map],
-            "total_credits": sem_credits,
-            "status": "Optimal"
-        })
+        if sem_courses:
+            semesters.append({
+                "semester_index": sem_idx + 1,
+                "name": s_name,
+                "season": sem_season,
+                "courses": [course_map[cid] for cid in sem_courses if cid in course_map],
+                "total_credits": sem_credits,
+                "status": "Optimal"
+            })
+        sem_idx += 1
 
     # Save newly planned list to student
     all_planned = [c["id"] for s in semesters for c in s["courses"]]
@@ -515,12 +533,13 @@ def generate_degree_pathway(req: PathwayGenerateRequest):
     db_manager.create_student(student)
 
     return {
-        "success": True,
+        "success": len(to_schedule) == 0,
         "student_id": student["id"],
         "pathway": semesters,
         "total_semesters": len(semesters),
         "total_planned_credits": sum(s["total_credits"] for s in semesters),
-        "target_graduation": req.target_graduation
+        "target_graduation": req.target_graduation,
+        "unscheduled_courses": to_schedule
     }
 
 # --- 5. FORMAL CONSTRAINT CONFLICT AUDITOR ---
@@ -573,36 +592,73 @@ def verify_schedule_constraints(req: AuditRequest):
             issues.append(f"❌ {cid} ({c['name']}) is only offered in {', '.join(offered)} (Policy §7.1).")
 
         # 3. Prerequisites
-        prereqs = []
-        for g in c.get("prerequisite_groups", []):
+        # Each group in prerequisite_groups is an AND condition.
+        # Within a group, the prerequisites are OR conditions.
+        prereq_groups = c.get("prerequisite_groups", [])
+        
+        # Fallback if old format is used
+        if not prereq_groups and "prereqs" in c:
+            prereq_groups = [{"prerequisites": [{"course_id": p, "min_grade": "D"}]} for p in c["prereqs"]]
+
+        petitions = db_manager.get_all_petitions()
+
+        for group_idx, g in enumerate(prereq_groups):
+            group_satisfied = False
+            missing_options = []
+            
             for p in g.get("prerequisites", []):
-                prereqs.append(p)
-        if not prereqs and "prereqs" in c:
-            prereqs = [{"course_id": p, "min_grade": "D"} for p in c["prereqs"]]
-
-        for p in prereqs:
-            pid = p.get("course_id")
-            min_g = p.get("min_grade", "D")
-            
-            # Check if this prerequisite has an approved waiver in petitions
-            petitions = db_manager.get_all_petitions()
-            has_waiver = any(
-                pt.get("student_id") == req.student_id and 
-                pt.get("status") == "APPROVED" and 
-                pt.get("course_id") == cid and 
-                pt.get("petition_type") == "PREREQUISITE_WAIVER" and 
-                (pid in pt.get("justification", "") or pid in pt.get("waived_rule", ""))
-                for pt in petitions
-            )
-            
-            if has_waiver:
-                continue
-
-            if pid not in completed_set:
+                pid = p.get("course_id")
+                min_g = p.get("min_grade", "D")
+                
+                # Check for waiver
+                has_waiver = any(
+                    pt.get("student_id") == req.student_id and 
+                    pt.get("status") == "APPROVED" and 
+                    pt.get("course_id") == cid and 
+                    pt.get("petition_type") == "PREREQUISITE_WAIVER" and 
+                    (pid in pt.get("justification", "") or pid in pt.get("waived_rule", ""))
+                    for pt in petitions
+                )
+                
+                if has_waiver:
+                    group_satisfied = True
+                    break
+                    
+                if pid in completed_set:
+                    # Check achieved grade if academic_history is present
+                    achieved_grade = None
+                    for sem in student.get("academic_history", []):
+                        for c_hist in sem.get("courses", []):
+                            if c_hist.get("course_id") == pid:
+                                achieved_grade = c_hist.get("grade")
+                                break
+                    
+                    if achieved_grade and min_g:
+                        # Simple grade comparison (A, B, C, D, E, F)
+                        grade_rank = {"O": 10, "S": 9, "A": 8, "B": 7, "C": 6, "D": 5, "E": 4, "F": 0, "P": 5}
+                        if grade_rank.get(achieved_grade, 0) >= grade_rank.get(min_g, 0):
+                            group_satisfied = True
+                            break
+                        else:
+                            # They took it but failed to meet the minimum grade
+                            pass
+                    else:
+                        # If no history is present, we assume it's passed since it's in completed
+                        group_satisfied = True
+                        break
+                
                 if p.get("can_be_concurrent") and pid in selected_set:
-                    pass
+                    group_satisfied = True
+                    break
+                    
+                missing_options.append(f"{pid} (min grade {min_g})")
+            
+            if not group_satisfied:
+                if len(missing_options) == 1:
+                    issues.append(f"❌ {cid} missing prerequisite: requires {missing_options[0]} prior to enrollment (Policy §1.1).")
                 else:
-                    issues.append(f"❌ {cid} missing prerequisite: requires {pid} to be completed prior (Policy §1.1).")
+                    options_str = " OR ".join(missing_options)
+                    issues.append(f"❌ {cid} missing prerequisite group: requires one of [{options_str}] prior to enrollment (Policy §1.1).")
 
         # 4. Corequisites
         coreqs = c.get("corequisites", [])
@@ -740,11 +796,26 @@ def apply_course_substitution(req: SubstitutionApplyRequest):
         raise HTTPException(status_code=404, detail="Student not found")
 
     planned = student.get("planned", [])
-    if req.original_course_id in planned:
-        idx = planned.index(req.original_course_id)
-        planned[idx] = req.substitute_course_id
-        student["planned"] = planned
-        db_manager.create_student(student)
+    if req.original_course_id not in planned:
+        raise HTTPException(status_code=400, detail=f"Original course {req.original_course_id} is not in your planned pathway.")
+
+    # Verify approved petition exists for this substitution
+    petitions = db_manager.get_all_petitions()
+    is_approved = any(
+        pt.get("student_id") == req.student_id and 
+        pt.get("status") == "APPROVED" and 
+        pt.get("petition_type") == "COURSE_SUBSTITUTION" and 
+        (req.original_course_id in pt.get("justification", "") or req.original_course_id == pt.get("course_id"))
+        for pt in petitions
+    )
+
+    if not is_approved:
+        raise HTTPException(status_code=403, detail="Substitution denied: Requires an approved faculty petition.")
+
+    idx = planned.index(req.original_course_id)
+    planned[idx] = req.substitute_course_id
+    student["planned"] = planned
+    db_manager.create_student(student)
 
     return {
         "success": True,
@@ -913,22 +984,8 @@ def admin_login(req: AdminLoginRequest):
                 "institution": "VFSTR (Deemed to be University)"
             }
         }
-    
-    # Also allow standard admin/admin123 fallback
-    if p == "admin123" or p == "admin":
-        return {
-            "success": True,
-            "message": "Authenticated as Academic Administrator",
-            "user": {
-                "username": u,
-                "role": "ADMIN",
-                "title": "Academic Administrator",
-                "department": "Computer Science & Engineering",
-                "institution": "VFSTR (Deemed to be University)"
-            }
-        }
         
-    raise HTTPException(status_code=401, detail="Invalid admin username or password. (Hint: use 'admin' / 'admin123' or 'hod_cse' / 'vignan2024')")
+    raise HTTPException(status_code=401, detail="Invalid admin username or password.")
 
 @app.get("/api/admin/stats")
 def get_admin_dashboard_stats():

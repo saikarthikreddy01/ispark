@@ -34,3 +34,7 @@ node_modules/
 data/*.db
 data/*.db-*
 data/persistent_db.json
+.env
+venv/
+backend_backup/
+__pycache__/

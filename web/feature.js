@@ -321,7 +321,7 @@ async function governance(student) {
   
   const out = document.querySelector('[data-output]');
   if (out) {
-    out.innerHTML = `<div class="data-list">${visible.map(item => `<div class="panel"><div class="data-row"><strong>${esc(item.petition_type)}</strong><span class="badge ${item.status === 'PENDING' ? 'warn' : ''}">${esc(item.status)}</span></div><p>${esc(item.justification)}</p><span class="muted">Automated audit: ${item.automated_audit_eligible ? 'eligible' : 'needs review'}</span>${item.status === 'PENDING' ? `<div style="display:flex;gap:8px;margin-top:14px"><button class="btn btn-primary" onclick="reviewPetition('${esc(item.petition_id)}','APPROVED')">Approve</button><button class="btn" onclick="reviewPetition('${esc(item.petition_id)}','REJECTED')">Reject</button></div>` : ''}</div>`).join('') || '<div class="empty">No petitions submitted yet.</div>'}</div>`;
+    out.innerHTML = `<div class="data-list">${visible.map(item => `<div class="panel"><div class="data-row"><strong>${esc(item.petition_type)}</strong><span class="badge ${item.status === 'PENDING' ? 'warn' : ''}">${esc(item.status)}</span></div><p>${esc(item.justification)}</p><span class="muted">Automated audit: ${item.automated_audit_eligible ? 'eligible' : 'needs review'}</span>${(item.status === 'PENDING' && !student?.id) ? `<div style="display:flex;gap:8px;margin-top:14px"><button class="btn btn-primary" onclick="reviewPetition('${esc(item.petition_id)}','APPROVED')">Approve</button><button class="btn" onclick="reviewPetition('${esc(item.petition_id)}','REJECTED')">Reject</button></div>` : ''}</div>`).join('') || '<div class="empty">No petitions submitted yet.</div>'}</div>`;
   }
   
   if (form) {

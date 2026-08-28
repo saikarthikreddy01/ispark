@@ -143,6 +143,8 @@ class MongoDBManager:
             s["password"] = "password123"
         if "academic_history" not in s:
             s["academic_history"] = []
+        
+        # Make a sanitized copy for public return, we'll keep password only when explicitly needed
         return s
 
     # --- Student Operations ---

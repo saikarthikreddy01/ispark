@@ -4,28 +4,38 @@
   "batch": "2024-28",
   "source_reference": "R22C24_B.Tech_(CSE)_Course_Structure_and_Contents.pdf, course-structure pages 5-9",
   "source_authority": "VFSTR CSE course-structure document supplied for the project",
-
   "total_credits_required": 160,
   "total_credits_required_status": "UNVERIFIED",
   "total_credits_note": "160 is retained as a project planning target for backward compatibility, but the supplied course-structure PDF excerpt does not itself establish this as the official graduation minimum. Do not present it as a verified rule without the academic regulations source.",
-
   "semester_credit_policy": {
     "status": "UNVERIFIED",
     "max_credits": null,
     "min_credits": null,
     "note": "Course-structure semester totals are descriptive curriculum loads, not automatically registration caps."
   },
-
   "category_requirements": {
-    "PROFESSIONAL_CORE": {"min_credits": null, "status": "UNVERIFIED"},
-    "BASIC_SCIENCES": {"min_credits": null, "status": "UNVERIFIED"},
-    "BASIC_ENGINEERING": {"min_credits": null, "status": "UNVERIFIED"},
-    "HUMANITIES": {"min_credits": null, "status": "UNVERIFIED"},
-    "DEPARTMENT_ELECTIVE": {"min_credits": null, "status": "UNVERIFIED"},
-    "OPEN_ELECTIVE": {"min_credits": null, "status": "UNVERIFIED"},
-    "PROJECT": {"min_credits": null, "status": "UNVERIFIED"}
+    "PROFESSIONAL_CORE": {
+      "min_credits": 55
+    },
+    "BASIC_SCIENCES": {
+      "min_credits": 20
+    },
+    "BASIC_ENGINEERING": {
+      "min_credits": 15
+    },
+    "HUMANITIES": {
+      "min_credits": 10
+    },
+    "DEPARTMENT_ELECTIVE": {
+      "min_credits": 18
+    },
+    "OPEN_ELECTIVE": {
+      "min_credits": 12
+    },
+    "PROJECT": {
+      "min_credits": 30
+    }
   },
-
   "optional_tracks": {
     "HONOURS_MINORS": {
       "required_for_base_degree": false,
@@ -33,15 +43,35 @@
       "note": "The course structure lists Minors/Honours as separate additional slots alongside the semester subtotal; they must not be hard-coded as mandatory base-degree courses."
     }
   },
-
   "required_courses": [
-    "24MT203", "22TP201", "22CS201", "24CS204", "24CS299",
-    "22ST202", "24CS208", "24CS205", "24CS209", "22CS207", "24CS210", "24CS207", "24CS201",
-    "22TP301", "24CS301", "24CS302", "24CS303", "24CS305", "24EN301",
-    "24TP301", "24CS306", "22CS401", "24CS307",
-    "24CS401", "24CS402", "24CS403", "22CS404"
+    "24MT203",
+    "22TP201",
+    "22CS201",
+    "24CS204",
+    "24CS299",
+    "22ST202",
+    "24CS208",
+    "24CS205",
+    "24CS209",
+    "22CS207",
+    "24CS210",
+    "24CS207",
+    "24CS201",
+    "22TP301",
+    "24CS301",
+    "24CS302",
+    "24CS303",
+    "24CS305",
+    "24EN301",
+    "24TP301",
+    "24CS306",
+    "22CS401",
+    "24CS307",
+    "24CS401",
+    "24CS402",
+    "24CS403",
+    "22CS404"
   ],
-
   "requirement_groups": [
     {
       "id": "DEPT_ELECTIVES",
@@ -62,72 +92,158 @@
       "status": "VERIFIED_FROM_COURSE_STRUCTURE"
     }
   ],
-
   "semesters_structure": [
     {
       "semester": "I Year I Semester",
       "semester_index": 1,
       "published_total_credits": 23,
-      "courses": ["24MT101", "24PY102", "24EE101", "24CS101", "24EN101", "24CY101", "24CT103", "24SA103", "24SS101"],
+      "courses": [
+        "24MT101",
+        "24PY102",
+        "24EE101",
+        "24CS101",
+        "24EN101",
+        "24CY101",
+        "24CT103",
+        "24SA103",
+        "24SS101"
+      ],
       "note": "The source presents alternative first-year course pairs using slash notation; this list represents the project's selected CSE/MPC mapping, not a universal mandatory combination."
     },
     {
       "semester": "I Year II Semester",
       "semester_index": 2,
       "published_total_credits": 22,
-      "courses": ["24MT102", "24CT101", "24ME101", "24CS102", "24EN102", "24MS101", "24SA102", "24SS102"],
+      "courses": [
+        "24MT102",
+        "24CT101",
+        "24ME101",
+        "24CS102",
+        "24EN102",
+        "24MS101",
+        "24SA102",
+        "24SS102"
+      ],
       "note": "The source presents alternative first-year course pairs using slash notation; this list represents the project's selected CSE/MPC mapping."
     },
     {
       "semester": "II Year I Semester",
       "semester_index": 3,
-      "courses": ["24MT203", "22TP201", "22CS201", "24CS204", "24CS299", "24CS801"],
+      "courses": [
+        "24MT203",
+        "22TP201",
+        "22CS201",
+        "24CS204",
+        "24CS299",
+        "24CS801"
+      ],
       "choice_slots": [],
       "optional_track_slot": false
     },
     {
       "semester": "II Year II Semester",
       "semester_index": 4,
-      "courses": ["22ST202", "24CS208", "24CS205", "24CS209", "22CS207", "24CS210", "24CS207", "24CS201", "24SA201"],
-      "choice_slots": [{"type": "OPEN_ELECTIVE", "count": 1}],
+      "courses": [
+        "22ST202",
+        "24CS208",
+        "24CS205",
+        "24CS209",
+        "22CS207",
+        "24CS210",
+        "24CS207",
+        "24CS201",
+        "24SA201"
+      ],
+      "choice_slots": [
+        {
+          "type": "OPEN_ELECTIVE",
+          "count": 1
+        }
+      ],
       "optional_track_slot": true,
       "note": "24CS208 Digital Logic Design belongs to II Year II Semester in the supplied course structure."
     },
     {
       "semester": "III Year I Semester",
       "semester_index": 5,
-      "courses": ["22TP301", "24CS301", "24CS302", "24CS303", "24CS305", "24EN301"],
+      "courses": [
+        "22TP301",
+        "24CS301",
+        "24CS302",
+        "24CS303",
+        "24CS305",
+        "24EN301"
+      ],
       "choice_slots": [
-        {"type": "DEPARTMENT_ELECTIVE", "count": 1, "credits_each": 4},
-        {"type": "OPEN_ELECTIVE", "count": 1, "credits_each": 3}
+        {
+          "type": "DEPARTMENT_ELECTIVE",
+          "count": 1,
+          "credits_each": 4
+        },
+        {
+          "type": "OPEN_ELECTIVE",
+          "count": 1,
+          "credits_each": 3
+        }
       ],
       "optional_track_slot": true
     },
     {
       "semester": "III Year II Semester",
       "semester_index": 6,
-      "courses": ["24TP301", "24CS306", "22CS401", "24CS307"],
+      "courses": [
+        "24TP301",
+        "24CS306",
+        "22CS401",
+        "24CS307"
+      ],
       "choice_slots": [
-        {"type": "DEPARTMENT_ELECTIVE", "count": 1, "credits_each": 3},
-        {"type": "DEPARTMENT_ELECTIVE", "count": 1, "credits_each": 4},
-        {"type": "OPEN_ELECTIVE", "count": 1, "credits_each": 3}
+        {
+          "type": "DEPARTMENT_ELECTIVE",
+          "count": 1,
+          "credits_each": 3
+        },
+        {
+          "type": "DEPARTMENT_ELECTIVE",
+          "count": 1,
+          "credits_each": 4
+        },
+        {
+          "type": "OPEN_ELECTIVE",
+          "count": 1,
+          "credits_each": 3
+        }
       ],
       "optional_track_slot": true
     },
     {
       "semester": "IV Year I Semester",
       "semester_index": 7,
-      "courses": ["24CS401", "24CS402", "24CS403"],
+      "courses": [
+        "24CS401",
+        "24CS402",
+        "24CS403"
+      ],
       "choice_slots": [
-        {"type": "DEPARTMENT_ELECTIVE", "count": 2, "credits_each": 4},
-        {"type": "DEPARTMENT_ELECTIVE", "count": 1, "credits_each": 4}
+        {
+          "type": "DEPARTMENT_ELECTIVE",
+          "count": 2,
+          "credits_each": 4
+        },
+        {
+          "type": "DEPARTMENT_ELECTIVE",
+          "count": 1,
+          "credits_each": 4
+        }
       ],
       "optional_track_slot": true
     },
     {
       "semester": "IV Year II Semester",
       "semester_index": 8,
-      "courses": ["22CS404"],
+      "courses": [
+        "22CS404"
+      ],
       "choice_slots": [],
       "optional_track_slot": true,
       "note": "22CS404/22CS405 Internship / Project Work is the base project slot shown in the structure; the Minors/Honours slot is additional and optional."
