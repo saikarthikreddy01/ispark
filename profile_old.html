@@ -29,14 +29,7 @@
     <div class="profile-hero">
       <span class="eyebrow">Academic Records</span>
       <h1>My Profile</h1>
-      <div id="student-info-banner" style="display:flex;align-items:center;gap:16px;margin-top:10px;margin-bottom:4px;">
-        <div style="width:48px;height:48px;border-radius:50%;background:var(--accent);color:#fff;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:700;" id="student-avatar">?</div>
-        <div>
-          <div style="font-size:18px;font-weight:700;line-height:1.2;" id="student-fullname">Loading…</div>
-          <div style="font-size:13px;color:#64748b;font-family:monospace;" id="student-regno"></div>
-        </div>
-      </div>
-      <p style="margin-top:10px;">Update your academic history to improve advisor accuracy. Add your completed subjects semester by semester.</p>
+      <p>Update your academic history to improve advisor accuracy. Add your completed subjects semester by semester.</p>
     </div>
 
     <form id="profile-form">
@@ -56,7 +49,7 @@
   </main>
 
   <div id="toast"></div>
-  <script src="portal.js?v=10"></script>
+  <script src="portal.js"></script>
   <script>
     let studentId = null;
     let academicHistory = [];
@@ -69,15 +62,6 @@
       academicHistory = student.academic_history || [];
       careerGoals = student.career_goals || [];
       document.getElementById('career-goals-input').value = careerGoals.join(', ');
-
-      // Populate the profile hero banner
-      const nameEl = document.getElementById('student-fullname');
-      const regEl  = document.getElementById('student-regno');
-      const avatarEl = document.getElementById('student-avatar');
-      if (nameEl) nameEl.textContent = student.name || '—';
-      if (regEl)  regEl.textContent  = 'Reg No: ' + (student.id || '—');
-      if (avatarEl) avatarEl.textContent = (student.name || 'S').charAt(0).toUpperCase();
-
       renderSemesters();
     }
 
@@ -92,7 +76,7 @@
         const header = document.createElement('div');
         header.className = 'semester-header';
         header.innerHTML = `
-          <h3><input type="text" value="${esc(sem.title || 'Year ' + (Math.floor(sIndex/2)+1) + ' Sem ' + ((sIndex%2)+1))}" onchange="updateSemTitle(${sIndex}, this.value)" style="border:none; font-weight:600; font-size:16px; width:200px; background:transparent;"></h3>
+          <h3><input type="text" value="${esc(sem.title || \`Year \${Math.floor(sIndex/2)+1} Sem \${(sIndex%2)+1}\`)}" onchange="updateSemTitle(${sIndex}, this.value)" style="border:none; font-weight:600; font-size:16px; width:200px; background:transparent;"></h3>
           <button type="button" class="remove-btn" onclick="removeSemester(${sIndex})">Remove Semester</button>
         `;
         block.appendChild(header);

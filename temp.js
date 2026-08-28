@@ -1,63 +1,4 @@
-<!doctype html>
-<html lang="en">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>My Profile | AcadGraph AI</title>
-  <link rel="stylesheet" href="portal.css">
-  <style>
-    .profile-hero { margin-bottom: 24px; }
-    .semester-block { border: 1px solid var(--border); border-radius: 8px; padding: 16px; margin-bottom: 24px; background: #fff; }
-    .semester-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
-    .semester-header h3 { margin: 0; font-size: 16px; font-weight: 600; }
-    .subject-row { display: grid; grid-template-columns: 2fr 3fr 1fr 1fr auto; gap: 12px; margin-bottom: 12px; align-items: center; }
-    .subject-row input { padding: 8px; border: 1px solid var(--border); border-radius: 4px; font-size: 14px; width: 100%; box-sizing: border-box; }
-    .remove-btn { color: #ef4444; background: none; border: none; cursor: pointer; font-weight: 600; }
-    .add-subject-btn { margin-top: 8px; font-size: 13px; color: var(--accent); background: none; border: none; cursor: pointer; font-weight: 500; }
-    .add-semester-btn { display: block; width: 100%; padding: 12px; border: 1px dashed var(--border); border-radius: 8px; background: transparent; color: var(--accent); font-weight: 500; cursor: pointer; text-align: center; }
-    .save-profile-btn { margin-top: 24px; width: auto; padding: 12px 24px; font-size: 16px; }
-    .header-labels { display: grid; grid-template-columns: 2fr 3fr 1fr 1fr auto; gap: 12px; margin-bottom: 8px; font-size: 12px; font-weight: 600; color: #64748b; }
-  </style>
-</head>
-<body data-page="profile">
-  <header class="appbar">
-    <nav class="nav"></nav>
-    <div class="userbar"></div>
-  </header>
 
-  <main class="page">
-    <div class="profile-hero">
-      <span class="eyebrow">Academic Records</span>
-      <h1>My Profile</h1>
-      <div id="student-info-banner" style="display:flex;align-items:center;gap:16px;margin-top:10px;margin-bottom:4px;">
-        <div style="width:48px;height:48px;border-radius:50%;background:var(--accent);color:#fff;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:700;" id="student-avatar">?</div>
-        <div>
-          <div style="font-size:18px;font-weight:700;line-height:1.2;" id="student-fullname">Loading…</div>
-          <div style="font-size:13px;color:#64748b;font-family:monospace;" id="student-regno"></div>
-        </div>
-      </div>
-      <p style="margin-top:10px;">Update your academic history to improve advisor accuracy. Add your completed subjects semester by semester.</p>
-    </div>
-
-    <form id="profile-form">
-      <div style="margin-bottom: 24px; padding: 16px; border: 1px solid var(--border); border-radius: 8px; background: #fff;">
-        <h3 style="margin-top: 0; font-size: 16px; font-weight: 600; margin-bottom: 8px;">Career Goals</h3>
-        <p style="font-size: 13px; color: #64748b; margin-bottom: 12px;">Enter your career aspirations (e.g., 'Data Scientist', 'Full Stack Developer') to get tailored elective recommendations in your degree pathway.</p>
-        <input type="text" id="career-goals-input" placeholder="e.g. AI Engineer, Cybersecurity Analyst" style="width: 100%; padding: 10px; border: 1px solid var(--border); border-radius: 6px; font-size: 14px; box-sizing: border-box;">
-      </div>
-
-      <div id="semesters-container"></div>
-      <button type="button" class="add-semester-btn" id="add-sem-btn">+ Add Semester</button>
-      
-      <div style="text-align: right;">
-        <button type="submit" class="btn btn-primary save-profile-btn" id="save-btn">Save Profile</button>
-      </div>
-    </form>
-  </main>
-
-  <div id="toast"></div>
-  <script src="portal.js?v=10"></script>
-  <script>
     let studentId = null;
     let academicHistory = [];
     let careerGoals = [];
@@ -69,15 +10,6 @@
       academicHistory = student.academic_history || [];
       careerGoals = student.career_goals || [];
       document.getElementById('career-goals-input').value = careerGoals.join(', ');
-
-      // Populate the profile hero banner
-      const nameEl = document.getElementById('student-fullname');
-      const regEl  = document.getElementById('student-regno');
-      const avatarEl = document.getElementById('student-avatar');
-      if (nameEl) nameEl.textContent = student.name || '—';
-      if (regEl)  regEl.textContent  = 'Reg No: ' + (student.id || '—');
-      if (avatarEl) avatarEl.textContent = (student.name || 'S').charAt(0).toUpperCase();
-
       renderSemesters();
     }
 
@@ -92,7 +24,7 @@
         const header = document.createElement('div');
         header.className = 'semester-header';
         header.innerHTML = `
-          <h3><input type="text" value="${esc(sem.title || 'Year ' + (Math.floor(sIndex/2)+1) + ' Sem ' + ((sIndex%2)+1))}" onchange="updateSemTitle(${sIndex}, this.value)" style="border:none; font-weight:600; font-size:16px; width:200px; background:transparent;"></h3>
+          <h3><input type="text" value="${esc(sem.title || \`Year \${Math.floor(sIndex/2)+1} Sem \${(sIndex%2)+1}\`)}" onchange="updateSemTitle(${sIndex}, this.value)" style="border:none; font-weight:600; font-size:16px; width:200px; background:transparent;"></h3>
           <button type="button" class="remove-btn" onclick="removeSemester(${sIndex})">Remove Semester</button>
         `;
         block.appendChild(header);
@@ -185,6 +117,4 @@
     };
 
     document.addEventListener('DOMContentLoaded', loadProfile);
-  </script>
-</body>
-</html>
+  
