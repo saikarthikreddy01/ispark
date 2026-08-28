@@ -33,6 +33,12 @@
     </div>
 
     <form id="profile-form">
+      <div style="margin-bottom: 24px; padding: 16px; border: 1px solid var(--border); border-radius: 8px; background: #fff;">
+        <h3 style="margin-top: 0; font-size: 16px; font-weight: 600; margin-bottom: 8px;">Career Goals</h3>
+        <p style="font-size: 13px; color: #64748b; margin-bottom: 12px;">Enter your career aspirations (e.g., 'Data Scientist', 'Full Stack Developer') to get tailored elective recommendations in your degree pathway.</p>
+        <input type="text" id="career-goals-input" placeholder="e.g. AI Engineer, Cybersecurity Analyst" style="width: 100%; padding: 10px; border: 1px solid var(--border); border-radius: 6px; font-size: 14px; box-sizing: border-box;">
+      </div>
+
       <div id="semesters-container"></div>
       <button type="button" class="add-semester-btn" id="add-sem-btn">+ Add Semester</button>
       
@@ -47,12 +53,15 @@
   <script>
     let studentId = null;
     let academicHistory = [];
+    let careerGoals = [];
 
     async function loadProfile() {
       const student = await initShell('profile');
       if (!student) return;
       studentId = student.id;
       academicHistory = student.academic_history || [];
+      careerGoals = student.career_goals || [];
+      document.getElementById('career-goals-input').value = careerGoals.join(', ');
       renderSemesters();
     }
 
@@ -66,16 +75,16 @@
         
         const header = document.createElement('div');
         header.className = 'semester-header';
-        header.innerHTML = \`
-          <h3><input type="text" value="\${esc(sem.title || \`Year \${Math.floor(sIndex/2)+1} Sem \${(sIndex%2)+1}\`)}" onchange="updateSemTitle(\${sIndex}, this.value)" style="border:none; font-weight:600; font-size:16px; width:200px; background:transparent;"></h3>
-          <button type="button" class="remove-btn" onclick="removeSemester(\${sIndex})">Remove Semester</button>
-        \`;
+        header.innerHTML = `
+          <h3><input type="text" value="${esc(sem.title || \`Year \${Math.floor(sIndex/2)+1} Sem \${(sIndex%2)+1}\`)}" onchange="updateSemTitle(${sIndex}, this.value)" style="border:none; font-weight:600; font-size:16px; width:200px; background:transparent;"></h3>
+          <button type="button" class="remove-btn" onclick="removeSemester(${sIndex})">Remove Semester</button>
+        `;
         block.appendChild(header);
 
         if (sem.courses && sem.courses.length > 0) {
           const labels = document.createElement('div');
           labels.className = 'header-labels';
-          labels.innerHTML = \`<div>Course Code</div><div>Course Name</div><div>GPA/Grade</div><div>Credits</div><div></div>\`;
+          labels.innerHTML = `<div>Course Code</div><div>Course Name</div><div>GPA/Grade</div><div>Credits</div><div></div>`;
           block.appendChild(labels);
         }
 
@@ -83,13 +92,13 @@
         (sem.courses || []).forEach((course, cIndex) => {
           const row = document.createElement('div');
           row.className = 'subject-row';
-          row.innerHTML = \`
-            <input type="text" placeholder="e.g. 24CS101" value="\${esc(course.code || '')}" onchange="updateCourse(\${sIndex}, \${cIndex}, 'code', this.value)" required>
-            <input type="text" placeholder="e.g. Programming" value="\${esc(course.name || '')}" onchange="updateCourse(\${sIndex}, \${cIndex}, 'name', this.value)" required>
-            <input type="number" step="0.1" placeholder="GPA" value="\${esc(course.gpa || '')}" onchange="updateCourse(\${sIndex}, \${cIndex}, 'gpa', this.value)" required>
-            <input type="number" placeholder="Credits" value="\${esc(course.credits || '')}" onchange="updateCourse(\${sIndex}, \${cIndex}, 'credits', this.value)" required>
-            <button type="button" class="remove-btn" onclick="removeCourse(\${sIndex}, \${cIndex})">&times;</button>
-          \`;
+          row.innerHTML = `
+            <input type="text" placeholder="e.g. 24CS101" value="${esc(course.code || '')}" onchange="updateCourse(${sIndex}, ${cIndex}, 'code', this.value)" required>
+            <input type="text" placeholder="e.g. Programming" value="${esc(course.name || '')}" onchange="updateCourse(${sIndex}, ${cIndex}, 'name', this.value)" required>
+            <input type="number" step="0.1" placeholder="GPA" value="${esc(course.gpa || '')}" onchange="updateCourse(${sIndex}, ${cIndex}, 'gpa', this.value)" required>
+            <input type="number" placeholder="Credits" value="${esc(course.credits || '')}" onchange="updateCourse(${sIndex}, ${cIndex}, 'credits', this.value)" required>
+            <button type="button" class="remove-btn" onclick="removeCourse(${sIndex}, ${cIndex})">&times;</button>
+          `;
           coursesDiv.appendChild(row);
         });
         block.appendChild(coursesDiv);
@@ -109,7 +118,7 @@
     window.updateCourse = (sIndex, cIndex, field, val) => { academicHistory[sIndex].courses[cIndex][field] = val; };
     
     window.addSemester = () => {
-      academicHistory.push({ title: \`Year \${Math.floor(academicHistory.length/2)+1} Sem \${(academicHistory.length%2)+1}\`, courses: [] });
+      academicHistory.push({ title: `Year ${Math.floor(academicHistory.length/2)+1} Sem ${(academicHistory.length%2)+1}`, courses: [] });
       renderSemesters();
     };
     
@@ -134,12 +143,16 @@
     document.getElementById('profile-form').onsubmit = async (e) => {
       e.preventDefault();
       const btn = document.getElementById('save-btn');
+      
+      const goalsText = document.getElementById('career-goals-input').value;
+      const goalsArray = goalsText.split(',').map(g => g.trim()).filter(g => g.length > 0);
+      
       btn.textContent = 'Saving...';
       btn.disabled = true;
       try {
-        await api(\`/api/student/\${encodeURIComponent(studentId)}/profile\`, {
+        await api(`/api/student/${encodeURIComponent(studentId)}/profile`, {
           method: 'PUT',
-          body: JSON.stringify({ academic_history: academicHistory })
+          body: JSON.stringify({ academic_history: academicHistory, career_goals: goalsArray })
         });
         toast('Profile saved successfully!');
       } catch (err) {

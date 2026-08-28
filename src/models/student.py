@@ -83,6 +83,7 @@ class Student(BaseModel):
     standing: str = "Good Standing"
     expected_grad: str = "May 2028"
     max_credits_per_semester: int = 18
+    career_goals: List[str] = Field(default_factory=list)
 
     @property
     def completed_course_ids(self) -> set[str]:

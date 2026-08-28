@@ -37,7 +37,8 @@ class MongoDBManager:
                     import certifi
                     client_kwargs["tlsCAFile"] = certifi.where()
                 except Exception:
-                    client_kwargs["tlsAllowInvalidCertificates"] = True
+                    # Do not allow invalid certs
+                    pass
             
             self.client = MongoClient(MONGODB_URI, **client_kwargs)
             # Trigger server check
@@ -47,19 +48,9 @@ class MongoDBManager:
             print(f"[OK] Connected to MongoDB at {MONGODB_URI} [DB: {DATABASE_NAME}]")
             self._seed_initial_data()
         except Exception as e:
-            try:
-                # Second attempt with tlsAllowInvalidCertificates if SSL failed
-                from pymongo import MongoClient
-                self.client = MongoClient(MONGODB_URI, serverSelectionTimeoutMS=5000, tlsAllowInvalidCertificates=True)
-                self.client.admin.command('ping')
-                self.db = self.client[DATABASE_NAME]
-                self.is_connected = True
-                print(f"[OK] Connected to MongoDB (TLS fallback) at {MONGODB_URI} [DB: {DATABASE_NAME}]")
-                self._seed_initial_data()
-            except Exception as e2:
-                print(f"[INFO] MongoDB at {MONGODB_URI} ({e2}). Using local persistent database.")
-                self.is_connected = False
-                self._init_file_db()
+            print(f"[INFO] MongoDB at {MONGODB_URI} ({e}). Using local persistent database.")
+            self.is_connected = False
+            self._init_file_db()
 
     def ensure_connected(self):
         """Attempts to reconnect if connection dropped or failed earlier."""
@@ -68,7 +59,8 @@ class MongoDBManager:
 
     def _init_file_db(self):
         self.fallback_file = DATA_DIR / "persistent_db.json"
-        self._seed_file_db()
+        if not self.fallback_file.exists():
+            self._seed_file_db()
 
     def _seed_file_db(self):
         students = self._load_json(DATA_DIR / "sample_students.json")
@@ -86,30 +78,30 @@ class MongoDBManager:
             json.dump(data, f, indent=2)
 
     def _seed_initial_data(self):
-        """Seed and synchronize MongoDB collections with latest C24 dataset"""
+        """Seed and synchronize MongoDB collections with latest C24 dataset only if empty"""
         if not self.is_connected or self.db is None:
             return
 
         try:
             # 1. Students
-            students = self._load_json(DATA_DIR / "sample_students.json")
-            if students:
-                self.db.students.delete_many({})
-                self.db.students.insert_many(students)
-                print(f"[SEED] Synced {len(students)} C24 students to MongoDB.")
+            if self.db.students.count_documents({}) == 0:
+                students = self._load_json(DATA_DIR / "sample_students.json")
+                if students:
+                    self.db.students.insert_many(students)
+                    print(f"[SEED] Synced {len(students)} C24 students to MongoDB.")
 
             # 2. Courses
-            courses = self._load_json(DATA_DIR / "courses.json")
-            if courses:
-                self.db.courses.delete_many({})
-                self.db.courses.insert_many(courses)
-                print(f"[SEED] Synced {len(courses)} C24 courses to MongoDB.")
+            if self.db.courses.count_documents({}) == 0:
+                courses = self._load_json(DATA_DIR / "courses.json")
+                if courses:
+                    self.db.courses.insert_many(courses)
+                    print(f"[SEED] Synced {len(courses)} C24 courses to MongoDB.")
 
             # 3. Equivalencies
-            equivs = self._load_json(DATA_DIR / "equivalencies.json")
-            if equivs:
-                self.db.equivalencies.delete_many({})
-                self.db.equivalencies.insert_one({"_id": "course_equivalencies", "data": equivs})
+            if self.db.equivalencies.count_documents({}) == 0:
+                equivs = self._load_json(DATA_DIR / "equivalencies.json")
+                if equivs:
+                    self.db.equivalencies.insert_one({"_id": "course_equivalencies", "data": equivs})
         except Exception as err:
             print(f"[WARN] Error seeding MongoDB: {err}")
 

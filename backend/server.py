@@ -56,6 +56,7 @@ class SignUpRequest(BaseModel):
 
 class StudentProfileUpdateRequest(BaseModel):
     academic_history: List[Dict]
+    career_goals: Optional[List[str]] = None
 
 class ChatRequest(BaseModel):
     student_id: str
@@ -231,6 +232,9 @@ def update_student_profile(student_id: str, request: StudentProfileUpdateRequest
         "completed": completed_courses
     }
     
+    if request.career_goals is not None:
+        update_data["career_goals"] = request.career_goals
+    
     updated = db_manager.update_student(student_id, update_data)
     if not updated:
         raise HTTPException(status_code=500, detail="Failed to update profile")
@@ -318,6 +322,10 @@ def login(req: LoginRequest):
         "message": f"Welcome back, {student.get('name', regno)}!",
         "student": student
     }
+
+@app.post("/api/auth/logout")
+def logout():
+    return {"success": True, "message": "Logged out successfully"}
 
 @app.post("/api/auth/signup")
 def signup(req: SignUpRequest):
