@@ -1,0 +1,34 @@
+[
+  {
+    "username": "admin",
+    "password_hash": "pbkdf2_sha256$260000$tI1Uay3mvWSRzickJz2bbQ$T5iX4tJ3WgEkXTBRcm9_QRZFNiJD5IdhnihIht6WCwM",
+    "role": "FACULTY",
+    "title": "System Administrator",
+    "department": "Computer Science & Engineering",
+    "institution": "VFSTR (Deemed to be University)"
+  },
+  {
+    "username": "dean",
+    "password_hash": "pbkdf2_sha256$260000$LPu5rfkzi_0k3WGa37sWrA$eeYLFjJwfz3PY_PMzwa2Qrf5nx2yZQI8oiFE7nOZHfU",
+    "role": "FACULTY",
+    "title": "Dean of Academic Affairs",
+    "department": "Computer Science & Engineering",
+    "institution": "VFSTR (Deemed to be University)"
+  },
+  {
+    "username": "hod_cse",
+    "password_hash": "pbkdf2_sha256$260000$7b4ZCYit_yEfIGrRq0uVZw$-hS7wZpK9l03LLQtnuU3QUJeXcAatJ04oLCFgBKaNy0",
+    "role": "FACULTY",
+    "title": "Head of Department (CSE)",
+    "department": "Computer Science & Engineering",
+    "institution": "VFSTR (Deemed to be University)"
+  },
+  {
+    "username": "faculty",
+    "password_hash": "pbkdf2_sha256$260000$6IDmT0HwEdDD33WwnQariQ$Q5hLiQrjCkR82qM8fDdNSxIcdxQDVZ03V-it1ycmMc0",
+    "role": "FACULTY",
+    "title": "Academic Faculty Advisor",
+    "department": "Computer Science & Engineering",
+    "institution": "VFSTR (Deemed to be University)"
+  }
+]

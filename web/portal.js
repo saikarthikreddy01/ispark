@@ -1,29 +1,17 @@
 const API = window.location.protocol === 'file:' ? 'http://127.0.0.1:8000' : window.location.origin;
 let signingOut = false;
+let activeSession = null;
+
 function loginPageUrl() {
   return new URL('login.html', document.baseURI).href;
 }
 
-function hasActiveSession() {
-  try {
-    return Boolean(
-      localStorage.getItem('academic_advisor_permanent_active_user_v3') ||
-      localStorage.getItem('academic_advisor_faculty_session') === 'active'
-    );
-  } catch (error) {
-    return false;
-  }
-}
-
-function clearAuthStorage() {
-  // This origin belongs only to the advisor demo, so a complete browser-side
-  // clear is simpler and more reliable than maintaining several auth keys.
-  localStorage.clear();
-  sessionStorage.clear();
-}
-
 async function api(path, options = {}) {
-  const response = await fetch(`${API}${path}`, { headers: { 'Content-Type': 'application/json' }, ...options });
+  const response = await fetch(`${API}${path}`, {
+    credentials: 'same-origin',
+    headers: { 'Content-Type': 'application/json' },
+    ...options
+  });
   const data = await response.json().catch(() => ({}));
   if (!response.ok) throw new Error(data.detail || 'Request failed');
   return data;
@@ -34,69 +22,67 @@ function esc(value) {
 }
 
 async function currentStudent() {
-  const savedId = localStorage.getItem('academic_advisor_permanent_active_user_v3');
-  if (!savedId && localStorage.getItem('academic_advisor_faculty_session') === 'active') {
-    return { id:'', name:'Faculty reviewer', major:'Faculty governance', completed:[] };
-  }
-  if (!savedId) return null;
   try {
-    const s = await api(`/api/student/${encodeURIComponent(savedId)}`);
-    if (s && s.id) {
-      localStorage.setItem('academic_advisor_cached_student', JSON.stringify(s));
-      return s;
+    activeSession = await api('/api/auth/session', { cache: 'no-store' });
+    if (activeSession.role === 'faculty') {
+      const user = activeSession.user || {};
+      return {
+        id: '',
+        name: user.title || user.username || 'Faculty reviewer',
+        major: user.department || 'Faculty governance',
+        completed: []
+      };
     }
-  } catch (err) {
-    console.warn('API fetch student failed, checking cached student data:', err);
-    try {
-      const cached = localStorage.getItem('academic_advisor_cached_student');
-      if (cached) return JSON.parse(cached);
-    } catch {}
-    return { id: savedId, name: 'Student (' + savedId + ')', major: 'Computer Science', completed: [] };
+    return activeSession.student || null;
+  } catch (error) {
+    activeSession = null;
+    return null;
   }
-  return null;
 }
 
 function isFacultySession() {
-  const savedId = localStorage.getItem('academic_advisor_permanent_active_user_v3');
-  if (savedId) {
-    localStorage.removeItem('academic_advisor_faculty_session');
-    return false;
-  }
-  return localStorage.getItem('academic_advisor_faculty_session') === 'active';
+  return activeSession?.role === 'faculty';
 }
 
-function signOut(event) {
+async function signOut(event) {
   if (event) {
     event.preventDefault();
     event.stopPropagation();
   }
   if (signingOut) return;
   signingOut = true;
-
-  try {
-    clearAuthStorage();
-  } catch (e) {
-    console.warn('Storage clear error:', e);
+  const button = event?.currentTarget;
+  if (button instanceof HTMLButtonElement) {
+    button.disabled = true;
+    button.textContent = 'Signing out…';
   }
 
-  // The query value bypasses a stale cached login navigation on hosted builds.
-  // replace() also prevents the authenticated page remaining in browser history.
   const target = new URL(loginPageUrl());
   target.searchParams.set('signed_out', '1');
-  target.searchParams.set('v', String(Date.now()));
   try {
+    await api('/api/auth/logout', { method: 'POST', cache: 'no-store', keepalive: true });
+    activeSession = null;
     window.location.replace(target.href);
   } catch (error) {
-    window.location.href = target.href;
+    signingOut = false;
+    if (button instanceof HTMLButtonElement) {
+      button.disabled = false;
+      button.textContent = 'Sign out';
+    }
+    toast('Sign out could not reach the server. Please try again.');
   }
 }
 window.signOut = signOut;
 
-// Browsers may restore a protected page from the back-forward cache. Re-check
-// storage whenever the page is shown and return signed-out users to login.
-window.addEventListener('pageshow', function() {
-  if (!hasActiveSession()) {
-    window.location.replace(loginPageUrl());
+// A back-button restore can revive an old page snapshot. Verify the HTTP-only
+// server session before allowing that restored page to remain visible.
+window.addEventListener('pageshow', async function(event) {
+  if (event.persisted) {
+    try {
+      await api('/api/auth/session', { cache: 'no-store' });
+    } catch (error) {
+      window.location.replace(loginPageUrl());
+    }
   }
 });
 
@@ -115,8 +101,8 @@ function nav(active, faculty) {
     ['advisor.html', 'Advisor', 'advisor'],
     ['pathway.html', 'Degree pathway', 'pathway'],
     ['graph.html', 'Knowledge graph', 'graph'],
-    ['profile.html', 'My profile', 'profile'],
-    ['governance.html', 'Faculty review', 'governance']
+    ['governance.html', 'Faculty review', 'governance'],
+    ['profile.html', 'My profile', 'profile']
   ];
   const visibleItems = faculty ? items.filter(([, , key]) => key === 'governance') : items;
   return visibleItems.map(([href,label,key]) => `<a class="${key === active ? 'active' : ''}" href="${href}">${label}</a>`).join('');
@@ -124,7 +110,7 @@ function nav(active, faculty) {
 
 async function initShell(active) {
   const student = await currentStudent();
-  if (!student) { location.href = 'login.html'; return null; }
+  if (!student) { window.location.replace(loginPageUrl()); return null; }
   const faculty = isFacultySession();
   if (faculty && active !== 'governance') { location.href = 'governance.html'; return null; }
   const appbar = document.querySelector('.appbar');
@@ -145,12 +131,12 @@ async function initShell(active) {
     profileLink.href = profileHref;
     profileLink.className = 'profile-icon-btn';
     profileLink.setAttribute('data-action', 'profile');
-    profileLink.setAttribute('aria-label', 'Open my profile');
+    profileLink.setAttribute('aria-label', faculty ? 'Open faculty review' : 'Open my profile');
     profileLink.title = faculty ? 'Faculty review workspace' : 'Open my profile';
     profileLink.style.cssText = 'display:inline-flex;align-items:center;gap:8px;text-decoration:none;border:1px solid var(--line,#e2e8f0);border-radius:8px;padding:5px 12px;font-size:13px;color:inherit;background:transparent;cursor:pointer;position:relative;z-index:9999;pointer-events:auto;';
     profileLink.addEventListener('click', function(event) {
       event.preventDefault();
-      window.location.href = profileHref;
+      window.location.assign(profileHref);
     });
 
     const avatar = document.createElement('span');
@@ -188,19 +174,6 @@ async function initShell(active) {
   }
   return student;
 }
-
-// Global sign-out delegation is retained as a fallback. Profile navigation is
-// handled by the anchor's href and must not be intercepted here.
-document.addEventListener('click', function(e) {
-  const target = e.target instanceof Element ? e.target : e.target?.parentElement;
-  if (!target) return;
-  // Sign Out click detection
-  const signoutElem = target.closest('[data-action="signout"]') || (target.tagName === 'BUTTON' && target.textContent.trim() === 'Sign out');
-  if (signoutElem) {
-    signOut(e);
-    return;
-  }
-}, true);
 
 function coursePrereqs(course) {
   return course.prereqs || (course.prerequisite_groups || []).flatMap(group => (group.prerequisites || []).map(item => item.course_id));

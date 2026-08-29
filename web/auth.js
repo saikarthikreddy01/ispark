@@ -1,7 +1,5 @@
-/* Academic AI Advisor — authentication module
-   Talks to the existing FastAPI endpoints and preserves the existing
-   session keys / redirect targets that portal.js and the dashboard
-   pages already depend on. */
+/* AcadGraph AI authentication.
+   Identity is stored only in a signed, HTTP-only server session cookie. */
 
 (function () {
     'use strict';
@@ -53,7 +51,7 @@
 
     function studentLoginFields() {
         return [
-            { id: 'identity', label: 'Student ID', type: 'text', placeholder: '241FA04077', autocomplete: 'username', help: 'The registration number printed on your college ID card.', required: true },
+            { id: 'identity', label: 'Student ID', type: 'text', placeholder: 'e.g. 24XX00000', autocomplete: 'username', help: 'The registration number printed on your college ID card.', required: true },
             { id: 'password', label: 'Password', type: 'password', placeholder: 'Enter your password', autocomplete: 'current-password', required: true, toggle: true }
         ];
     }
@@ -61,7 +59,7 @@
     function studentSignupFields() {
         return [
             { id: 'name', label: 'Full name', type: 'text', placeholder: 'Ananya Rao', autocomplete: 'name', required: true },
-            { id: 'identity', label: 'Student ID', type: 'text', placeholder: '241FA04077', autocomplete: 'username', help: 'The registration number printed on your college ID card.', required: true },
+            { id: 'identity', label: 'Student ID', type: 'text', placeholder: 'e.g. 24XX00000', autocomplete: 'username', help: 'The registration number printed on your college ID card.', required: true },
             { id: 'major', label: 'Major / department', type: 'text', placeholder: 'Computer Science', autocomplete: 'off', required: true },
             { id: 'expected_grad', label: 'Expected graduation', type: 'text', placeholder: 'Spring 2027', autocomplete: 'off', required: true },
             { id: 'password', label: 'Password', type: 'password', placeholder: 'Create a password', autocomplete: 'new-password', required: true, toggle: true, strength: true },
@@ -71,7 +69,7 @@
 
     function facultyLoginFields() {
         return [
-            { id: 'identity', label: 'Faculty username', type: 'text', placeholder: 'admin / hod_cse / dean', autocomplete: 'username', help: 'Use your institutional faculty or department username.', required: true },
+            { id: 'identity', label: 'Faculty username', type: 'text', placeholder: 'Enter faculty username', autocomplete: 'username', help: 'Use your institutional faculty or department username.', required: true },
             { id: 'password', label: 'Password', type: 'password', placeholder: 'Enter your password', autocomplete: 'current-password', required: true, toggle: true }
         ];
     }
@@ -280,6 +278,7 @@
     function friendlyError(message) {
         var known = {
             'Student ID not found.': 'We couldn\u2019t find that student ID. Check the number and try again.',
+            'Invalid student ID or password.': 'That student ID or password is incorrect.',
             'Incorrect password.': 'That password doesn\u2019t match our records.',
             'Student ID already registered.': 'This student ID is already registered. Please sign in instead.'
         };
@@ -328,6 +327,8 @@
 
             var response = await fetch(endpoint, {
                 method: 'POST',
+                credentials: 'same-origin',
+                cache: 'no-store',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(payload)
             });
@@ -339,31 +340,40 @@
             }
 
             if (state.role === 'faculty') {
-                localStorage.removeItem('academic_advisor_permanent_active_user_v3');
-                localStorage.removeItem('academic_advisor_cached_student');
-                localStorage.setItem('academic_advisor_faculty_session', 'active');
                 showNotice('Welcome back. Opening your workspace\u2026', 'good');
-                window.setTimeout(function () { location.href = 'governance.html?faculty=1'; }, 450);
+                window.setTimeout(function () { window.location.replace('governance.html'); }, 450);
                 return;
             }
-
-            var studentId = data.student && data.student.id ? data.student.id : payload.regno;
-            localStorage.removeItem('academic_advisor_faculty_session');
-            localStorage.setItem('academic_advisor_permanent_active_user_v3', studentId);
 
             if (state.mode === 'signup') {
                 showNotice('Account created. Setting up your workspace\u2026', 'good');
             } else {
                 showNotice('Signed in. Loading your workspace\u2026', 'good');
             }
-            window.setTimeout(function () { location.href = 'home.html'; }, 450);
+            window.setTimeout(function () { window.location.replace('home.html'); }, 450);
         } catch (error) {
             setSubmitting(false, '');
             showNotice(friendlyError(error.message));
         }
     }
 
-    function init() {
+    async function redirectExistingSession() {
+        try {
+            var response = await fetch('/api/auth/session', {
+                credentials: 'same-origin',
+                cache: 'no-store'
+            });
+            if (!response.ok) return false;
+            var session = await response.json();
+            window.location.replace(session.role === 'faculty' ? 'governance.html' : 'home.html');
+            return true;
+        } catch (error) {
+            return false;
+        }
+    }
+
+    async function init() {
+        if (await redirectExistingSession()) return;
         document.querySelectorAll('.role-btn').forEach(function (btn) {
             btn.addEventListener('click', function () { setRole(btn.dataset.role); });
         });

@@ -10,6 +10,8 @@ from pathlib import Path
 from typing import Dict, List, Optional, Any
 from dotenv import load_dotenv
 
+from backend.security import hash_password
+
 load_dotenv()
 
 # MongoDB Configuration
@@ -117,7 +119,7 @@ class MongoDBManager:
                 return json.load(f)
         return []
 
-    def _normalize_student(self, student: Dict) -> Dict:
+    def _normalize_student(self, student: Dict, include_auth: bool = False) -> Dict:
         if not student:
             return student
         s = dict(student)
@@ -137,13 +139,65 @@ class MongoDBManager:
             s["planned"] = s.get("planned_course_ids", [])
         if "conflicts" not in s:
             s["conflicts"] = []
-        if "password" not in s:
-            s["password"] = "password123"
         if "academic_history" not in s:
             s["academic_history"] = []
-        
-        # Make a sanitized copy for public return, we'll keep password only when explicitly needed
+
+        if not include_auth:
+            s.pop("password", None)
+            s.pop("password_hash", None)
         return s
+
+    def get_student_auth_by_id(self, student_id: str) -> Optional[Dict]:
+        """Return one student including credential fields for login only."""
+        self.ensure_connected()
+        student_id = student_id.upper()
+        if self.is_connected and self.db is not None:
+            try:
+                doc = self.db.students.find_one(
+                    {"$or": [
+                        {"id": {"$regex": f"^{student_id}$", "$options": "i"}},
+                        {"student_id": {"$regex": f"^{student_id}$", "$options": "i"}},
+                    ]},
+                    {"_id": 0},
+                )
+                return self._normalize_student(doc, include_auth=True) if doc else None
+            except Exception:
+                self.is_connected = False
+
+        with open(self.fallback_file, "r", encoding="utf-8") as f:
+            students = json.load(f).get("students", [])
+        for student in students:
+            if student.get("id", "").upper() == student_id or student.get("student_id", "").upper() == student_id:
+                return self._normalize_student(student, include_auth=True)
+        return None
+
+    def set_student_password(self, student_id: str, password: str) -> None:
+        """Store a password hash and remove a legacy plaintext password."""
+        password_hash = hash_password(password)
+        self.ensure_connected()
+        student_id = student_id.upper()
+        if self.is_connected and self.db is not None:
+            try:
+                self.db.students.update_one(
+                    {"$or": [
+                        {"id": {"$regex": f"^{student_id}$", "$options": "i"}},
+                        {"student_id": {"$regex": f"^{student_id}$", "$options": "i"}},
+                    ]},
+                    {"$set": {"password_hash": password_hash}, "$unset": {"password": ""}},
+                )
+                return
+            except Exception:
+                self.is_connected = False
+
+        with open(self.fallback_file, "r", encoding="utf-8") as f:
+            db_data = json.load(f)
+        for student in db_data.get("students", []):
+            if student.get("id", "").upper() == student_id or student.get("student_id", "").upper() == student_id:
+                student["password_hash"] = password_hash
+                student.pop("password", None)
+                break
+        with open(self.fallback_file, "w", encoding="utf-8") as f:
+            json.dump(db_data, f, indent=2)
 
     # --- Student Operations ---
     def get_all_students(self) -> List[Dict]:
@@ -181,7 +235,11 @@ class MongoDBManager:
 
     def create_student(self, student_data: Dict) -> Dict:
         self.ensure_connected()
+        student_data = dict(student_data)
         student_data["id"] = student_data.get("id", "").upper()
+        plaintext = student_data.pop("password", None)
+        if plaintext:
+            student_data["password_hash"] = hash_password(plaintext)
         if self.is_connected and self.db is not None:
             try:
                 self.db.students.update_one(
@@ -203,7 +261,11 @@ class MongoDBManager:
 
     def update_student(self, student_id: str, update_data: Dict) -> Optional[Dict]:
         self.ensure_connected()
+        update_data = dict(update_data)
         student_id = student_id.upper()
+        plaintext = update_data.pop("password", None)
+        if plaintext:
+            update_data["password_hash"] = hash_password(plaintext)
         if "id" in update_data:
             update_data["id"] = update_data["id"].upper()
         if self.is_connected and self.db is not None:

@@ -30,48 +30,22 @@
 
     <section class="panel pathway-controls" aria-labelledby="pathway-controls-title">
       <div>
-        <span class="eyebrow">Plan settings &bull; Dynamic Sequencing</span>
-        <h2 id="pathway-controls-title">Build your personalized degree pathway</h2>
-        <p>Select your starting academic term, specialization track, pacing strategy, and maximum term load to dynamically sequence your remaining graduation requirements.</p>
+        <span class="eyebrow">Plan settings</span>
+        <h2 id="pathway-controls-title">Build your remaining degree route</h2>
+        <p>Adjust the maximum semester load and target graduation, then regenerate the sequence.</p>
       </div>
-      <form data-pathway-form class="pathway-form pathway-form-expanded">
-        <label>Start Planning From
-          <select name="start_semester">
-            <option value="AUTO" selected>Auto (Current Term · III-1)</option>
-            <option value="III Year I Semester">III Year I Sem (Fall 2026)</option>
-            <option value="III Year II Semester">III Year II Sem (Spring 2027)</option>
-            <option value="IV Year I Semester">IV Year I Sem (Fall 2027)</option>
-            <option value="IV Year II Semester">IV Year II Sem (Spring 2028)</option>
-          </select>
-        </label>
-        <label>Career / Elective Focus
-          <select name="elective_track">
-            <option value="GENERAL" selected>General / Standard Track</option>
-            <option value="AI_ML">🤖 AI &amp; Machine Learning</option>
-            <option value="DATA_SCIENCE">📊 Data Science &amp; Analytics</option>
-            <option value="CLOUD_SYSTEMS">☁️ Cloud &amp; Distributed Systems</option>
-            <option value="CYBERSECURITY">🔒 Cybersecurity &amp; Defense</option>
-          </select>
-        </label>
-        <label>Pacing Mode
-          <select name="pacing_strategy">
-            <option value="BALANCED" selected>Balanced Load</option>
-            <option value="ACCELERATED">Fast-Track (Accelerated)</option>
-            <option value="RELAXED">Relaxed (Steady Pace)</option>
-          </select>
-        </label>
-        <label>Max credits per term
+      <form data-pathway-form class="pathway-form">
+        <label>Maximum credits per semester
           <select name="max_credits">
             <option value="14">14 credits</option>
             <option value="16" selected>16 credits</option>
             <option value="18">18 credits</option>
-            <option value="20">20 credits</option>
           </select>
         </label>
         <label>Target graduation
           <input name="target_graduation" type="text" placeholder="May 2028">
         </label>
-        <button class="btn btn-primary pathway-submit-btn" type="submit">Regenerate pathway <span aria-hidden="true">&rarr;</span></button>
+        <button class="btn btn-primary" type="submit">Regenerate pathway <span aria-hidden="true">&rarr;</span></button>
       </form>
     </section>
 
@@ -90,7 +64,7 @@
   <div id="toast"></div>
 
   <!-- Operational Lifecycle Scripts -->
-  <script src="portal.js?v=15"></script>
-  <script src="feature.js?v=12"></script>
+  <script src="portal.js?v=16"></script>
+  <script src="feature.js?v=13"></script>
 </body>
 </html>

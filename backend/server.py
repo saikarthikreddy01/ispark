@@ -8,14 +8,17 @@ import os
 import json
 import uuid
 import datetime
+import hmac
 from pathlib import Path
 from typing import Dict, List, Optional, Any
-from fastapi import FastAPI, HTTPException
+from fastapi import Depends, FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
 from fastapi.staticfiles import StaticFiles
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 from backend.database import db_manager
+from backend.security import load_faculty_account, public_faculty, verify_password
 
 app = FastAPI(
     title="Academic AI Advisor — 3D Graph-RAG Platform",
@@ -42,17 +45,41 @@ def load_json_file(filename: str) -> Any:
             return json.load(f)
     return []
 
+
+def require_session(request: Request) -> Dict[str, Any]:
+    """Return the signed server session or reject unauthenticated requests."""
+    session = dict(request.session)
+    if session.get("role") not in {"student", "faculty"}:
+        raise HTTPException(status_code=401, detail="Authentication required.")
+    return session
+
+
+def require_faculty_session(request: Request) -> Dict[str, Any]:
+    session = require_session(request)
+    if session.get("role") != "faculty":
+        raise HTTPException(status_code=403, detail="Faculty access required.")
+    return session
+
+
+def require_student_identity(request: Request, student_id: str) -> Dict[str, Any]:
+    session = require_session(request)
+    if session.get("role") == "faculty":
+        return session
+    if session.get("student_id", "").upper() != student_id.upper():
+        raise HTTPException(status_code=403, detail="You cannot access another student's record.")
+    return session
+
 # --- Pydantic Request Models ---
 class LoginRequest(BaseModel):
     regno: str
-    password: Optional[str] = "password"
+    password: str
 
 class SignUpRequest(BaseModel):
     name: str
     regno: str
     major: Optional[str] = "Computer Science"
     expected_grad: Optional[str] = "Spring 2027"
-    password: Optional[str] = "password"
+    password: str = Field(min_length=8, max_length=128)
 
 class StudentProfileUpdateRequest(BaseModel):
     academic_history: List[Dict]
@@ -70,10 +97,7 @@ class AuditRequest(BaseModel):
 class PathwayGenerateRequest(BaseModel):
     student_id: str
     max_credits_per_semester: Optional[int] = 16
-    target_graduation: Optional[str] = "May 2028"
-    start_semester: Optional[str] = "AUTO"
-    elective_track: Optional[str] = "GENERAL"
-    pacing_strategy: Optional[str] = "BALANCED"
+    target_graduation: Optional[str] = "Spring 2027"
 
 class SubstitutionApplyRequest(BaseModel):
     student_id: str
@@ -90,7 +114,7 @@ class PetitionSubmitRequest(BaseModel):
 
 class PetitionReviewRequest(BaseModel):
     decision: str  # APPROVED or REJECTED
-    reviewer: str
+    reviewer: Optional[str] = None
     comments: Optional[str] = ""
 
 # --- Admin Module Request Models ---
@@ -107,7 +131,7 @@ class StudentAdminCreateRequest(BaseModel):
     expected_grad: Optional[str] = "Spring 2028"
     completed: Optional[List[str]] = []
     planned: Optional[List[str]] = []
-    password: Optional[str] = "password123"
+    password: str = Field(min_length=8, max_length=128)
 
 class StudentAdminUpdateRequest(BaseModel):
     name: Optional[str] = None
@@ -190,22 +214,20 @@ def health_check():
     }
 
 @app.get("/api/students")
-def get_students():
-    students = db_manager.get_all_students()
-    for s in students:
-        s.pop("password", None)
-    return students
+def get_students(_session: Dict[str, Any] = Depends(require_faculty_session)):
+    return db_manager.get_all_students()
 
 @app.get("/api/student/{student_id}")
-def get_student(student_id: str):
+def get_student(student_id: str, request: Request):
+    require_student_identity(request, student_id)
     student = db_manager.get_student_by_id(student_id)
     if not student:
         raise HTTPException(status_code=404, detail="Student not found")
-    student.pop("password", None)
     return student
 
 @app.put("/api/student/{student_id}/profile")
-def update_student_profile(student_id: str, request: StudentProfileUpdateRequest):
+def update_student_profile(student_id: str, profile: StudentProfileUpdateRequest, request: Request):
+    require_student_identity(request, student_id)
     student = db_manager.get_student_by_id(student_id)
     if not student:
         raise HTTPException(status_code=404, detail="Student not found")
@@ -218,7 +240,7 @@ def update_student_profile(student_id: str, request: StudentProfileUpdateRequest
     ALLOWED_GRADES = {"O", "S", "A+", "A", "B+", "B", "C", "P", "F", "-"}
     NON_GRADED_GRADES = {"-"}
     
-    for semester in request.academic_history:
+    for semester in profile.academic_history:
         for course in semester.get("courses", []):
             code = str(course.get("code") or course.get("course_id") or "").strip().upper()
             name = str(course.get("name") or "").strip()
@@ -269,14 +291,14 @@ def update_student_profile(student_id: str, request: StudentProfileUpdateRequest
     new_gpa = round(total_points / total_credits, 2) if total_credits > 0 else student.get("gpa", 0)
     
     update_data = {
-        "academic_history": request.academic_history,
+        "academic_history": profile.academic_history,
         "gpa": new_gpa,
         "gpa_scale": 10,
         "completed": completed_courses
     }
     
-    if request.career_goals is not None:
-        update_data["career_goals"] = request.career_goals
+    if profile.career_goals is not None:
+        update_data["career_goals"] = profile.career_goals
         
     updated = db_manager.update_student(student_id, update_data)
     if not updated:
@@ -339,26 +361,25 @@ def get_equivalencies():
 # --- 2. AUTHENTICATION ---
 
 @app.post("/api/auth/login")
-def login(req: LoginRequest):
+def login(req: LoginRequest, request: Request):
     regno = req.regno.strip().upper()
-    student = db_manager.get_student_by_id(regno)
-    
-    # Fallback search by ID case-insensitively
-    if not student:
-        all_students = db_manager.get_all_students()
-        for s in all_students:
-            if s.get("id", "").strip().upper() == regno:
-                student = s
-                break
+    auth_record = db_manager.get_student_auth_by_id(regno)
+    if not auth_record:
+        raise HTTPException(status_code=401, detail="Invalid student ID or password.")
 
-    if not student:
-        raise HTTPException(status_code=401, detail=f"Student ID '{regno}' not found. Please click 'Sign Up' to create your account.")
-    
-    stored_pwd = student.get("password")
-    if stored_pwd and req.password != stored_pwd:
+    password_valid = verify_password(req.password, auth_record.get("password_hash", ""))
+    legacy_password = auth_record.get("password")
+    if not password_valid and legacy_password:
+        password_valid = hmac.compare_digest(req.password, str(legacy_password))
+        if password_valid:
+            db_manager.set_student_password(regno, req.password)
+
+    if not password_valid:
         raise HTTPException(status_code=401, detail="Incorrect password.")
 
-    student.pop("password", None)
+    student = db_manager.get_student_by_id(regno)
+    request.session.clear()
+    request.session.update({"role": "student", "student_id": regno})
 
     return {
         "success": True,
@@ -366,12 +387,32 @@ def login(req: LoginRequest):
         "student": student
     }
 
-@app.api_route("/api/auth/logout", methods=["GET", "POST", "OPTIONS"])
-def logout():
-    return {"success": True, "message": "Logged out successfully"}
+@app.get("/api/auth/session")
+def auth_session(request: Request):
+    session = require_session(request)
+    if session["role"] == "faculty":
+        return {"authenticated": True, "role": "faculty", "user": session.get("user", {})}
+
+    student = db_manager.get_student_by_id(session.get("student_id", ""))
+    if not student:
+        request.session.clear()
+        raise HTTPException(status_code=401, detail="Student account no longer exists.")
+    return {"authenticated": True, "role": "student", "student": student}
+
+
+@app.post("/api/auth/logout")
+def logout(request: Request):
+    request.session.clear()
+    return JSONResponse(
+        {"success": True, "message": "Logged out successfully."},
+        headers={
+            "Cache-Control": "no-store",
+            "Clear-Site-Data": '"cache", "cookies", "storage"',
+        },
+    )
 
 @app.post("/api/auth/signup")
-def signup(req: SignUpRequest):
+def signup(req: SignUpRequest, request: Request):
     regno = req.regno.strip().upper()
     existing = db_manager.get_student_by_id(regno)
     if existing:
@@ -380,7 +421,7 @@ def signup(req: SignUpRequest):
     new_student = {
         "id": regno,
         "name": req.name.strip(),
-        "password": req.password or "password123",
+        "password": req.password,
         "major": req.major or "Computer Science",
         "gpa": 7.78,
         "completed": ["CS101", "MATH101", "CS102", "MATH201", "PHYS101", "CS201", "CS250", "ENG101"],
@@ -391,6 +432,8 @@ def signup(req: SignUpRequest):
     }
 
     saved = db_manager.create_student(new_student)
+    request.session.clear()
+    request.session.update({"role": "student", "student_id": regno})
     return {
         "success": True,
         "message": f"Student account {regno} registered successfully in MongoDB Atlas!",
@@ -412,7 +455,8 @@ def get_gemini_status():
 _advisor_instance = None
 
 @app.post("/api/chat")
-def advisor_chat(req: ChatRequest):
+def advisor_chat(req: ChatRequest, request: Request):
+    require_student_identity(request, req.student_id)
     global _advisor_instance
     student = db_manager.get_student_by_id(req.student_id)
     
@@ -467,18 +511,19 @@ def advisor_chat(req: ChatRequest):
         }
 
 @app.get("/api/chat/history/{student_id}")
-def get_chat_history(student_id: str):
+def get_chat_history(student_id: str, request: Request):
+    require_student_identity(request, student_id)
     history = db_manager.get_chat_history(student_id)
     return {"history": history}
 
 # --- 4. TOPOLOGICAL DEGREE PATHWAY GENERATION ---
 
 @app.post("/api/pathway/generate")
-def generate_degree_pathway(req: PathwayGenerateRequest):
+def generate_degree_pathway(req: PathwayGenerateRequest, request: Request):
+    require_student_identity(request, req.student_id)
     """
     Computes optimal multi-semester degree sequencing using Topological Sorting DAG.
-    Considers completed courses, prerequisites, term offerings (Fall/Spring), starting semester,
-    elective track preferences, and max credit caps.
+    Considers completed courses, prerequisites, term offerings (Fall/Spring), and max credit caps.
     """
     student = db_manager.get_student_by_id(req.student_id)
     if not student:
@@ -495,66 +540,18 @@ def generate_degree_pathway(req: PathwayGenerateRequest):
     for sem in req_file.get("semesters_structure", []):
         structure_required.extend(sem.get("courses", []))
     
-    required_ids = structure_required if structure_required else req_file.get("required_courses", [])
+    required_ids = structure_required
     
-    # Remaining uncompleted required courses
+    # Remaining uncompleted courses
     remaining = [cid for cid in required_ids if cid not in completed and cid in course_map]
 
-    # Categorize courses & identify tracks
-    def parse_ltpc(ltpc_str, cr_val):
-        try:
-            parts = str(ltpc_str or "").split("-")
-            if len(parts) >= 4:
-                l, t, p, c = int(parts[0]), int(parts[1]), int(parts[2]), int(parts[3])
-                th = l + t
-                pr = p // 2 if p > 0 else 0
-                if th + pr != c and c > 0:
-                    th = max(0, c - pr)
-                return th, pr
-        except Exception:
-            pass
-        cr = int(cr_val or 3)
-        return max(1, cr - 1), max(0, cr - max(1, cr - 1))
-
-    # Track classification helper
-    track_keywords = {
-        "AI_ML": ["artificial intelligence", "machine learning", "deep learning", "nlp", "computer vision", "neural", "soft computing", "ai", "ml", "24cs302", "22cs804", "24cs306"],
-        "DATA_SCIENCE": ["data analytics", "big data", "data mining", "data science", "statistics", "business intelligence", "visualization", "predictive"],
-        "CLOUD_SYSTEMS": ["cloud computing", "distributed", "web technologies", "devops", "microservices", "full stack", "operating systems", "architecture", "networks"],
-        "CYBERSECURITY": ["information security", "cryptography", "network security", "ethical hacking", "cyber", "forensics", "secure coding"],
-    }
-    chosen_track = (req.elective_track or "GENERAL").upper().replace(" ", "_")
-
-    def course_matches_track(cid, c_obj):
-        if chosen_track == "GENERAL" or chosen_track not in track_keywords:
-            return False
-        keywords = track_keywords[chosen_track]
-        text = f"{cid} {c_obj.get('name', '')} {c_obj.get('description', '')} {c_obj.get('category', '')}".lower()
-        return any(k in text for k in keywords)
-
-    # Add elective options based on track preference
-    all_electives = [c["id"] for c in courses if "ELECTIVE" in c.get("credit_categories", []) or "Elective" in c.get("category", "")]
-    # Sort electives so track-matching electives come first
-    all_electives.sort(key=lambda el: 0 if course_matches_track(el, course_map[el]) else 1)
-
+    # Additional electives if needed
+    all_electives = [c["id"] for c in courses if "ELECTIVE" in c.get("credit_categories", []) or c.get("category") == "Elective"]
     for el in all_electives:
-        if el not in completed and el not in remaining and len(remaining) < 16:
+        if el not in completed and el not in remaining and len(remaining) < 14:
             remaining.append(el)
 
-    # Identify bottleneck courses (>= 2 dependents)
-    blocking_counts = {c["id"]: 0 for c in courses}
-    for c in courses:
-        prereqs = []
-        for g in c.get("prerequisite_groups", []):
-            for p in g.get("prerequisites", []):
-                prereqs.append(p.get("course_id"))
-        if not prereqs and "prereqs" in c:
-            prereqs = c["prereqs"]
-        for p in prereqs:
-            if p in blocking_counts:
-                blocking_counts[p] += 1
-
-    # Topological Sort by prerequisite depth and track priority
+    # Topological Sort by prerequisite depth
     def get_prereq_depth(cid, visited=None):
         if visited is None:
             visited = set()
@@ -572,87 +569,34 @@ def generate_degree_pathway(req: PathwayGenerateRequest):
             return 0
         return 1 + max([get_prereq_depth(p, visited.copy()) for p in prereqs if p in course_map], default=0)
 
-    # Sort remaining courses by topological level, track priority boost, semester order, and difficulty
-    def sort_key(cid):
-        c = course_map[cid]
-        depth = get_prereq_depth(cid)
-        track_boost = 0 if course_matches_track(cid, c) else 1
-        sem_pref = c.get("sem", 99) or 99
-        diff = c.get("difficulty_level", 2)
-        bottleneck_pri = -blocking_counts.get(cid, 0)
-        return (depth, track_boost, sem_pref, bottleneck_pri, diff)
-
-    remaining.sort(key=sort_key)
-
-    # Academic term sequence definition (Terms 1 to 8)
-    academic_term_sequence = [
-        ("I Year I Semester", "FALL", 1, 1, 2024),
-        ("I Year II Semester", "SPRING", 1, 2, 2025),
-        ("II Year I Semester", "FALL", 2, 3, 2025),
-        ("II Year II Semester", "SPRING", 2, 4, 2026),
-        ("III Year I Semester", "FALL", 3, 5, 2026),
-        ("III Year II Semester", "SPRING", 3, 6, 2027),
-        ("IV Year I Semester", "FALL", 4, 7, 2027),
-        ("IV Year II Semester", "SPRING", 4, 8, 2028),
-    ]
-
-    def get_term_index(term_str: str) -> int:
-        text = str(term_str or "").strip().upper()
-        if not text or text == "AUTO":
-            return 4  # Default to III-1 for third-year students
-        if "IV YEAR" in text or "4TH YEAR" in text or "YEAR 4" in text or "YEAR-4" in text or "4-1" in text or "4-2" in text:
-            if "II SEM" in text or "2ND SEM" in text or "SEM 2" in text or "4-2" in text or "SEM 8" in text or "SPRING" in text:
-                return 7
-            return 6
-        if "III YEAR" in text or "3RD YEAR" in text or "YEAR 3" in text or "YEAR-3" in text or "3-1" in text or "3-2" in text:
-            if "II SEM" in text or "2ND SEM" in text or "SEM 2" in text or "3-2" in text or "SEM 6" in text:
-                return 5
-            return 4
-        if "II YEAR" in text or "2ND YEAR" in text or "YEAR 2" in text or "YEAR-2" in text or "2-1" in text or "2-2" in text:
-            if "II SEM" in text or "2ND SEM" in text or "SEM 2" in text or "2-2" in text or "SEM 4" in text:
-                return 3
-            return 2
-        if "I YEAR" in text or "1ST YEAR" in text or "YEAR 1" in text or "YEAR-1" in text or "1-1" in text or "1-2" in text:
-            if "II SEM" in text or "2ND SEM" in text or "SEM 2" in text or "1-2" in text or "SEM 2" in text:
-                return 1
-            return 0
-        return 4
-
-    req_start = (req.start_semester or "AUTO").strip()
-    if req_start.upper() != "AUTO":
-        start_seq_idx = get_term_index(req_start)
-    else:
-        curr_sem = str(student.get("current_semester", "")).strip()
-        start_seq_idx = get_term_index(curr_sem)
-
-    # Pacing adjustment
-    effective_max_credits = req.max_credits_per_semester or 16
-    if req.pacing_strategy == "ACCELERATED":
-        effective_max_credits = max(effective_max_credits, 18)
-    elif req.pacing_strategy == "RELAXED":
-        effective_max_credits = min(effective_max_credits, 15)
+    # Sort remaining courses by topological dependency level
+    remaining.sort(key=lambda cid: (get_prereq_depth(cid), course_map[cid].get("difficulty_level", 2)))
 
     # Schedule across remaining semesters dynamically
     semesters = []
     current_pool = set(completed)
     to_schedule = list(remaining)
     
+    import datetime
+    current_year = datetime.datetime.now().year
+    current_month = datetime.datetime.now().month
+    
+    # Start next available major semester
+    start_season = "FALL" if current_month >= 6 else "SPRING"
+    start_year = current_year if current_month >= 6 else current_year
+    
     sem_idx = 0
-    max_semesters = 10
-    total_bottlenecks_cleared = []
+    max_semesters = 12
     
     while to_schedule and sem_idx < max_semesters:
-        term_pointer = (start_seq_idx + sem_idx)
-        if term_pointer < len(academic_term_sequence):
-            term_name, sem_season, term_year_num, sem_num, cal_year = academic_term_sequence[term_pointer]
+        if start_season == "FALL":
+            sem_season = "FALL" if sem_idx % 2 == 0 else "SPRING"
+            sem_year = start_year + (sem_idx // 2) if sem_season == "FALL" else start_year + (sem_idx // 2) + 1
         else:
-            ext_year = 4 + (term_pointer - 7 + 1) // 2
-            sem_season = "FALL" if term_pointer % 2 == 0 else "SPRING"
-            term_name = f"Extended Term {term_pointer + 1} ({sem_season.capitalize()})"
-            cal_year = 2028 + (term_pointer - 7) // 2
+            sem_season = "SPRING" if sem_idx % 2 == 0 else "FALL"
+            sem_year = start_year + (sem_idx // 2) if sem_season == "SPRING" else start_year + (sem_idx // 2)
 
-        cal_name = f"{sem_season.capitalize()} {cal_year}"
-        
+        s_name = f"{sem_season.capitalize()} {sem_year}"
         sem_courses = []
         sem_credits = 0
 
@@ -678,57 +622,24 @@ def generate_degree_pathway(req: PathwayGenerateRequest):
         # Pick up to credit limit
         for cid in eligible_this_sem:
             cr = course_map[cid].get("credits", 3)
-            if sem_credits + cr <= effective_max_credits:
+            if sem_credits + cr <= req.max_credits_per_semester:
                 sem_courses.append(cid)
                 sem_credits += cr
                 to_schedule.remove(cid)
 
+        # If no courses could be scheduled this semester, we might be stuck in a prerequisite deadlock, but we shouldn't infinite loop. 
+        # Actually, advancing the semester season might unlock spring-only or fall-only courses, so we let it continue until max_semesters.
+        
         # Update current_pool with courses completed in this scheduled semester
         current_pool.update(sem_courses)
 
         if sem_courses:
-            term_course_objs = []
-            term_theory = 0
-            term_practical = 0
-            term_diff_sum = 0
-            term_cleared_bn = []
-
-            for cid in sem_courses:
-                c_obj = dict(course_map[cid])
-                cr = int(c_obj.get("credits", 3) or 3)
-                th, pr = parse_ltpc(c_obj.get("ltpc"), cr)
-                c_obj["theory_credits"] = th
-                c_obj["practical_credits"] = pr
-                c_obj["is_bottleneck"] = blocking_counts.get(cid, 0) >= 2
-                c_obj["is_track_match"] = course_matches_track(cid, c_obj)
-                
-                term_theory += th
-                term_practical += pr
-                term_diff_sum += c_obj.get("difficulty_level", 2)
-                if c_obj["is_bottleneck"]:
-                    term_cleared_bn.append(cid)
-                    total_bottlenecks_cleared.append(cid)
-                term_course_objs.append(c_obj)
-
-            avg_diff = round(term_diff_sum / max(1, len(sem_courses)), 1)
-            workload_tag = "Balanced"
-            if sem_credits >= 18 or avg_diff >= 3.2:
-                workload_tag = "Intensive"
-            elif sem_credits <= 13:
-                workload_tag = "Light"
-
             semesters.append({
                 "semester_index": sem_idx + 1,
-                "name": cal_name,
-                "academic_term": term_name,
+                "name": s_name,
                 "season": sem_season,
-                "courses": term_course_objs,
+                "courses": [course_map[cid] for cid in sem_courses if cid in course_map],
                 "total_credits": sem_credits,
-                "theory_credits": term_theory,
-                "practical_credits": term_practical,
-                "difficulty_score": avg_diff,
-                "workload_intensity": workload_tag,
-                "bottlenecks_cleared": term_cleared_bn,
                 "status": "Optimal"
             })
         sem_idx += 1
@@ -751,84 +662,6 @@ def generate_degree_pathway(req: PathwayGenerateRequest):
     ) if degree_credits_required else 0
     plan_complete = len(to_schedule) == 0
 
-    # Calculate Category Breakdown Progress
-    cat_defs = {
-        "PROFESSIONAL_CORE": {"name": "Professional Core (PCC)", "min": 55, "completed": 0, "planned": 0},
-        "BASIC_SCIENCES": {"name": "Basic Sciences & Math (BSC)", "min": 20, "completed": 0, "planned": 0},
-        "BASIC_ENGINEERING": {"name": "Engineering Sciences (ESC)", "min": 15, "completed": 0, "planned": 0},
-        "DEPARTMENT_ELECTIVE": {"name": "Professional Electives (PEC)", "min": 18, "completed": 0, "planned": 0},
-        "OPEN_ELECTIVE": {"name": "Open Electives (OEC)", "min": 12, "completed": 0, "planned": 0},
-        "HUMANITIES": {"name": "Humanities & Management (HSMC)", "min": 10, "completed": 0, "planned": 0},
-        "PROJECT": {"name": "Projects & Internships (PRJ)", "min": 30, "completed": 0, "planned": 0},
-    }
-
-    def categorize_course(cid):
-        c = course_map.get(cid, {})
-        cat = str(c.get("category", "")).upper()
-        ccats = [str(x).upper() for x in c.get("credit_categories", [])]
-        name = str(c.get("name", "")).upper()
-        
-        if "PROJECT" in cat or "INTERNSHIP" in cat or "PROJECT" in name or "SOCIO-CENTRIC" in name or "24CS299" in cid or "22CS404" in cid or "24CS403" in cid:
-            return "PROJECT"
-        if "OPEN ELECTIVE" in cat or "OPEN_ELECTIVE" in ccats:
-            return "OPEN_ELECTIVE"
-        if "DEPARTMENT ELECTIVE" in cat or "PROFESSIONAL ELECTIVE" in cat or "ELECTIVE" in ccats:
-            return "DEPARTMENT_ELECTIVE"
-        if "MATHEMATICS" in cat or "PHYSICS" in cat or "CHEMISTRY" in cat or "BASIC SCIENCES" in cat or "BSC" in ccats or cid.startswith("24MT") or cid.startswith("24PY") or cid.startswith("24CY"):
-            return "BASIC_SCIENCES"
-        if "BASIC ENGINEERING" in cat or "ESC" in ccats or cid.startswith("24EE") or cid.startswith("24ME") or cid.startswith("24CT"):
-            return "BASIC_ENGINEERING"
-        if "HUMANITIES" in cat or "MANAGEMENT" in cat or "ENGLISH" in cat or "HSMC" in ccats or cid.startswith("24MS") or cid.startswith("24EN") or cid.startswith("22TP") or cid.startswith("24TP") or cid.startswith("24SS") or cid.startswith("24SA"):
-            return "HUMANITIES"
-        return "PROFESSIONAL_CORE"
-
-    for cid in completed:
-        if cid in course_map:
-            k = categorize_course(cid)
-            cr = int(course_map[cid].get("credits", 0) or 0)
-            if k in cat_defs:
-                cat_defs[k]["completed"] += cr
-
-    for cid in all_planned:
-        if cid in course_map:
-            k = categorize_course(cid)
-            cr = int(course_map[cid].get("credits", 0) or 0)
-            if k in cat_defs:
-                cat_defs[k]["planned"] += cr
-
-    category_breakdown = []
-    for k, v in cat_defs.items():
-        total_cr = v["completed"] + v["planned"]
-        req_cr = v["min"]
-        pct = min(100, round((total_cr / max(1, req_cr)) * 100))
-        category_breakdown.append({
-            "category_key": k,
-            "category_name": v["name"],
-            "completed_credits": v["completed"],
-            "planned_credits": v["planned"],
-            "total_credits": total_cr,
-            "required_credits": req_cr,
-            "fulfillment_percent": pct,
-            "status": "Fulfilled" if total_cr >= req_cr else "In Progress"
-        })
-
-    # Overall timeline feasibility
-    target_terms_count = 4 # default to 4 future terms for 3rd year student
-    avg_credits_term = round(planned_credits / max(1, len(semesters)), 1)
-    velocity_needed = round((degree_credits_required - completed_credits) / max(1, target_terms_count), 1)
-    
-    feasibility = "ON_TRACK"
-    if len(semesters) > target_terms_count:
-        feasibility = "REVIEW_REQUIRED"
-    elif len(semesters) < target_terms_count:
-        feasibility = "ACCELERATED"
-
-    # Total theory vs practical planned
-    total_planned_th = sum(s["theory_credits"] for s in semesters)
-    total_planned_pr = sum(s["practical_credits"] for s in semesters)
-
-    start_term_label = academic_term_sequence[start_seq_idx][0] if start_seq_idx < len(academic_term_sequence) else req_start
-
     return {
         "success": plan_complete,
         "student_id": student["id"],
@@ -839,36 +672,21 @@ def generate_degree_pathway(req: PathwayGenerateRequest):
         "degree_credits_required": degree_credits_required,
         "degree_progress_percent": progress_percent,
         "projected_credits": completed_credits + planned_credits,
-        "average_credits_per_term": avg_credits_term,
-        "credit_velocity_required": velocity_needed,
-        "timeline_feasibility": feasibility,
-        "start_semester": start_term_label,
         "target_graduation": req.target_graduation,
-        "elective_track": req.elective_track or "GENERAL",
-        "pacing_strategy": req.pacing_strategy or "BALANCED",
-        "category_breakdown": category_breakdown,
-        "workload_overview": {
-            "total_theory_credits": total_planned_th,
-            "total_practical_credits": total_planned_pr,
-            "theory_practical_ratio": f"{round((total_planned_th / max(1, total_planned_th + total_planned_pr)) * 100)}% Theory · {round((total_planned_pr / max(1, total_planned_th + total_planned_pr)) * 100)}% Practical",
-            "bottlenecks_cleared_count": len(total_bottlenecks_cleared),
-            "bottlenecks_cleared": list(set(total_bottlenecks_cleared))
-        },
         "unscheduled_courses": to_schedule,
         "plan_status": "VERIFIED_CANDIDATE" if plan_complete else "REVIEW_REQUIRED",
         "constraints_checked": [
             "prerequisite sequence",
             "semester offering",
-            f"maximum {effective_max_credits}-credit load",
-            f"start term: {start_term_label}",
-            f"elective track: {req.elective_track or 'General'}",
+            f"maximum {req.max_credits_per_semester}-credit load",
         ],
     }
 
 # --- 5. FORMAL CONSTRAINT CONFLICT AUDITOR ---
 
 @app.post("/api/audit/verify")
-def verify_schedule_constraints(req: AuditRequest):
+def verify_schedule_constraints(req: AuditRequest, request: Request):
+    require_student_identity(request, req.student_id)
     """
     Formal constraint checking:
     1. Prerequisite completion & minimum grade verification
@@ -1010,7 +828,8 @@ def verify_schedule_constraints(req: AuditRequest):
 # --- 6. BOTTLENECK & GRADUATION-RISK ANALYSIS ---
 
 @app.get("/api/bottlenecks/{student_id}")
-def analyze_bottlenecks_and_risk(student_id: str):
+def analyze_bottlenecks_and_risk(student_id: str, request: Request):
+    require_student_identity(request, student_id)
     """
     Identifies high-impact bottleneck courses (courses blocking 3+ downstream requirements)
     and computes student's personalized Graduation Risk Index (0-100%).
@@ -1113,7 +932,8 @@ def get_substitutions_for_course(course_id: str):
     return {"course_id": course_id, "substitutions": matches}
 
 @app.post("/api/substitutions/apply")
-def apply_course_substitution(req: SubstitutionApplyRequest):
+def apply_course_substitution(req: SubstitutionApplyRequest, request: Request):
+    require_student_identity(request, req.student_id)
     student = db_manager.get_student_by_id(req.student_id)
     if not student:
         raise HTTPException(status_code=404, detail="Student not found")
@@ -1194,11 +1014,19 @@ def get_academic_policies():
 # --- 9. FORMAL FACULTY REVIEW & PETITION GOVERNANCE BOARD ---
 
 @app.get("/api/petitions")
-def list_petitions():
-    return db_manager.get_all_petitions()
+def list_petitions(request: Request):
+    session = require_session(request)
+    petitions = db_manager.get_all_petitions()
+    if session["role"] == "student":
+        student_id = session.get("student_id", "").upper()
+        petitions = [item for item in petitions if item.get("student_id", "").upper() == student_id]
+    return petitions
 
 @app.post("/api/petitions/submit")
-def submit_petition(req: PetitionSubmitRequest):
+def submit_petition(req: PetitionSubmitRequest, request: Request):
+    session = require_session(request)
+    if session.get("role") != "student" or session.get("student_id", "").upper() != req.student_id.upper():
+        raise HTTPException(status_code=403, detail="A student may submit only their own petition.")
     student = db_manager.get_student_by_id(req.student_id)
     if not student:
         raise HTTPException(status_code=404, detail="Student not found")
@@ -1246,11 +1074,20 @@ def submit_petition(req: PetitionSubmitRequest):
     }
 
 @app.post("/api/petitions/{petition_id}/review")
-def review_petition(petition_id: str, req: PetitionReviewRequest):
+def review_petition(
+    petition_id: str,
+    req: PetitionReviewRequest,
+    faculty_session: Dict[str, Any] = Depends(require_faculty_session),
+):
+    decision = req.decision.strip().upper()
+    if decision not in {"APPROVED", "REJECTED"}:
+        raise HTTPException(status_code=400, detail="Decision must be APPROVED or REJECTED.")
+    faculty_user = faculty_session.get("user", {})
+    reviewer = faculty_user.get("title") or faculty_user.get("username") or "Faculty reviewer"
     reviewed = db_manager.review_petition(
         petition_id=petition_id,
-        decision=req.decision,
-        reviewer=req.reviewer,
+        decision=decision,
+        reviewer=reviewer,
         comments=req.comments or ""
     )
 
@@ -1258,7 +1095,7 @@ def review_petition(petition_id: str, req: PetitionReviewRequest):
         raise HTTPException(status_code=404, detail="Petition not found")
 
     # If approved, apply resolution directly to student record
-    if req.decision.upper() == "APPROVED":
+    if decision == "APPROVED":
         student = db_manager.get_student_by_id(reviewed["student_id"])
         if student:
             # Clear conflicts or add approved override
@@ -1269,7 +1106,7 @@ def review_petition(petition_id: str, req: PetitionReviewRequest):
 
     return {
         "success": True,
-        "message": f"Petition {petition_id} {req.decision.upper()} by {req.reviewer}.",
+        "message": f"Petition {petition_id} {decision} by {reviewer}.",
         "petition": reviewed
     }
 
@@ -1277,47 +1114,30 @@ def review_petition(petition_id: str, req: PetitionReviewRequest):
 # --- 8. ACADEMIC ADMIN & FACULTY GOVERNANCE MODULE ---
 # =========================================================================
 
-ADMIN_CREDENTIALS = {
-    "admin": "admin123",
-    "dean": "dean123",
-    "hod_cse": "vignan2024",
-    "faculty": "faculty123"
-}
-
 @app.post("/api/admin/login")
-def admin_login(req: AdminLoginRequest):
+def admin_login(req: AdminLoginRequest, request: Request):
     u = req.username.strip().lower()
-    p = req.password.strip()
-    
-    if u in ADMIN_CREDENTIALS and ADMIN_CREDENTIALS[u] == p:
-        role_titles = {
-            "admin": "System Administrator",
-            "dean": "Dean of Academic Affairs",
-            "hod_cse": "Head of Department (CSE)",
-            "faculty": "Academic Faculty Advisor"
-        }
-        return {
-            "success": True,
-            "message": f"Authenticated as {role_titles.get(u, 'Academic Administrator')}",
-            "user": {
-                "username": u,
-                "role": "ADMIN",
-                "title": role_titles.get(u, "Academic Administrator"),
-                "department": "Computer Science & Engineering",
-                "institution": "VFSTR (Deemed to be University)"
-            }
-        }
-        
-    raise HTTPException(status_code=401, detail="Invalid admin username or password.")
+    account = load_faculty_account(u)
+    if not account or not verify_password(req.password, account.get("password_hash", "")):
+        raise HTTPException(status_code=401, detail="Invalid faculty username or password.")
+
+    user = public_faculty(account)
+    request.session.clear()
+    request.session.update({"role": "faculty", "user": user})
+    return {
+        "success": True,
+        "message": f"Authenticated as {user.get('title', 'Academic Faculty Advisor')}",
+        "user": user,
+    }
 
 @app.get("/api/admin/stats")
-def get_admin_dashboard_stats():
+def get_admin_dashboard_stats(_session: Dict[str, Any] = Depends(require_faculty_session)):
     """Returns aggregated department overview metrics."""
     return db_manager.get_admin_stats()
 
 # --- Student Management Endpoints ---
 @app.get("/api/admin/students")
-def list_admin_students(search: Optional[str] = None):
+def list_admin_students(search: Optional[str] = None, _session: Dict[str, Any] = Depends(require_faculty_session)):
     students = db_manager.get_all_students()
     if search:
         s_lower = search.lower()
@@ -1332,7 +1152,7 @@ def list_admin_students(search: Optional[str] = None):
     }
 
 @app.post("/api/admin/students")
-def create_admin_student(req: StudentAdminCreateRequest):
+def create_admin_student(req: StudentAdminCreateRequest, _session: Dict[str, Any] = Depends(require_faculty_session)):
     regno = req.id.strip().upper()
     existing = db_manager.get_student_by_id(regno)
     if existing:
@@ -1348,7 +1168,7 @@ def create_admin_student(req: StudentAdminCreateRequest):
         "completed": req.completed or [],
         "planned": req.planned or [],
         "conflicts": [],
-        "password": req.password or "password123"
+        "password": req.password
     }
 
     saved = db_manager.create_student(student_data)
@@ -1359,7 +1179,7 @@ def create_admin_student(req: StudentAdminCreateRequest):
     }
 
 @app.put("/api/admin/students/{student_id}")
-def update_admin_student(student_id: str, req: StudentAdminUpdateRequest):
+def update_admin_student(student_id: str, req: StudentAdminUpdateRequest, _session: Dict[str, Any] = Depends(require_faculty_session)):
     student = db_manager.get_student_by_id(student_id)
     if not student:
         raise HTTPException(status_code=404, detail="Student not found.")
@@ -1390,7 +1210,7 @@ def update_admin_student(student_id: str, req: StudentAdminUpdateRequest):
     }
 
 @app.delete("/api/admin/students/{student_id}")
-def delete_admin_student(student_id: str):
+def delete_admin_student(student_id: str, _session: Dict[str, Any] = Depends(require_faculty_session)):
     success = db_manager.delete_student(student_id)
     if not success:
         raise HTTPException(status_code=404, detail="Student not found or could not be deleted.")
@@ -1401,7 +1221,7 @@ def delete_admin_student(student_id: str):
 
 # --- Course Catalog Management Endpoints ---
 @app.get("/api/admin/courses")
-def list_admin_courses(search: Optional[str] = None):
+def list_admin_courses(search: Optional[str] = None, _session: Dict[str, Any] = Depends(require_faculty_session)):
     courses = db_manager.get_all_courses()
     if search:
         s_lower = search.lower()
@@ -1416,7 +1236,7 @@ def list_admin_courses(search: Optional[str] = None):
     }
 
 @app.post("/api/admin/courses")
-def create_admin_course(req: CourseAdminCreateRequest):
+def create_admin_course(req: CourseAdminCreateRequest, _session: Dict[str, Any] = Depends(require_faculty_session)):
     cid = req.id.strip().upper()
     existing = db_manager.get_course_by_id(cid)
     if existing:
@@ -1432,7 +1252,7 @@ def create_admin_course(req: CourseAdminCreateRequest):
     }
 
 @app.put("/api/admin/courses/{course_id}")
-def update_admin_course(course_id: str, req: CourseAdminUpdateRequest):
+def update_admin_course(course_id: str, req: CourseAdminUpdateRequest, _session: Dict[str, Any] = Depends(require_faculty_session)):
     course = db_manager.get_course_by_id(course_id)
     if not course:
         raise HTTPException(status_code=404, detail="Course not found.")
@@ -1446,7 +1266,7 @@ def update_admin_course(course_id: str, req: CourseAdminUpdateRequest):
     }
 
 @app.delete("/api/admin/courses/{course_id}")
-def delete_admin_course(course_id: str):
+def delete_admin_course(course_id: str, _session: Dict[str, Any] = Depends(require_faculty_session)):
     success = db_manager.delete_course(course_id)
     if not success:
         raise HTTPException(status_code=404, detail="Course not found or could not be deleted.")
@@ -1457,7 +1277,7 @@ def delete_admin_course(course_id: str):
 
 # --- Faculty Petition Review Endpoints ---
 @app.get("/api/admin/petitions")
-def list_admin_petitions():
+def list_admin_petitions(_session: Dict[str, Any] = Depends(require_faculty_session)):
     petitions = db_manager.get_all_petitions()
     return {
         "success": True,
@@ -1467,7 +1287,7 @@ def list_admin_petitions():
 
 # --- Course Equivalency Endpoints ---
 @app.get("/api/admin/equivalencies")
-def list_admin_equivalencies():
+def list_admin_equivalencies(_session: Dict[str, Any] = Depends(require_faculty_session)):
     equivs = db_manager.get_equivalencies()
     return {
         "success": True,
@@ -1476,7 +1296,7 @@ def list_admin_equivalencies():
     }
 
 @app.post("/api/admin/equivalencies")
-def create_admin_equivalency(req: EquivalencyAdminCreateRequest):
+def create_admin_equivalency(req: EquivalencyAdminCreateRequest, _session: Dict[str, Any] = Depends(require_faculty_session)):
     equiv_data = req.model_dump()
     saved = db_manager.create_equivalency(equiv_data)
     return {
@@ -1486,7 +1306,7 @@ def create_admin_equivalency(req: EquivalencyAdminCreateRequest):
     }
 
 @app.delete("/api/admin/equivalencies/{course_id}/{equiv_id}")
-def delete_admin_equivalency(course_id: str, equiv_id: str):
+def delete_admin_equivalency(course_id: str, equiv_id: str, _session: Dict[str, Any] = Depends(require_faculty_session)):
     success = db_manager.delete_equivalency(course_id, equiv_id)
     if not success:
         raise HTTPException(status_code=404, detail="Equivalency rule not found.")
@@ -1497,7 +1317,7 @@ def delete_admin_equivalency(course_id: str, equiv_id: str):
 
 # --- Bottleneck & Cohort Risk Analytics ---
 @app.get("/api/admin/bottlenecks")
-def get_admin_bottleneck_analytics():
+def get_admin_bottleneck_analytics(_session: Dict[str, Any] = Depends(require_faculty_session)):
     courses = db_manager.get_all_courses()
     students = db_manager.get_all_students()
     

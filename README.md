@@ -81,13 +81,16 @@ The current `AcademicVectorStore` is a lightweight **lexical TF-IDF/cosine retri
 
 ```text
 backend/
+  app.py
   database.py
+  security.py
   server.py
 
 data/
   courses.json
   degree_requirements.json
   equivalencies.json
+  faculty_accounts.json
   policies.md
   sample_students.json
 
@@ -227,6 +230,34 @@ After authentication:
 - Student accounts open `home.html`, the personalized advising dashboard.
 - Faculty accounts open `governance.html`, the exception-review workspace.
 
+### Authentication and demo accounts
+
+Authentication uses one signed, HTTP-only `acadgraph_session` cookie. The
+browser does not store a student ID, role, password, or login flag in
+`localStorage`/`sessionStorage`. Login, session verification, protected faculty
+actions, and logout are handled by FastAPI. Logout also sends `Clear-Site-Data`
+and protected pages re-check the server session after a browser back-button
+restore.
+
+Seeded hackathon demo accounts:
+
+- Student: `241FA04077` / `password123`
+- Faculty reviewer: `faculty` / `faculty123`
+
+Only salted PBKDF2 password hashes are committed. These accounts are for the
+prototype demonstration and must be replaced for a real institutional rollout.
+
+For Render, add a long random `SESSION_SECRET` environment variable so signed
+sessions remain valid across service restarts. An optional single faculty
+account override can be supplied with `FACULTY_USERNAME`,
+`FACULTY_PASSWORD_HASH`, `FACULTY_TITLE`, `FACULTY_DEPARTMENT`, and
+`FACULTY_INSTITUTION`. Generate a password hash locally without printing the
+password itself:
+
+```bash
+python -c "from backend.security import hash_password; import getpass; print(hash_password(getpass.getpass()))"
+```
+
 The **Degree Pathway** screen now supports configurable 14/16/18-credit loads,
 target-graduation input, credit-progress metrics, prerequisite-safe term cards,
 constraint status, and unscheduled-course warnings. The **AI Advisor** displays
@@ -240,7 +271,8 @@ Run the agent regression suite:
 python -m unittest discover -s tests -v
 ```
 
-The suite contains 16 checks covering the agent workflow, student transcript,
+The suite contains 22 checks covering authentication/session/logout behavior,
+the agent workflow, student transcript,
 10-point GPA/grades, pathways, bottlenecks, substitutions, faculty escalation,
 citations, landing/login routing, and the enhanced advising UI.
 
@@ -276,5 +308,5 @@ A good response should demonstrate:
 
 - The active document retriever is lexical rather than neural-embedding based.
 - The supplied course-structure PDF is not a complete replacement for official Registrar/Academic Regulations documents.
-- Some legacy FastAPI/UI paths still require security hardening before production use.
+- Seeded student/faculty accounts are demo fixtures and are not an institutional identity provider.
 - This is a hackathon academic-planning prototype, not an official registration or degree-audit system.

@@ -2,7 +2,7 @@
   {
     "id": "241FA04077",
     "name": "SAI KARTHIK REDDY",
-    "password": "password123",
+    "password_hash": "pbkdf2_sha256$260000$_opD31Ql6qda6DABk5byww$ceZ4pPl0xnkF7FEX4JTVYq9X52sblBC53qStIOU53rs",
     "major": "B.Tech Computer Science & Engineering",
     "reg_regulation": "C24",
     "current_semester": "III Year I Semester",
@@ -134,7 +134,7 @@
   {
     "id": "241FA04001",
     "name": "Ananya Sharma",
-    "password": "password123",
+    "password_hash": "pbkdf2_sha256$260000$_opD31Ql6qda6DABk5byww$ceZ4pPl0xnkF7FEX4JTVYq9X52sblBC53qStIOU53rs",
     "major": "B.Tech Computer Science & Engineering",
     "reg_regulation": "C24",
     "current_semester": "II Year II Semester",
@@ -206,7 +206,7 @@
   {
     "id": "241FA04123",
     "name": "Rahul Verma",
-    "password": "password123",
+    "password_hash": "pbkdf2_sha256$260000$_opD31Ql6qda6DABk5byww$ceZ4pPl0xnkF7FEX4JTVYq9X52sblBC53qStIOU53rs",
     "major": "B.Tech Computer Science & Engineering",
     "reg_regulation": "C24",
     "current_semester": "II Year I Semester",
@@ -244,7 +244,7 @@
   {
     "id": "S1001",
     "name": "Alice Johnson",
-    "password": "password123",
+    "password_hash": "pbkdf2_sha256$260000$_opD31Ql6qda6DABk5byww$ceZ4pPl0xnkF7FEX4JTVYq9X52sblBC53qStIOU53rs",
     "major": "B.Tech Computer Science & Engineering",
     "reg_regulation": "C24",
     "current_semester": "III Year I Semester",

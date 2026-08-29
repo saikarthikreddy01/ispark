@@ -7,14 +7,20 @@ hard-coded chatbot decision path from the deployed request flow.
 """
 
 from functools import lru_cache
+import os
+from typing import TYPE_CHECKING
 
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
+from starlette.middleware.sessions import SessionMiddleware
 
 from backend.database import db_manager
+from backend.security import get_session_secret
 from backend.server import app as legacy_app
-from src.agents.orchestrator import AcademicAdvisor
+
+if TYPE_CHECKING:
+    from src.agents.orchestrator import AcademicAdvisor
 
 
 class ChatRequest(BaseModel):
@@ -23,8 +29,10 @@ class ChatRequest(BaseModel):
 
 
 @lru_cache(maxsize=1)
-def get_advisor() -> AcademicAdvisor:
+def get_advisor() -> "AcademicAdvisor":
     """Create one reusable advisor graph per application process."""
+    from src.agents.orchestrator import AcademicAdvisor
+
     return AcademicAdvisor()
 
 
@@ -37,17 +45,43 @@ app = FastAPI(
     version="4.0.0",
 )
 
+allowed_origins = [
+    origin.strip()
+    for origin in os.getenv("ALLOWED_ORIGINS", "").split(",")
+    if origin.strip()
+]
+if allowed_origins:
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=allowed_origins,
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
+
 app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    SessionMiddleware,
+    secret_key=get_session_secret(),
+    session_cookie="acadgraph_session",
+    max_age=60 * 60 * 12,
+    same_site="lax",
+    https_only=os.getenv("RENDER", "").lower() == "true",
 )
 
 
+@app.middleware("http")
+async def prevent_stale_auth_pages(request: Request, call_next):
+    """Stop browsers and hosting proxies from restoring stale auth pages."""
+    response = await call_next(request)
+    path = request.url.path
+    if path.endswith(".html") or path.startswith("/api/auth/"):
+        response.headers["Cache-Control"] = "no-store, max-age=0"
+        response.headers["Pragma"] = "no-cache"
+    return response
+
+
 @app.post("/api/chat")
-def advisor_chat(req: ChatRequest):
+def advisor_chat(req: ChatRequest, request: Request):
     """Run the real multi-agent academic-advising workflow.
 
     Flow:
@@ -55,6 +89,12 @@ def advisor_chat(req: ChatRequest):
       specialist agent -> deterministic verification -> citations -> Gemini
       explanation. Faculty review is prepared when an exception is required.
     """
+    session = dict(request.session)
+    if session.get("role") != "student":
+        raise HTTPException(status_code=401, detail="Student authentication required")
+    if session.get("student_id", "").upper() != req.student_id.upper():
+        raise HTTPException(status_code=403, detail="You cannot access another student's advisor")
+
     student = db_manager.get_student_by_id(req.student_id)
     if not student:
         raise HTTPException(status_code=404, detail="Student not found")
