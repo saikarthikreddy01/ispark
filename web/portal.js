@@ -3,7 +3,11 @@ let signingOut = false;
 let activeSession = null;
 
 function loginPageUrl() {
-  return new URL('login.html', document.baseURI).href;
+  try {
+    return new URL('login.html', document.baseURI || window.location.href).href;
+  } catch (e) {
+    return 'login.html';
+  }
 }
 
 async function api(path, options = {}) {
@@ -56,9 +60,14 @@ function signOut(event) {
     button.disabled = true;
     button.textContent = 'Signing out…';
   }
-
   activeSession = null;
-  window.location.replace(new URL('/logout', window.location.origin).href);
+  try {
+    window.location.replace(new URL('/logout', window.location.origin).href);
+  } catch (e) {
+    console.warn('Redirection error:', e);
+    window.location.href = '/logout';
+    signingOut = false;
+  }
 }
 window.signOut = signOut;
 
@@ -69,7 +78,11 @@ window.addEventListener('pageshow', async function(event) {
     try {
       await api('/api/auth/session', { cache: 'no-store' });
     } catch (error) {
-      window.location.replace(loginPageUrl());
+      try {
+        window.location.replace(loginPageUrl());
+      } catch (e) {
+        window.location.href = 'login.html';
+      }
     }
   }
 });
