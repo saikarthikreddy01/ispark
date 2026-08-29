@@ -50,56 +50,301 @@
         {
           "title": "I Year - I Semester",
           "courses": [
-            {"code": "24CS101", "name": "Programming in C", "credits": 4, "grade": "A", "gpa": 7.52, "month_year": "DECEMBER-2024"},
-            {"code": "24CT101", "name": "Engineering Chemistry", "credits": 4, "grade": "A", "gpa": 7.34, "month_year": "DECEMBER-2024"},
-            {"code": "24CY101", "name": "IT Tools and Cyber Security", "credits": 2, "grade": "S", "gpa": 8.54, "month_year": "DECEMBER-2024"},
-            {"code": "24EE101", "name": "Basics of Electrical and Electronics Engineering", "credits": 3, "grade": "A", "gpa": 8.15, "month_year": "DECEMBER-2024"},
-            {"code": "24EN101", "name": "English Proficiency and Communication Skills", "credits": 1, "grade": "B", "gpa": 6.73, "month_year": "DECEMBER-2024"},
-            {"code": "24MS101", "name": "Management Science", "credits": 3, "grade": "A", "gpa": 7.83, "month_year": "DECEMBER-2024"},
-            {"code": "24MT101", "name": "Linear Algebra and Ordinary Differential Equations", "credits": 4, "grade": "A", "gpa": 7.83, "month_year": "DECEMBER-2024"},
-            {"code": "24SA103", "name": "Physical Fitness, Sports & Games*", "credits": 1, "grade": "-", "gpa": null, "month_year": "DECEMBER-2024"},
-            {"code": "24SS101", "name": "Constitution of India*", "credits": 1, "grade": "-", "gpa": null, "month_year": "DECEMBER-2024"}
+            {
+              "code": "24CS101",
+              "name": "Programming in C",
+              "credits": 4,
+              "grade": "A",
+              "gpa": 7.52,
+              "month_year": "DECEMBER-2024"
+            },
+            {
+              "code": "24CT101",
+              "name": "Engineering Chemistry",
+              "credits": 4,
+              "grade": "A",
+              "gpa": 7.34,
+              "month_year": "DECEMBER-2024"
+            },
+            {
+              "code": "24CY101",
+              "name": "IT Tools and Cyber Security",
+              "credits": 2,
+              "grade": "S",
+              "gpa": 8.54,
+              "month_year": "DECEMBER-2024"
+            },
+            {
+              "code": "24EE101",
+              "name": "Basics of Electrical and Electronics Engineering",
+              "credits": 3,
+              "grade": "A",
+              "gpa": 8.15,
+              "month_year": "DECEMBER-2024"
+            },
+            {
+              "code": "24EN101",
+              "name": "English Proficiency and Communication Skills",
+              "credits": 1,
+              "grade": "B",
+              "gpa": 6.73,
+              "month_year": "DECEMBER-2024"
+            },
+            {
+              "code": "24MS101",
+              "name": "Management Science",
+              "credits": 3,
+              "grade": "A",
+              "gpa": 7.83,
+              "month_year": "DECEMBER-2024"
+            },
+            {
+              "code": "24MT101",
+              "name": "Linear Algebra and Ordinary Differential Equations",
+              "credits": 4,
+              "grade": "A",
+              "gpa": 7.83,
+              "month_year": "DECEMBER-2024"
+            },
+            {
+              "code": "24SA103",
+              "name": "Physical Fitness, Sports & Games*",
+              "credits": 1,
+              "grade": "-",
+              "gpa": null,
+              "month_year": "DECEMBER-2024"
+            },
+            {
+              "code": "24SS101",
+              "name": "Constitution of India*",
+              "credits": 1,
+              "grade": "-",
+              "gpa": null,
+              "month_year": "DECEMBER-2024"
+            }
           ]
         },
         {
           "title": "I Year - II Semester",
           "courses": [
-            {"code": "24CS102", "name": "Problem Solving Using Python", "credits": 3, "grade": "A", "gpa": 7.87, "month_year": "MAY-2025"},
-            {"code": "24CT103", "name": "Environmental Studies", "credits": 3, "grade": "B", "gpa": 6.43, "month_year": "MAY-2025"},
-            {"code": "24EN102", "name": "Technical English Communication", "credits": 3, "grade": "A", "gpa": 7.23, "month_year": "MAY-2025"},
-            {"code": "24ME101", "name": "Engineering Graphics", "credits": 3, "grade": "A", "gpa": 7.02, "month_year": "MAY-2025"},
-            {"code": "24MT102", "name": "Calculus", "credits": 4, "grade": "A", "gpa": 7.81, "month_year": "MAY-2025"},
-            {"code": "24PY102", "name": "Engineering Physics", "credits": 4, "grade": "A", "gpa": 7.21, "month_year": "MAY-2025"},
-            {"code": "24SA101", "name": "Orientation Session*", "credits": 1, "grade": "-", "gpa": null, "month_year": "MAY-2025"},
-            {"code": "24SA102", "name": "Self-Empowerment and Gender Sensitization*", "credits": 1, "grade": "-", "gpa": null, "month_year": "MAY-2025"},
-            {"code": "24SS102", "name": "Indian Knowledge Systems*", "credits": 1, "grade": "-", "gpa": null, "month_year": "MAY-2025"}
+            {
+              "code": "24CS102",
+              "name": "Problem Solving Using Python",
+              "credits": 3,
+              "grade": "A",
+              "gpa": 7.87,
+              "month_year": "MAY-2025"
+            },
+            {
+              "code": "24CT103",
+              "name": "Environmental Studies",
+              "credits": 3,
+              "grade": "B",
+              "gpa": 6.43,
+              "month_year": "MAY-2025"
+            },
+            {
+              "code": "24EN102",
+              "name": "Technical English Communication",
+              "credits": 3,
+              "grade": "A",
+              "gpa": 7.23,
+              "month_year": "MAY-2025"
+            },
+            {
+              "code": "24ME101",
+              "name": "Engineering Graphics",
+              "credits": 3,
+              "grade": "A",
+              "gpa": 7.02,
+              "month_year": "MAY-2025"
+            },
+            {
+              "code": "24MT102",
+              "name": "Calculus",
+              "credits": 4,
+              "grade": "A",
+              "gpa": 7.81,
+              "month_year": "MAY-2025"
+            },
+            {
+              "code": "24PY102",
+              "name": "Engineering Physics",
+              "credits": 4,
+              "grade": "A",
+              "gpa": 7.21,
+              "month_year": "MAY-2025"
+            },
+            {
+              "code": "24SA101",
+              "name": "Orientation Session*",
+              "credits": 1,
+              "grade": "-",
+              "gpa": null,
+              "month_year": "MAY-2025"
+            },
+            {
+              "code": "24SA102",
+              "name": "Self-Empowerment and Gender Sensitization*",
+              "credits": 1,
+              "grade": "-",
+              "gpa": null,
+              "month_year": "MAY-2025"
+            },
+            {
+              "code": "24SS102",
+              "name": "Indian Knowledge Systems*",
+              "credits": 1,
+              "grade": "-",
+              "gpa": null,
+              "month_year": "MAY-2025"
+            }
           ]
         },
         {
           "title": "II Year - I Semester",
           "courses": [
-            {"code": "22CS201", "name": "Database Management Systems", "credits": 4, "grade": "A", "gpa": 8.19, "month_year": "NOVEMBER-2025"},
-            {"code": "22SA220", "name": "Computational Thinking*", "credits": 1, "grade": "-", "gpa": null, "month_year": "NOVEMBER-2025"},
-            {"code": "22TP201", "name": "Data Structures", "credits": 4, "grade": "A", "gpa": 7.03, "month_year": "NOVEMBER-2025"},
-            {"code": "24CS204", "name": "Object Oriented Programming Through Java", "credits": 4, "grade": "A", "gpa": 8.47, "month_year": "NOVEMBER-2025"},
-            {"code": "24CS205", "name": "Front End Application Development", "credits": 2, "grade": "S", "gpa": 8.59, "month_year": "NOVEMBER-2025"},
-            {"code": "24CS208", "name": "Digital Logic Design", "credits": 4, "grade": "A", "gpa": 8.16, "month_year": "NOVEMBER-2025"},
-            {"code": "24CS299", "name": "Design Thinking and Engineering Orientation", "credits": 1, "grade": "A", "gpa": 8.35, "month_year": "NOVEMBER-2025"},
-            {"code": "24CS801", "name": "Industry Interface Course*", "credits": 1, "grade": "-", "gpa": null, "month_year": "NOVEMBER-2025"},
-            {"code": "24MT203", "name": "Discrete Mathematical Structures", "credits": 4, "grade": "A", "gpa": 8.01, "month_year": "NOVEMBER-2025"}
+            {
+              "code": "22CS201",
+              "name": "Database Management Systems",
+              "credits": 4,
+              "grade": "A",
+              "gpa": 8.19,
+              "month_year": "NOVEMBER-2025"
+            },
+            {
+              "code": "22SA220",
+              "name": "Computational Thinking*",
+              "credits": 1,
+              "grade": "-",
+              "gpa": null,
+              "month_year": "NOVEMBER-2025"
+            },
+            {
+              "code": "22TP201",
+              "name": "Data Structures",
+              "credits": 4,
+              "grade": "A",
+              "gpa": 7.03,
+              "month_year": "NOVEMBER-2025"
+            },
+            {
+              "code": "24CS204",
+              "name": "Object Oriented Programming Through Java",
+              "credits": 4,
+              "grade": "A",
+              "gpa": 8.47,
+              "month_year": "NOVEMBER-2025"
+            },
+            {
+              "code": "24CS205",
+              "name": "Front End Application Development",
+              "credits": 2,
+              "grade": "S",
+              "gpa": 8.59,
+              "month_year": "NOVEMBER-2025"
+            },
+            {
+              "code": "24CS208",
+              "name": "Digital Logic Design",
+              "credits": 4,
+              "grade": "A",
+              "gpa": 8.16,
+              "month_year": "NOVEMBER-2025"
+            },
+            {
+              "code": "24CS299",
+              "name": "Design Thinking and Engineering Orientation",
+              "credits": 1,
+              "grade": "A",
+              "gpa": 8.35,
+              "month_year": "NOVEMBER-2025"
+            },
+            {
+              "code": "24CS801",
+              "name": "Industry Interface Course*",
+              "credits": 1,
+              "grade": "-",
+              "gpa": null,
+              "month_year": "NOVEMBER-2025"
+            },
+            {
+              "code": "24MT203",
+              "name": "Discrete Mathematical Structures",
+              "credits": 4,
+              "grade": "A",
+              "gpa": 8.01,
+              "month_year": "NOVEMBER-2025"
+            }
           ]
         },
         {
           "title": "II Year - II Semester",
           "courses": [
-            {"code": "22CS207", "name": "Operating Systems", "credits": 3, "grade": "A", "gpa": 8.14, "month_year": "MAY-2026"},
-            {"code": "22ST202", "name": "Probability & Statistics", "credits": 4, "grade": "A", "gpa": 8.10, "month_year": "MAY-2026"},
-            {"code": "24CS201", "name": "Field Projects", "credits": 1, "grade": "A", "gpa": 8.28, "month_year": "MAY-2026"},
-            {"code": "24CS207", "name": "Full Stack Development", "credits": 2, "grade": "S", "gpa": 8.95, "month_year": "MAY-2026"},
-            {"code": "24CS209", "name": "Design and Analysis of Algorithms", "credits": 4, "grade": "A", "gpa": 8.04, "month_year": "MAY-2026"},
-            {"code": "24CS210", "name": "Computer Organization", "credits": 3, "grade": "A", "gpa": 7.15, "month_year": "MAY-2026"},
-            {"code": "24CS956", "name": "UI or UX Design (H*)", "credits": 4, "grade": "S", "gpa": 9.03, "month_year": "MAY-2026"},
-            {"code": "24SA201", "name": "Universal Human Values*", "credits": 1, "grade": "-", "gpa": null, "month_year": "MAY-2026"}
+            {
+              "code": "22CS207",
+              "name": "Operating Systems",
+              "credits": 3,
+              "grade": "A",
+              "gpa": 8.14,
+              "month_year": "MAY-2026"
+            },
+            {
+              "code": "22ST202",
+              "name": "Probability & Statistics",
+              "credits": 4,
+              "grade": "A",
+              "gpa": 8.1,
+              "month_year": "MAY-2026"
+            },
+            {
+              "code": "24CS201",
+              "name": "Field Projects",
+              "credits": 1,
+              "grade": "A",
+              "gpa": 8.28,
+              "month_year": "MAY-2026"
+            },
+            {
+              "code": "24CS207",
+              "name": "Full Stack Development",
+              "credits": 2,
+              "grade": "S",
+              "gpa": 8.95,
+              "month_year": "MAY-2026"
+            },
+            {
+              "code": "24CS209",
+              "name": "Design and Analysis of Algorithms",
+              "credits": 4,
+              "grade": "A",
+              "gpa": 8.04,
+              "month_year": "MAY-2026"
+            },
+            {
+              "code": "24CS210",
+              "name": "Computer Organization",
+              "credits": 3,
+              "grade": "A",
+              "gpa": 7.15,
+              "month_year": "MAY-2026"
+            },
+            {
+              "code": "24CS956",
+              "name": "UI or UX Design (H*)",
+              "credits": 4,
+              "grade": "S",
+              "gpa": 9.03,
+              "month_year": "MAY-2026"
+            },
+            {
+              "code": "24SA201",
+              "name": "Universal Human Values*",
+              "credits": 1,
+              "grade": "-",
+              "gpa": null,
+              "month_year": "MAY-2026"
+            }
           ]
         }
       ],
@@ -3937,38 +4182,96 @@
         "SPRING"
       ],
       "difficulty_level": 2
+    },
+    {
+      "id": "22SA220",
+      "name": "Computational Thinking",
+      "department": "CSE",
+      "credits": 1,
+      "ltpc": "",
+      "category": "Binary Grade",
+      "sem": 3,
+      "description": "Completed binary-grade course imported from the verified student academic record.",
+      "prerequisite_groups": [],
+      "corequisites": [],
+      "credit_categories": [
+        "BINARY_GRADE"
+      ],
+      "offered_semesters": [
+        "FALL",
+        "SPRING"
+      ],
+      "difficulty_level": 1
+    },
+    {
+      "id": "24CS956",
+      "name": "UI or UX Design",
+      "department": "CSE",
+      "credits": 4,
+      "ltpc": "",
+      "category": "Honours",
+      "sem": 4,
+      "description": "Completed Honours course imported from the verified student academic record.",
+      "prerequisite_groups": [],
+      "corequisites": [],
+      "credit_categories": [
+        "HONOURS"
+      ],
+      "offered_semesters": [
+        "FALL",
+        "SPRING"
+      ],
+      "difficulty_level": 2
     }
   ],
   "equivalencies": [
     {
       "course_id": "24CS402",
       "equivalent_course_id": "22CS953",
-      "notes": "Parallel & Distributed Computing (Core) equivalent to Honours version 22CS953"
+      "notes": "Candidate substitution based on similar Parallel & Distributed Computing content. Not established as an approved equivalency by the supplied course-structure document.",
+      "status": "CANDIDATE",
+      "requires_faculty_approval": true,
+      "source_reference": "Project-derived curriculum similarity; faculty verification required"
     },
     {
       "course_id": "24CS204",
       "equivalent_course_id": "22CS902",
-      "notes": "OOP through Java (Core) equivalent to Minor track 22CS902"
+      "notes": "Candidate mapping between OOP through Java and the Java OOP minor course. Faculty verification required.",
+      "status": "CANDIDATE",
+      "requires_faculty_approval": true,
+      "source_reference": "Project-derived curriculum similarity; faculty verification required"
     },
     {
       "course_id": "22TP201",
       "equivalent_course_id": "22CS801",
-      "notes": "Data Structures satisfies prerequisite bridge for Advanced Data Structures"
+      "notes": "Advanced Data Structures lists Data Structures as prerequisite knowledge; this is not an approved course substitution.",
+      "status": "READINESS_BRIDGE",
+      "requires_faculty_approval": true,
+      "source_reference": "CSE Department Electives: 22CS801 prerequisite knowledge = Data Structures"
     },
     {
       "course_id": "24CS102",
       "equivalent_course_id": "22CS901",
-      "notes": "Problem Solving through Python equivalent to 22CS901"
+      "notes": "Candidate mapping between Python courses. Not an approved substitution in the supplied source.",
+      "status": "CANDIDATE",
+      "requires_faculty_approval": true,
+      "source_reference": "Project-derived curriculum similarity; faculty verification required"
     },
     {
       "course_id": "24CS403",
       "equivalent_course_id": "22CS815",
-      "notes": "Privacy & Intrusion Detection equivalent to IDPS 22CS815"
+      "notes": "Candidate security-course mapping. Not an approved equivalency in the supplied source.",
+      "status": "CANDIDATE",
+      "requires_faculty_approval": true,
+      "source_reference": "Project-derived curriculum similarity; faculty verification required"
     },
     {
       "course_id": "24CS207",
       "equivalent_course_id": "22CS904",
-      "notes": "Full Stack Development (MERN) satisfies Web Technologies 22CS904"
+      "notes": "Candidate web/full-stack mapping. Not an approved substitution in the supplied source.",
+      "status": "CANDIDATE",
+      "requires_faculty_approval": true,
+      "source_reference": "Project-derived curriculum similarity; faculty verification required"
     }
   ],
   "chat_history": [],
