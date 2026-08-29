@@ -528,10 +528,27 @@ async function governance(student) {
 }
 
 async function reviewPetition(petitionId, decision) {
-  const data = await api(`/api/petitions/${encodeURIComponent(petitionId)}/review`, { method:'POST', body:JSON.stringify({ decision, reviewer:'Faculty reviewer', comments:`${decision.toLowerCase()} after formal constraint review.` }) });
-  toast(data.message);
-  const student = await currentStudent();
-  governance(student);
+  const normalizedDecision = String(decision || '').toUpperCase();
+  if (!['APPROVED', 'REJECTED'].includes(normalizedDecision)) {
+    toast('Choose Approve or Reject.');
+    return;
+  }
+
+  try {
+    const data = await api(`/api/petitions/${encodeURIComponent(petitionId)}/review`, {
+      method:'POST',
+      body:JSON.stringify({
+        decision: normalizedDecision,
+        reviewer:'Faculty reviewer',
+        comments:`${normalizedDecision.toLowerCase()} after formal constraint review.`
+      })
+    });
+    toast(data.message);
+    const activeSession = await currentStudent();
+    await governance(activeSession);
+  } catch (error) {
+    toast(`Faculty review failed: ${error.message}`);
+  }
 }
 
 window.applySub = applySub;

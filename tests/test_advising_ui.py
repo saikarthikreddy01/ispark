@@ -26,7 +26,9 @@ class AdvisingUiRegressionTests(unittest.TestCase):
         self.assertIn("localStorage.clear()", self.portal_js)
         self.assertIn("sessionStorage.clear()", self.portal_js)
         self.assertNotIn("fetch(API + '/api/auth/logout'", self.portal_js)
-        self.assertTrue(all('portal.js?v=14' in html for html in self.protected_html))
+        self.assertIn("profileLink.addEventListener('click'", self.portal_js)
+        self.assertIn("['profile.html', 'My profile', 'profile']", self.portal_js)
+        self.assertTrue(all('portal.js?v=15' in html for html in self.protected_html))
 
     def test_pathway_has_controls_progress_and_constraint_status(self):
         for marker in ("data-pathway-form", "data-plan-status", "max_credits", "target_graduation"):
@@ -38,6 +40,8 @@ class AdvisingUiRegressionTests(unittest.TestCase):
         for marker in ("data-advisor-context", "data-agent-status", "data-quick-actions"):
             self.assertIn(marker, self.advisor_html)
         for marker in ("renderAgentTrace", "renderAdvisorEvidence", "citation_details", "needs_faculty_approval"):
+            self.assertIn(marker, self.feature_js)
+        for marker in ("reviewPetition", "await governance(activeSession)", "Faculty review failed"):
             self.assertIn(marker, self.feature_js)
 
 

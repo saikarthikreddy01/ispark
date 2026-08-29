@@ -115,9 +115,10 @@ function nav(active, faculty) {
     ['advisor.html', 'Advisor', 'advisor'],
     ['pathway.html', 'Degree pathway', 'pathway'],
     ['graph.html', 'Knowledge graph', 'graph'],
+    ['profile.html', 'My profile', 'profile'],
     ['governance.html', 'Faculty review', 'governance']
   ];
-  const visibleItems = faculty ? items.filter(([, , key]) => key === 'governance') : items.filter(([, , key]) => key !== 'profile');
+  const visibleItems = faculty ? items.filter(([, , key]) => key === 'governance') : items;
   return visibleItems.map(([href,label,key]) => `<a class="${key === active ? 'active' : ''}" href="${href}">${label}</a>`).join('');
 }
 
@@ -144,8 +145,13 @@ async function initShell(active) {
     profileLink.href = profileHref;
     profileLink.className = 'profile-icon-btn';
     profileLink.setAttribute('data-action', 'profile');
-    profileLink.title = 'My Profile';
+    profileLink.setAttribute('aria-label', 'Open my profile');
+    profileLink.title = faculty ? 'Faculty review workspace' : 'Open my profile';
     profileLink.style.cssText = 'display:inline-flex;align-items:center;gap:8px;text-decoration:none;border:1px solid var(--line,#e2e8f0);border-radius:8px;padding:5px 12px;font-size:13px;color:inherit;background:transparent;cursor:pointer;position:relative;z-index:9999;pointer-events:auto;';
+    profileLink.addEventListener('click', function(event) {
+      event.preventDefault();
+      window.location.href = profileHref;
+    });
 
     const avatar = document.createElement('span');
     avatar.textContent = initial;
