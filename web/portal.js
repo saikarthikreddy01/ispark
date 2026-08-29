@@ -1,11 +1,5 @@
 const API = window.location.protocol === 'file:' ? 'http://127.0.0.1:8000' : window.location.origin;
 let signingOut = false;
-const AUTH_STORAGE_KEYS = [
-  'academic_advisor_permanent_active_user_v3',
-  'academic_advisor_faculty_session',
-  'academic_advisor_cached_student'
-];
-
 function loginPageUrl() {
   return new URL('login.html', document.baseURI).href;
 }
@@ -22,10 +16,10 @@ function hasActiveSession() {
 }
 
 function clearAuthStorage() {
-  AUTH_STORAGE_KEYS.forEach(key => {
-    localStorage.removeItem(key);
-    sessionStorage.removeItem(key);
-  });
+  // This origin belongs only to the advisor demo, so a complete browser-side
+  // clear is simpler and more reliable than maintaining several auth keys.
+  localStorage.clear();
+  sessionStorage.clear();
 }
 
 async function api(path, options = {}) {
@@ -85,16 +79,16 @@ function signOut(event) {
     console.warn('Storage clear error:', e);
   }
 
+  // The query value bypasses a stale cached login navigation on hosted builds.
+  // replace() also prevents the authenticated page remaining in browser history.
+  const target = new URL(loginPageUrl());
+  target.searchParams.set('signed_out', '1');
+  target.searchParams.set('v', String(Date.now()));
   try {
-    fetch(API + '/api/auth/logout', {
-      method: 'POST',
-      credentials: 'include',
-      keepalive: true
-    }).catch(function() {});
-  } catch (e) {}
-
-  // replace() prevents the authenticated page from remaining in browser history.
-  window.location.replace(loginPageUrl());
+    window.location.replace(target.href);
+  } catch (error) {
+    window.location.href = target.href;
+  }
 }
 window.signOut = signOut;
 
