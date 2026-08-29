@@ -1,18 +1,52 @@
 const API = window.location.protocol === 'file:' ? 'http://127.0.0.1:8000' : window.location.origin;
-let signingOut = false;
-let activeSession = null;
 
-function loginPageUrl() {
-  try {
-    return new URL('login.html', document.baseURI || window.location.href).href;
-  } catch (e) {
-    return 'login.html';
-  }
+// --- Storage keys ---
+const AUTH_KEYS = [
+  'academic_advisor_user_id',
+  'academic_advisor_faculty_session',
+  'academic_advisor_cached_student'
+];
+
+// --- Session helpers ---
+function hasActiveSession() {
+  return !!(
+    localStorage.getItem('academic_advisor_user_id') ||
+    localStorage.getItem('academic_advisor_faculty_session') === 'active'
+  );
 }
 
+function isFacultySession() {
+  return localStorage.getItem('academic_advisor_faculty_session') === 'active';
+}
+
+function clearAuthStorage() {
+  AUTH_KEYS.forEach(key => {
+    localStorage.removeItem(key);
+    sessionStorage.removeItem(key);
+  });
+}
+
+// --- Sign out ---
+function signOut(event) {
+  if (event) {
+    event.preventDefault();
+    event.stopPropagation();
+  }
+  clearAuthStorage();
+  window.location.replace('login.html');
+}
+window.signOut = signOut;
+
+// If the browser restores this page from cache and the user has signed out, send them back.
+window.addEventListener('pageshow', function () {
+  if (!hasActiveSession()) {
+    window.location.replace('login.html');
+  }
+});
+
+// --- API helper ---
 async function api(path, options = {}) {
   const response = await fetch(`${API}${path}`, {
-    credentials: 'same-origin',
     headers: { 'Content-Type': 'application/json' },
     ...options
   });
@@ -21,72 +55,14 @@ async function api(path, options = {}) {
   return data;
 }
 
+// --- Escape HTML ---
 function esc(value) {
-  return String(value ?? '').replace(/[&<>'"]/g, char => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', "'":'&#39;', '"':'&quot;' }[char]));
+  return String(value ?? '').replace(/[&<>'"]/g, c => (
+    { '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[c]
+  ));
 }
 
-async function currentStudent() {
-  try {
-    activeSession = await api('/api/auth/session', { cache: 'no-store' });
-    if (activeSession.role === 'faculty') {
-      const user = activeSession.user || {};
-      return {
-        id: '',
-        name: user.title || user.username || 'Faculty reviewer',
-        major: user.department || 'Faculty governance',
-        completed: []
-      };
-    }
-    return activeSession.student || null;
-  } catch (error) {
-    activeSession = null;
-    return null;
-  }
-}
-
-function isFacultySession() {
-  return activeSession?.role === 'faculty';
-}
-
-function signOut(event) {
-  if (event) {
-    event.preventDefault();
-    event.stopPropagation();
-  }
-  if (signingOut) return;
-  signingOut = true;
-  const button = event?.currentTarget;
-  if (button instanceof HTMLButtonElement) {
-    button.disabled = true;
-    button.textContent = 'Signing out…';
-  }
-  activeSession = null;
-  try {
-    window.location.replace(new URL('/logout', window.location.origin).href);
-  } catch (e) {
-    console.warn('Redirection error:', e);
-    window.location.href = '/logout';
-    signingOut = false;
-  }
-}
-window.signOut = signOut;
-
-// A back-button restore can revive an old page snapshot. Verify the HTTP-only
-// server session before allowing that restored page to remain visible.
-window.addEventListener('pageshow', async function(event) {
-  if (event.persisted) {
-    try {
-      await api('/api/auth/session', { cache: 'no-store' });
-    } catch (error) {
-      try {
-        window.location.replace(loginPageUrl());
-      } catch (e) {
-        window.location.href = 'login.html';
-      }
-    }
-  }
-});
-
+// --- Toast notification ---
 function toast(message) {
   const node = document.getElementById('toast');
   if (node) {
@@ -96,105 +72,148 @@ function toast(message) {
   }
 }
 
-function nav(active, faculty) {
-  const items = [
-    ['home.html', 'Dashboard', 'home'],
-    ['advisor.html', 'Advisor', 'advisor'],
-    ['pathway.html', 'Degree pathway', 'pathway'],
-    ['graph.html', 'Knowledge graph', 'graph'],
-    ['governance.html', 'Faculty review', 'governance'],
-    ['profile.html', 'My profile', 'profile']
-  ];
-  const visibleItems = faculty ? items.filter(([, , key]) => key === 'governance') : items;
-  return visibleItems.map(([href,label,key]) => `<a class="${key === active ? 'active' : ''}" href="${href}">${label}</a>`).join('');
+// --- Load current student ---
+async function currentStudent() {
+  const savedId = localStorage.getItem('academic_advisor_user_id');
+  if (!savedId && isFacultySession()) {
+    return { id: '', name: 'Faculty reviewer', major: 'Faculty governance', completed: [] };
+  }
+  if (!savedId) return null;
+  try {
+    const s = await api(`/api/student/${encodeURIComponent(savedId)}`);
+    if (s && s.id) {
+      localStorage.setItem('academic_advisor_cached_student', JSON.stringify(s));
+      return s;
+    }
+  } catch {
+    const cached = localStorage.getItem('academic_advisor_cached_student');
+    if (cached) {
+      try { return JSON.parse(cached); } catch { /* ignore */ }
+    }
+  }
+  return null;
 }
 
+// --- Nav bar ---
+function nav(active, faculty) {
+  const items = [
+    ['home.html',       'Dashboard',      'home'],
+    ['advisor.html',    'Advisor',        'advisor'],
+    ['pathway.html',    'Degree pathway', 'pathway'],
+    ['graph.html',      'Knowledge graph','graph'],
+    ['governance.html', 'Faculty review', 'governance'],
+    ['profile.html',    'My profile',     'profile'],
+  ];
+  const visible = faculty
+    ? items.filter(([, , k]) => k === 'governance')
+    : items.filter(([, , k]) => k !== 'governance');
+  return visible.map(([href, label, key]) =>
+    `<a class="${key === active ? 'active' : ''}" href="${href}">${label}</a>`
+  ).join('');
+}
+
+// --- Shell init (called by every protected page) ---
 async function initShell(active) {
+  if (!hasActiveSession()) { window.location.replace('login.html'); return null; }
   const student = await currentStudent();
-  if (!student) { window.location.replace(loginPageUrl()); return null; }
+  if (!student) { clearAuthStorage(); window.location.replace('login.html'); return null; }
+
   const faculty = isFacultySession();
-  if (faculty && active !== 'governance') { location.href = 'governance.html'; return null; }
+  if (faculty && active !== 'governance') { window.location.replace('governance.html'); return null; }
+
+  // Brand
   const appbar = document.querySelector('.appbar');
   if (appbar && !appbar.querySelector('.brand')) {
-    appbar.insertAdjacentHTML('afterbegin', `<a class="brand" href="${faculty ? 'governance.html' : 'home.html'}"><span class="brand-mark">AA</span><span>Academic Advisor</span></a>`);
+    appbar.insertAdjacentHTML('afterbegin',
+      `<a class="brand" href="${faculty ? 'governance.html' : 'home.html'}">` +
+      `<span class="brand-mark">AA</span><span>Academic Advisor</span></a>`
+    );
   }
+
+  // Nav
   const navNode = document.querySelector('.nav');
   if (navNode) navNode.innerHTML = nav(active, faculty);
+
+  // Userbar
   const userbar = document.querySelector('.userbar');
   if (userbar) {
-    const initial = (student.name || 'S').charAt(0).toUpperCase();
+    const initial   = (student.name || 'S').charAt(0).toUpperCase();
     const displayId = student.id || 'Faculty';
     const profileHref = faculty ? 'governance.html' : 'profile.html';
 
-    // Use a real anchor so profile navigation works even if JavaScript event
-    // delegation changes. Students go to profile; faculty remain in governance.
     const profileLink = document.createElement('a');
-    profileLink.href = profileHref;
+    profileLink.href      = profileHref;
     profileLink.className = 'profile-icon-btn';
-    profileLink.setAttribute('data-action', 'profile');
-    profileLink.setAttribute('aria-label', faculty ? 'Open faculty review' : 'Open my profile');
-    profileLink.title = faculty ? 'Faculty review workspace' : 'Open my profile';
-    profileLink.style.cssText = 'display:inline-flex;align-items:center;gap:8px;text-decoration:none;border:1px solid var(--line,#e2e8f0);border-radius:8px;padding:5px 12px;font-size:13px;color:inherit;background:transparent;cursor:pointer;position:relative;z-index:9999;pointer-events:auto;';
-    profileLink.addEventListener('click', function(event) {
-      event.preventDefault();
-      window.location.assign(profileHref);
-    });
+    profileLink.title     = 'My Profile';
+    profileLink.style.cssText =
+      'display:inline-flex;align-items:center;gap:8px;text-decoration:none;' +
+      'border:1px solid var(--line,#e2e8f0);border-radius:8px;padding:5px 12px;' +
+      'font-size:13px;color:inherit;background:transparent;cursor:pointer;';
 
     const avatar = document.createElement('span');
-    avatar.textContent = initial;
-    avatar.style.cssText = 'width:26px;height:26px;border-radius:50%;background:#2563eb;color:#fff;display:inline-flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;flex-shrink:0;pointer-events:none;';
+    avatar.textContent  = initial;
+    avatar.style.cssText =
+      'width:26px;height:26px;border-radius:50%;background:#2563eb;color:#fff;' +
+      'display:inline-flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;flex-shrink:0;';
 
     const nameSpan = document.createElement('span');
-    nameSpan.textContent = student.name || '';
-    nameSpan.style.cssText = 'max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:500;pointer-events:none;';
+    nameSpan.textContent  = student.name || '';
+    nameSpan.style.cssText =
+      'max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:500;';
 
     const idSpan = document.createElement('span');
-    idSpan.textContent = displayId;
-    idSpan.style.cssText = 'font-family:monospace;color:#64748b;font-size:11px;pointer-events:none;';
+    idSpan.textContent  = displayId;
+    idSpan.style.cssText = 'font-family:monospace;color:#64748b;font-size:11px;';
 
-    profileLink.appendChild(avatar);
-    profileLink.appendChild(nameSpan);
-    profileLink.appendChild(idSpan);
+    profileLink.append(avatar, nameSpan, idSpan);
 
-    // Use a real navigation link so logout still works when JavaScript fetch,
-    // service-worker state, or a stale browser cache is unreliable.
-    const signOutBtn = document.createElement('a');
+    const signOutBtn = document.createElement('button');
+    signOutBtn.type      = 'button';
     signOutBtn.className = 'btn';
-    signOutBtn.href = '/logout';
     signOutBtn.setAttribute('data-action', 'signout');
     signOutBtn.textContent = 'Sign out';
-    signOutBtn.style.cssText = 'cursor:pointer;position:relative;z-index:9999;pointer-events:auto;';
+    signOutBtn.addEventListener('click', signOut);
 
-    // Clear and inject
     userbar.innerHTML = '';
-    userbar.appendChild(profileLink);
-    userbar.appendChild(signOutBtn);
+    userbar.append(profileLink, signOutBtn);
   }
+
   if (!document.getElementById('global-chatbot-widget') && !faculty) {
     initGlobalChatbot(student);
   }
   return student;
 }
 
+// --- Course helpers ---
 function coursePrereqs(course) {
-  return course.prereqs || (course.prerequisite_groups || []).flatMap(group => (group.prerequisites || []).map(item => item.course_id));
+  return course.prereqs ||
+    (course.prerequisite_groups || []).flatMap(g =>
+      (g.prerequisites || []).map(p => p.course_id)
+    );
 }
 
 function courseRow(course, student) {
   const done = (student?.completed || []).includes(course.id);
-  return `<div class="data-row"><div><span class="code">${esc(course.id)}</span><strong> ${esc(course.name)}</strong><div class="muted">${esc(course.description || course.desc || 'Course information available in the C24 catalog.')}</div></div><div><span class="badge">${esc(course.credits || 0)} credits</span> <span class="badge ${done ? '' : 'warn'}">${done ? 'Completed' : `Semester ${esc(course.sem || '?')}`}</span></div></div>`;
+  return `<div class="data-row">` +
+    `<div><span class="code">${esc(course.id)}</span><strong> ${esc(course.name)}</strong>` +
+    `<div class="muted">${esc(course.description || course.desc || 'Course information available in the C24 catalog.')}</div></div>` +
+    `<div><span class="badge">${esc(course.credits || 0)} credits</span> ` +
+    `<span class="badge ${done ? '' : 'warn'}">${done ? 'Completed' : `Semester ${esc(course.sem || '?')}`}</span></div>` +
+    `</div>`;
 }
 
-window.api = api;
-window.esc = esc;
-window.toast = toast;
-window.signOut = signOut;
-window.initShell = initShell;
+// --- Global exports ---
+window.api            = api;
+window.esc            = esc;
+window.toast          = toast;
+window.signOut        = signOut;
+window.initShell      = initShell;
 window.currentStudent = currentStudent;
-window.coursePrereqs = coursePrereqs;
-window.courseRow = courseRow;
+window.coursePrereqs  = coursePrereqs;
+window.courseRow      = courseRow;
 window.initGlobalChatbot = initGlobalChatbot;
 
+// --- Global chatbot widget ---
 function initGlobalChatbot(student) {
   const html = `
     <div id="global-chatbot-widget" class="global-chatbot-widget">
@@ -234,13 +253,12 @@ function initGlobalChatbot(student) {
   document.body.insertAdjacentHTML('beforeend', html);
 
   const toggleBtn = document.getElementById('global-chatbot-toggle');
-  const closeBtn = document.getElementById('global-chatbot-close');
-  const chatWin = document.getElementById('global-chatbot-window');
-  const form = document.getElementById('global-chatbot-form');
-  const msgs = document.getElementById('global-chatbot-messages');
-  const chips = document.querySelectorAll('.global-chip');
+  const closeBtn  = document.getElementById('global-chatbot-close');
+  const chatWin   = document.getElementById('global-chatbot-window');
+  const form      = document.getElementById('global-chatbot-form');
+  const msgs      = document.getElementById('global-chatbot-messages');
 
-  chips.forEach(chip => {
+  document.querySelectorAll('.global-chip').forEach(chip => {
     chip.onclick = () => {
       const p = chip.getAttribute('data-prompt');
       if (p && form.elements.question) {
@@ -251,24 +269,32 @@ function initGlobalChatbot(student) {
   });
 
   toggleBtn.onclick = () => chatWin.classList.add('open');
-  closeBtn.onclick = () => chatWin.classList.remove('open');
+  closeBtn.onclick  = () => chatWin.classList.remove('open');
 
   form.onsubmit = async (e) => {
     e.preventDefault();
-    const input = form.elements.question;
+    const input    = form.elements.question;
     const question = input.value.trim();
     if (!question) return;
 
-    msgs.insertAdjacentHTML('beforeend', `<div class="global-chatbot-message user"><strong>You</strong><p>${esc(question)}</p></div><div class="global-chatbot-message assistant chat-loading"><strong>Autonomous AI Advisor</strong><p>⚡ Executing academic reasoning...</p></div>`);
+    msgs.insertAdjacentHTML('beforeend',
+      `<div class="global-chatbot-message user"><strong>You</strong><p>${esc(question)}</p></div>` +
+      `<div class="global-chatbot-message assistant chat-loading"><strong>Autonomous AI Advisor</strong><p>⚡ Executing academic reasoning...</p></div>`
+    );
     msgs.scrollTop = msgs.scrollHeight;
     input.value = '';
     input.disabled = true;
     form.querySelector('button').disabled = true;
 
     try {
-      const result = await api('/api/chat', { method: 'POST', body: JSON.stringify({ student_id: student.id, question }) });
+      const result = await api('/api/chat', {
+        method: 'POST',
+        body: JSON.stringify({ student_id: student.id, question })
+      });
       const citations = Array.isArray(result.citations) ? result.citations : [];
-      const toolBadge = result.tool_executed ? `<span class="badge good" style="font-size:10px;margin-bottom:6px;display:inline-block;">⚡ Tool: ${esc(result.tool_executed)}</span>` : '';
+      const toolBadge = result.tool_executed
+        ? `<span class="badge good" style="font-size:10px;margin-bottom:6px;display:inline-block;">⚡ Tool: ${esc(result.tool_executed)}</span>`
+        : '';
       let replyHtml = esc(result.reply || 'I could not generate an answer.')
         .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
         .replace(/\*(.*?)\*/g, '<em>$1</em>')
@@ -276,11 +302,22 @@ function initGlobalChatbot(student) {
         .replace(/\n/g, '<br>');
       const loading = msgs.querySelector('.chat-loading:last-child');
       if (loading) {
-        loading.outerHTML = `<div class="global-chatbot-message assistant"><strong>Autonomous AI Advisor</strong>${toolBadge}<div class="reply-text">${replyHtml}</div>${citations.length ? `<div class="chat-citations">${citations.map(c => `<span class="badge">${esc(typeof c === 'string' ? c : (c.reference || c.content || 'Source'))}</span>`).join('')}</div>` : ''}</div>`;
+        loading.outerHTML =
+          `<div class="global-chatbot-message assistant"><strong>Autonomous AI Advisor</strong>` +
+          `${toolBadge}<div class="reply-text">${replyHtml}</div>` +
+          (citations.length
+            ? `<div class="chat-citations">${citations.map(c =>
+                `<span class="badge">${esc(typeof c === 'string' ? c : (c.reference || c.content || 'Source'))}</span>`
+              ).join('')}</div>`
+            : '') +
+          `</div>`;
       }
     } catch (error) {
       const loading = msgs.querySelector('.chat-loading:last-child');
-      if (loading) loading.outerHTML = `<div class="global-chatbot-message assistant"><strong>Autonomous AI Advisor</strong><p>${esc(error.message)}</p></div>`;
+      if (loading) {
+        loading.outerHTML =
+          `<div class="global-chatbot-message assistant"><strong>Autonomous AI Advisor</strong><p>${esc(error.message)}</p></div>`;
+      }
     } finally {
       input.disabled = false;
       form.querySelector('button').disabled = false;

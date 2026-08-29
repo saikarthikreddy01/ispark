@@ -5,61 +5,43 @@ from fastapi.testclient import TestClient
 from backend.app import app
 
 
-class AuthenticationSessionTests(unittest.TestCase):
+class AuthenticationTests(unittest.TestCase):
     def setUp(self):
         self.client = TestClient(app)
 
-    def test_student_login_session_and_logout(self):
+    def test_student_login_returns_student_and_no_session_cookie(self):
         login = self.client.post(
             "/api/auth/login",
             json={"regno": "241FA04077", "password": "password123"},
         )
         self.assertEqual(login.status_code, 200)
-        self.assertIn("acadgraph_session", login.headers.get("set-cookie", ""))
+        data = login.json()
+        self.assertTrue(data["success"])
+        self.assertIn("student", data)
+        self.assertNotIn("password",      data["student"])
+        self.assertNotIn("password_hash", data["student"])
+        # No session cookie should be set
+        self.assertNotIn("acadgraph_session", login.headers.get("set-cookie", ""))
 
-        session = self.client.get("/api/auth/session")
-        self.assertEqual(session.status_code, 200)
-        self.assertEqual(session.json()["role"], "student")
-        self.assertEqual(session.json()["student"]["id"], "241FA04077")
-        self.assertNotIn("password", session.json()["student"])
-        self.assertNotIn("password_hash", session.json()["student"])
-
+    def test_logout_is_a_no_op_and_returns_success(self):
         logout = self.client.post("/api/auth/logout")
         self.assertEqual(logout.status_code, 200)
-        self.assertIn("cookies", logout.headers.get("clear-site-data", ""))
-        self.assertEqual(self.client.get("/api/auth/session").status_code, 401)
+        self.assertTrue(logout.json()["success"])
 
-    def test_browser_logout_redirects_and_clears_session(self):
-        self.client.post(
-            "/api/auth/login",
-            json={"regno": "241FA04077", "password": "password123"},
-        )
-        logout = self.client.get("/logout", follow_redirects=False)
-        self.assertEqual(logout.status_code, 303)
-        self.assertEqual(logout.headers["location"], "/login.html?signed_out=1")
-        self.assertIn("acadgraph_session", logout.headers.get("set-cookie", ""))
-        self.assertEqual(self.client.get("/api/auth/session").status_code, 401)
-
-    def test_faculty_session_controls_review_access(self):
-        self.assertEqual(self.client.get("/api/admin/stats").status_code, 401)
-        login = self.client.post(
-            "/api/admin/login",
-            json={"username": "faculty", "password": "faculty123"},
-        )
-        self.assertEqual(login.status_code, 200)
-
-        session = self.client.get("/api/auth/session")
-        self.assertEqual(session.status_code, 200)
-        self.assertEqual(session.json()["role"], "faculty")
-        self.assertEqual(self.client.get("/api/admin/stats").status_code, 200)
-
-    def test_wrong_credentials_do_not_create_session(self):
+    def test_wrong_credentials_return_401(self):
         response = self.client.post(
             "/api/auth/login",
             json={"regno": "241FA04077", "password": "incorrect"},
         )
         self.assertEqual(response.status_code, 401)
-        self.assertEqual(self.client.get("/api/auth/session").status_code, 401)
+
+    def test_faculty_login_returns_success(self):
+        login = self.client.post(
+            "/api/admin/login",
+            json={"username": "faculty", "password": "faculty123"},
+        )
+        self.assertEqual(login.status_code, 200)
+        self.assertTrue(login.json().get("success"))
 
 
 if __name__ == "__main__":

@@ -1,5 +1,5 @@
 /* AcadGraph AI authentication.
-   Identity is stored only in a signed, HTTP-only server session cookie. */
+   Identity is stored in localStorage — no server-side sessions or cookies. */
 
 (function () {
     'use strict';
@@ -327,8 +327,6 @@
 
             var response = await fetch(endpoint, {
                 method: 'POST',
-                credentials: 'same-origin',
-                cache: 'no-store',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(payload)
             });
@@ -340,10 +338,19 @@
             }
 
             if (state.role === 'faculty') {
+                // Store faculty session flag in localStorage
+                localStorage.removeItem('academic_advisor_user_id');
+                localStorage.removeItem('academic_advisor_cached_student');
+                localStorage.setItem('academic_advisor_faculty_session', 'active');
                 showNotice('Welcome back. Opening your workspace\u2026', 'good');
                 window.setTimeout(function () { window.location.replace('governance.html'); }, 450);
                 return;
             }
+
+            // Store student ID in localStorage
+            var studentId = data.student && data.student.id ? data.student.id : payload.regno;
+            localStorage.removeItem('academic_advisor_faculty_session');
+            localStorage.setItem('academic_advisor_user_id', studentId);
 
             if (state.mode === 'signup') {
                 showNotice('Account created. Setting up your workspace\u2026', 'good');
@@ -357,23 +364,7 @@
         }
     }
 
-    async function redirectExistingSession() {
-        try {
-            var response = await fetch('/api/auth/session', {
-                credentials: 'same-origin',
-                cache: 'no-store'
-            });
-            if (!response.ok) return false;
-            var session = await response.json();
-            window.location.replace(session.role === 'faculty' ? 'governance.html' : 'home.html');
-            return true;
-        } catch (error) {
-            return false;
-        }
-    }
-
-    async function init() {
-        if (await redirectExistingSession()) return;
+    function init() {
         document.querySelectorAll('.role-btn').forEach(function (btn) {
             btn.addEventListener('click', function () { setRole(btn.dataset.role); });
         });
@@ -384,7 +375,6 @@
         el('switch-btn').addEventListener('click', function () {
             setMode(state.mode === 'login' ? 'signup' : 'login');
         });
-
         render(false);
     }
 

@@ -57,8 +57,8 @@ class LandingPageRegressionTests(unittest.TestCase):
     def test_successful_login_routes_to_the_correct_dashboard(self):
         self.assertIn("window.location.replace('home.html')", self.auth_js)
         self.assertIn("window.location.replace('governance.html')", self.auth_js)
-        self.assertIn("/api/auth/session", self.auth_js)
-        self.assertNotIn("localStorage", self.auth_js)
+        self.assertIn("localStorage", self.auth_js)
+        self.assertNotIn("/api/auth/session", self.auth_js)
 
     def test_feature_and_workflow_content_is_complete(self):
         self.assertEqual(self.html.count('class="feature-number"'), 8)

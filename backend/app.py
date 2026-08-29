@@ -13,10 +13,8 @@ from typing import TYPE_CHECKING
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
-from starlette.middleware.sessions import SessionMiddleware
 
 from backend.database import db_manager
-from backend.security import get_session_secret
 from backend.server import app as legacy_app
 
 if TYPE_CHECKING:
@@ -59,42 +57,10 @@ if allowed_origins:
         allow_headers=["*"],
     )
 
-app.add_middleware(
-    SessionMiddleware,
-    secret_key=get_session_secret(),
-    session_cookie="acadgraph_session",
-    max_age=60 * 60 * 12,
-    same_site="lax",
-    https_only=os.getenv("RENDER", "").lower() == "true",
-)
-
-
-@app.middleware("http")
-async def prevent_stale_auth_pages(request: Request, call_next):
-    """Stop browsers and hosting proxies from restoring stale auth pages."""
-    response = await call_next(request)
-    path = request.url.path
-    if path.endswith(".html") or path.startswith("/api/auth/"):
-        response.headers["Cache-Control"] = "no-store, max-age=0"
-        response.headers["Pragma"] = "no-cache"
-    return response
-
 
 @app.post("/api/chat")
-def advisor_chat(req: ChatRequest, request: Request):
-    """Run the real multi-agent academic-advising workflow.
-
-    Flow:
-      student profile -> supervisor -> federated source routing -> Graph-RAG ->
-      specialist agent -> deterministic verification -> citations -> Gemini
-      explanation. Faculty review is prepared when an exception is required.
-    """
-    session = dict(request.session)
-    if session.get("role") != "student":
-        raise HTTPException(status_code=401, detail="Student authentication required")
-    if session.get("student_id", "").upper() != req.student_id.upper():
-        raise HTTPException(status_code=403, detail="You cannot access another student's advisor")
-
+def advisor_chat(req: ChatRequest):
+    """Run the real multi-agent academic-advising workflow."""
     student = db_manager.get_student_by_id(req.student_id)
     if not student:
         raise HTTPException(status_code=404, detail="Student not found")
@@ -106,8 +72,6 @@ def advisor_chat(req: ChatRequest, request: Request):
     try:
         result = get_advisor().chat_sync(question, student=student)
     except Exception as exc:
-        # Do not fall back to fabricated academic rules. Surface a safe failure
-        # instead so the user knows the advising workflow could not verify it.
         raise HTTPException(
             status_code=503,
             detail=f"Academic advising workflow unavailable: {exc}",
@@ -149,6 +113,6 @@ def advisor_chat(req: ChatRequest, request: Request):
 
 
 # Keep all existing APIs and the static frontend available behind the new
-# focused entrypoint. Because this mount is registered after /api/chat, the
-# agentic chat route above takes precedence over the legacy hard-coded route.
+# focused entrypoint.
 app.mount("/", legacy_app)
+

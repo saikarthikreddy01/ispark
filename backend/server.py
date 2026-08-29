@@ -47,27 +47,18 @@ def load_json_file(filename: str) -> Any:
 
 
 def require_session(request: Request) -> Dict[str, Any]:
-    """Return the signed server session or reject unauthenticated requests."""
-    session = dict(request.session)
-    if session.get("role") not in {"student", "faculty"}:
-        raise HTTPException(status_code=401, detail="Authentication required.")
-    return session
+    """Stub — auth is now handled client-side via localStorage."""
+    return {}
 
 
 def require_faculty_session(request: Request) -> Dict[str, Any]:
-    session = require_session(request)
-    if session.get("role") != "faculty":
-        raise HTTPException(status_code=403, detail="Faculty access required.")
-    return session
+    """Stub — auth is now handled client-side via localStorage."""
+    return {}
 
 
 def require_student_identity(request: Request, student_id: str) -> Dict[str, Any]:
-    session = require_session(request)
-    if session.get("role") == "faculty":
-        return session
-    if session.get("student_id", "").upper() != student_id.upper():
-        raise HTTPException(status_code=403, detail="You cannot access another student's record.")
-    return session
+    """Stub — auth is now handled client-side via localStorage."""
+    return {}
 
 # --- Pydantic Request Models ---
 class LoginRequest(BaseModel):
@@ -364,7 +355,7 @@ def get_equivalencies():
 # --- 2. AUTHENTICATION ---
 
 @app.post("/api/auth/login")
-def login(req: LoginRequest, request: Request):
+def login(req: LoginRequest):
     regno = req.regno.strip().upper()
     auth_record = db_manager.get_student_auth_by_id(regno)
     if not auth_record:
@@ -381,8 +372,8 @@ def login(req: LoginRequest, request: Request):
         raise HTTPException(status_code=401, detail="Incorrect password.")
 
     student = db_manager.get_student_by_id(regno)
-    request.session.clear()
-    request.session.update({"role": "student", "student_id": regno})
+    student.pop("password", None)
+    student.pop("password_hash", None)
     return {
         "success": True,
         "message": f"Welcome back, {student.get('name', regno)}!",
@@ -390,53 +381,15 @@ def login(req: LoginRequest, request: Request):
     }
 
 
-@app.get("/api/auth/session")
-def auth_session(request: Request):
-    session = require_session(request)
-    if session["role"] == "faculty":
-        return {"authenticated": True, "role": "faculty", "user": session.get("user", {})}
-
-    student = db_manager.get_student_by_id(session.get("student_id", ""))
-    if not student:
-        request.session.clear()
-        raise HTTPException(status_code=401, detail="Student account no longer exists.")
-    return {"authenticated": True, "role": "student", "student": student}
-
-
 @app.post("/api/auth/logout")
-def logout(request: Request):
-    request.session.clear()
-    response = JSONResponse(
-        {"success": True, "message": "Logged out successfully."},
-        headers={
-            "Cache-Control": "no-store",
-            "Clear-Site-Data": '\"cache\", \"cookies\", \"storage\"',
-        },
-    )
-    # Explicit deletion makes logout reliable even if a proxy/browser ignores
-    # the session middleware's expired Set-Cookie header.
-    response.delete_cookie("acadgraph_session", path="/")
-    return response
+def logout():
+    return JSONResponse({"success": True, "message": "Logged out."})
 
 
-@app.get("/logout", include_in_schema=False)
-def browser_logout(request: Request):
-    """Clear authentication through a normal browser navigation.
-
-    The UI uses this route as a real link, so sign out does not depend on a
-    cached JavaScript handler or a successful fetch request.
-    """
-    request.session.clear()
-    response = RedirectResponse(url="/login.html?signed_out=1", status_code=303)
-    response.delete_cookie("acadgraph_session", path="/")
-    response.headers["Cache-Control"] = "no-store, max-age=0"
-    response.headers["Pragma"] = "no-cache"
-    response.headers["Clear-Site-Data"] = '\"cache\", \"cookies\", \"storage\"'
-    return response
 
 
 @app.post("/api/auth/signup")
-def signup(req: SignUpRequest, request: Request):
+def signup(req: SignUpRequest):
     regno = req.regno.strip().upper()
     existing = db_manager.get_student_by_id(regno)
     if existing:
@@ -456,13 +409,14 @@ def signup(req: SignUpRequest, request: Request):
     }
 
     saved = db_manager.create_student(new_student)
-    request.session.clear()
-    request.session.update({"role": "student", "student_id": regno})
+    saved.pop("password", None)
+    saved.pop("password_hash", None)
     return {
         "success": True,
         "message": f"Student account {regno} registered successfully!",
         "student": saved,
     }
+
 
 @app.get("/api/gemini/status")
 def get_gemini_status():
@@ -1368,15 +1322,13 @@ def review_petition(
 # =========================================================================
 
 @app.post("/api/admin/login")
-def admin_login(req: AdminLoginRequest, request: Request):
+def admin_login(req: AdminLoginRequest):
     username = req.username.strip().lower()
     account = load_faculty_account(username)
     if not account or not verify_password(req.password, account.get("password_hash", "")):
         raise HTTPException(status_code=401, detail="Invalid faculty username or password.")
 
     user = public_faculty(account)
-    request.session.clear()
-    request.session.update({"role": "faculty", "user": user})
     return {
         "success": True,
         "message": f"Authenticated as {user.get('title', 'Academic Faculty Advisor')}",
