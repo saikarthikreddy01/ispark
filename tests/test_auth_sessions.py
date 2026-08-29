@@ -29,6 +29,17 @@ class AuthenticationSessionTests(unittest.TestCase):
         self.assertIn("cookies", logout.headers.get("clear-site-data", ""))
         self.assertEqual(self.client.get("/api/auth/session").status_code, 401)
 
+    def test_browser_logout_redirects_and_clears_session(self):
+        self.client.post(
+            "/api/auth/login",
+            json={"regno": "241FA04077", "password": "password123"},
+        )
+        logout = self.client.get("/logout", follow_redirects=False)
+        self.assertEqual(logout.status_code, 303)
+        self.assertEqual(logout.headers["location"], "/login.html?signed_out=1")
+        self.assertIn("acadgraph_session", logout.headers.get("set-cookie", ""))
+        self.assertEqual(self.client.get("/api/auth/session").status_code, 401)
+
     def test_faculty_session_controls_review_access(self):
         self.assertEqual(self.client.get("/api/admin/stats").status_code, 401)
         login = self.client.post(

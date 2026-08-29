@@ -13,7 +13,7 @@ from pathlib import Path
 from typing import Dict, List, Optional, Any
 from fastapi import Depends, FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 
@@ -406,13 +406,33 @@ def auth_session(request: Request):
 @app.post("/api/auth/logout")
 def logout(request: Request):
     request.session.clear()
-    return JSONResponse(
+    response = JSONResponse(
         {"success": True, "message": "Logged out successfully."},
         headers={
             "Cache-Control": "no-store",
             "Clear-Site-Data": '\"cache\", \"cookies\", \"storage\"',
         },
     )
+    # Explicit deletion makes logout reliable even if a proxy/browser ignores
+    # the session middleware's expired Set-Cookie header.
+    response.delete_cookie("acadgraph_session", path="/")
+    return response
+
+
+@app.get("/logout", include_in_schema=False)
+def browser_logout(request: Request):
+    """Clear authentication through a normal browser navigation.
+
+    The UI uses this route as a real link, so sign out does not depend on a
+    cached JavaScript handler or a successful fetch request.
+    """
+    request.session.clear()
+    response = RedirectResponse(url="/login.html?signed_out=1", status_code=303)
+    response.delete_cookie("acadgraph_session", path="/")
+    response.headers["Cache-Control"] = "no-store, max-age=0"
+    response.headers["Pragma"] = "no-cache"
+    response.headers["Clear-Site-Data"] = '\"cache\", \"cookies\", \"storage\"'
+    return response
 
 
 @app.post("/api/auth/signup")
@@ -1614,5 +1634,4 @@ if WEB_DIR.exists():
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run("backend.server:app", host="0.0.0.0", port=8000, reload=False)
-
 

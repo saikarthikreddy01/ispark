@@ -23,12 +23,12 @@ class AdvisingUiRegressionTests(unittest.TestCase):
         self.assertIn("new URL('login.html'", self.portal_js)
         self.assertNotIn("new URL('index.html'", self.portal_js)
         self.assertIn("/api/auth/session", self.portal_js)
-        self.assertIn("/api/auth/logout", self.portal_js)
+        self.assertIn("href = '/logout'", self.portal_js)
         self.assertIn("credentials: 'same-origin'", self.portal_js)
         self.assertNotIn("localStorage", self.portal_js)
         self.assertNotIn("sessionStorage", self.portal_js)
         self.assertIn("['profile.html', 'My profile', 'profile']", self.portal_js)
-        self.assertTrue(all('portal.js?v=16' in html for html in self.protected_html))
+        self.assertTrue(all('portal.js?v=17' in html for html in self.protected_html))
 
     def test_pathway_has_controls_progress_and_constraint_status(self):
         for marker in ("data-pathway-form", "data-plan-status", "max_credits", "target_graduation"):

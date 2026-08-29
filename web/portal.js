@@ -44,7 +44,7 @@ function isFacultySession() {
   return activeSession?.role === 'faculty';
 }
 
-async function signOut(event) {
+function signOut(event) {
   if (event) {
     event.preventDefault();
     event.stopPropagation();
@@ -57,20 +57,8 @@ async function signOut(event) {
     button.textContent = 'Signing out…';
   }
 
-  const target = new URL(loginPageUrl());
-  target.searchParams.set('signed_out', '1');
-  try {
-    await api('/api/auth/logout', { method: 'POST', cache: 'no-store', keepalive: true });
-    activeSession = null;
-    window.location.replace(target.href);
-  } catch (error) {
-    signingOut = false;
-    if (button instanceof HTMLButtonElement) {
-      button.disabled = false;
-      button.textContent = 'Sign out';
-    }
-    toast('Sign out could not reach the server. Please try again.');
-  }
+  activeSession = null;
+  window.location.replace(new URL('/logout', window.location.origin).href);
 }
 window.signOut = signOut;
 
@@ -155,14 +143,14 @@ async function initShell(active) {
     profileLink.appendChild(nameSpan);
     profileLink.appendChild(idSpan);
 
-    // Build sign out button with attributes and handlers
-    const signOutBtn = document.createElement('button');
+    // Use a real navigation link so logout still works when JavaScript fetch,
+    // service-worker state, or a stale browser cache is unreliable.
+    const signOutBtn = document.createElement('a');
     signOutBtn.className = 'btn';
-    signOutBtn.type = 'button';
+    signOutBtn.href = '/logout';
     signOutBtn.setAttribute('data-action', 'signout');
     signOutBtn.textContent = 'Sign out';
     signOutBtn.style.cssText = 'cursor:pointer;position:relative;z-index:9999;pointer-events:auto;';
-    signOutBtn.addEventListener('click', signOut);
 
     // Clear and inject
     userbar.innerHTML = '';
